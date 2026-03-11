@@ -1,8 +1,6 @@
 # 🏨 HotelM - Hotel Management System
 
-A web-based hotel room booking and management system for small hotels (50–100 guests).
-
----
+A web-based hotel room booking and management system for small hotels.
 
 ## Features
 
@@ -16,15 +14,11 @@ A web-based hotel room booking and management system for small hotels (50–100 
 **Admin**
 - Manage rooms, users, and view revenue reports
 
----
-
 ## Tech Stack
 
 - **Backend:** Java Spring Boot
 - **Database:** MySQL
 - **Build Tool:** Maven
-
----
 
 ## Project Structure
 
@@ -52,8 +46,6 @@ HotelM/
 │   └── test/
 └── pom.xml
 ```
-
----
 
 ## License
 
