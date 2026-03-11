@@ -46,7 +46,3 @@ HotelM/
 │   └── test/
 └── pom.xml
 ```
-
-## License
-
-MIT
