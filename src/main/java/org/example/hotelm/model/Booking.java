@@ -1,7 +1,13 @@
 package org.example.hotelm.model;
 
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Booking {
     public enum BookingStatus {
         PENDING,
@@ -19,4 +25,5 @@ public class Booking {
     private BookingStatus status;
     private LocalDateTime createdAt;
     private String note;
+
 }
