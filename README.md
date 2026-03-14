@@ -7,7 +7,6 @@ It aims to:
 - Support receptionists with check-in / check-out and invoice generation
 - Help admins manage rooms, users, and view basic reports
 
----
 
 ## English Documentation
 
@@ -178,5 +177,3 @@ mvn spring-boot:run
    - `DELETE /bookings/{id}` – xóa booking
 
 ---
-
-Feel free to extend this README with more modules (rooms, users, reviews, invoices) as the project grows.
