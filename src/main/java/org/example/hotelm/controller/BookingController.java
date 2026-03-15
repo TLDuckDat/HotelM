@@ -1,11 +1,13 @@
 package org.example.hotelm.controller;
 
 import org.example.hotelm.model.Booking;
+import org.example.hotelm.model.Room;
 import org.example.hotelm.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,8 +39,7 @@ public class BookingController {
                     request.getRoomId(),
                     request.getCheckIn(),
                     request.getCheckOut(),
-                    request.getNote()
-            );
+                    request.getNote());
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -47,7 +48,7 @@ public class BookingController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable String id,
-                                          @RequestParam Booking.BookingStatus status) {
+            @RequestParam Booking.BookingStatus status) {
         try {
             Booking updated = bookingService.updateBookingStatus(id, status);
             return ResponseEntity.ok(updated);
@@ -59,7 +60,7 @@ public class BookingController {
     @PostMapping("/{id}/cancel")
     public ResponseEntity<?> cancelBooking(@PathVariable String id) {
         try {
-            Booking cancelled = bookingService.updateBookingStatus(id,Booking.BookingStatus.CANCELLED);
+            Booking cancelled = bookingService.updateBookingStatus(id, Booking.BookingStatus.CANCELLED);
             return ResponseEntity.ok(cancelled);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -74,6 +75,14 @@ public class BookingController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+    // Lấy danh sách phòng đã được đặt trong khoảng thời gian [start, end]
+    @GetMapping("/rooms/booked")
+    public ResponseEntity<List<Room>> getBookedRooms(
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+        List<Room> rooms = bookingService.getBookedRoomsBetween(start, end);
+        return ResponseEntity.ok(rooms);
     }
 
     // Tạo 1 lớp request riêng cho @RequestBody

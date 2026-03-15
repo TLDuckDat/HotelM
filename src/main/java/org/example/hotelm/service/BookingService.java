@@ -96,4 +96,14 @@ public class BookingService {
         }
         bookingRepository.deleteById(id);
     }
+    
+    // Lấy danh sách phòng đã được đặt trong khoảng thời gian [start, end]
+    public List<Room> getBookedRoomsBetween(LocalDateTime start, LocalDateTime end) {
+        List<Booking.BookingStatus> statuses = List.of(
+                Booking.BookingStatus.PENDING,
+                Booking.BookingStatus.CONFIRMED,
+                Booking.BookingStatus.CHECKED_IN
+        );
+        return bookingRepository.findBookedRoomsBetween(start, end, statuses);
+    }
 }
