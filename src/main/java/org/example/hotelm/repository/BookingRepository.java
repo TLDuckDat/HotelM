@@ -13,8 +13,19 @@ import java.util.List;
 // extends JpaRepository để không phải tự viết Query chay
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, String> {
-    boolean existsOverlappingBooking(Room room, List<Booking.BookingStatus> statuses,
-            LocalDateTime checkIn, LocalDateTime checkOut);
+    @Query("""
+            SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END
+            FROM Booking b
+            WHERE b.room = :room
+              AND b.checkIn < :checkOut
+              AND b.checkOut > :checkIn
+              AND b.status IN :statuses
+            """)
+    boolean existsOverlappingBooking(
+            @Param("room") Room room,
+            @Param("statuses") List<Booking.BookingStatus> statuses,
+            @Param("checkIn") LocalDateTime checkIn,
+            @Param("checkOut") LocalDateTime checkOut);
 
     // Lấy danh sách phòng đã được đặt trong khoảng thời gian [start, end]
     @Query("""
