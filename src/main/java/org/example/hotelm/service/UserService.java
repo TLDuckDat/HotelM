@@ -3,7 +3,9 @@ package org.example.hotelm.service;
 import org.example.hotelm.model.User;
 import org.example.hotelm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,7 +30,7 @@ public class UserService {
     // Tạo user mới
     public User createUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email đã tồn tại: " + user.getEmail());
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email đã tồn tại: " + user.getEmail());
         }
         user.setCreatedAt(LocalDate.now());
         if (user.getStatus() == null) {
@@ -43,7 +45,7 @@ public class UserService {
     // Cập nhật user
     public User updateUser(String id, User updatedUser) {
         User existing = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy user với ID: " + id));
 
         existing.setFullName(updatedUser.getFullName());
         existing.setPhoneNumber(updatedUser.getPhoneNumber());
@@ -67,7 +69,7 @@ public class UserService {
     // Xóa user
     public void deleteUser(String id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("Không tìm thấy user với ID: " + id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy user với ID: " + id);
         }
         userRepository.deleteById(id);
     }
@@ -75,7 +77,7 @@ public class UserService {
     // Thay đổi trạng thái user (ACTIVE / BANNED / INACTIVE)
     public User updateUserStatus(String id, User.UserStatus status) {
         User existing = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy user với ID: " + id));
         existing.setStatus(status);
         return userRepository.save(existing);
     }

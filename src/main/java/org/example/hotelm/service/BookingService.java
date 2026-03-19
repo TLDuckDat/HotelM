@@ -7,7 +7,9 @@ import org.example.hotelm.repository.BookingRepository;
 import org.example.hotelm.repository.RoomRepository;
 import org.example.hotelm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,12 +42,17 @@ public class BookingService {
                                  LocalDateTime checkIn, LocalDateTime checkOut,
                                  String note) {
         if (checkIn == null || checkOut == null || !checkIn.isBefore(checkOut)) {
-            throw new RuntimeException("Thời gian nhận/trả phòng không hợp lệ");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thời gian nhận/trả phòng không hợp lệ");
         }
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + userId));
-        Room room = roomRepository.findById(Long.valueOf(roomId))
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng với ID: " + roomId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy user với ID: " + userId));
+
+        if (roomId == null || roomId.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "roomId là bắt buộc");
+        }
+
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy phòng với ID: " + roomId));
 
         // Kiểm tra phòng đã được đặt chưa
         List<Booking.BookingStatus> activeStatuses = Arrays.asList(
@@ -56,7 +63,7 @@ public class BookingService {
         // Kiểm tra trùng
         boolean isOverlap = bookingRepository.existsOverlappingBooking(room, activeStatuses, checkIn, checkOut);
         if (isOverlap) {
-            throw new RuntimeException("Phòng đã được đặt trong khoảng thời gian này");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Phòng đã được đặt trong khoảng thời gian này");
         }
 
         Booking booking = new Booking();
@@ -84,7 +91,8 @@ public class BookingService {
 
     // Cập nhật trạng thái của Booking
     public Booking updateBookingStatus(String id, Booking.BookingStatus status) {
-        Booking existing = bookingRepository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy Booking với ID : " + id));
+        Booking existing = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy Booking với ID : " + id));
         existing.setStatus(status);
         return bookingRepository.save(existing);
     }
@@ -92,7 +100,7 @@ public class BookingService {
     // Xóa Booking
     public void deleteBooking(String id) {
         if (!bookingRepository.existsById(id)) {
-            throw new RuntimeException("Không tìm thấy Booking với ID : " + id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy Booking với ID : " + id);
         }
         bookingRepository.deleteById(id);
     }

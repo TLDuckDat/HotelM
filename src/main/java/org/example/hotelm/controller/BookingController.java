@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,53 +29,37 @@ public class BookingController {
     public ResponseEntity<Booking> getBookingById(@PathVariable String id) {
         return bookingService.getBookingById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy Booking với ID: " + id));
     }
 
     @PostMapping
-    public ResponseEntity<?> createBooking(@RequestBody CreateBookingRequest request) {
-        try {
-            Booking created = bookingService.createBooking(
-                    request.getUserId(),
-                    request.getRoomId(),
-                    request.getCheckIn(),
-                    request.getCheckOut(),
-                    request.getNote());
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<Booking> createBooking(@RequestBody CreateBookingRequest request) {
+        Booking created = bookingService.createBooking(
+                request.getUserId(),
+                request.getRoomId(),
+                request.getCheckIn(),
+                request.getCheckOut(),
+                request.getNote());
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<?> updateStatus(@PathVariable String id,
+    public ResponseEntity<Booking> updateStatus(@PathVariable String id,
             @RequestParam Booking.BookingStatus status) {
-        try {
-            Booking updated = bookingService.updateBookingStatus(id, status);
-            return ResponseEntity.ok(updated);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Booking updated = bookingService.updateBookingStatus(id, status);
+        return ResponseEntity.ok(updated);
     }
 
     @PostMapping("/{id}/cancel")
-    public ResponseEntity<?> cancelBooking(@PathVariable String id) {
-        try {
-            Booking cancelled = bookingService.updateBookingStatus(id, Booking.BookingStatus.CANCELLED);
-            return ResponseEntity.ok(cancelled);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Booking> cancelBooking(@PathVariable String id) {
+        Booking cancelled = bookingService.updateBookingStatus(id, Booking.BookingStatus.CANCELLED);
+        return ResponseEntity.ok(cancelled);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBooking(@PathVariable String id) {
-        try {
-            bookingService.deleteBooking(id);
-            return ResponseEntity.ok("Xóa booking thành công");
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Void> deleteBooking(@PathVariable String id) {
+        bookingService.deleteBooking(id);
+        return ResponseEntity.noContent().build();
     }
     // Lấy danh sách phòng đã được đặt trong khoảng thời gian [start, end]
     @GetMapping("/rooms/booked")

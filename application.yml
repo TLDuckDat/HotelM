@@ -1,0 +1,26 @@
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      ssl:
+        enabled: ${REDIS_SSL:false}
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+          max-wait: 2000ms
+        shutdown-timeout: 200ms
+
+rate-limit:
+  enabled: true
+  default:
+    capacity: 100
+    refill-tokens: 100
+    refill-duration-seconds: 60
+  api:
+    capacity: 30
+    refill-tokens: 30
+    refill-duration-seconds: 10

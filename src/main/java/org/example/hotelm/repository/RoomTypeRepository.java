@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
+
+// extends JpaRepository để không phải tự viết Query chay\
 public interface RoomTypeRepository extends JpaRepository<RoomType, String> {
     Optional<RoomType> findByTypeNameIgnoreCase(String typeName);
 }
