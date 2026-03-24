@@ -1,0 +1,39 @@
+package org.example.hotelm.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+import java.time.Instant;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+public class ChatMessage {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "thread_id", nullable = false)
+    private ChatThread thread;
+
+    @Column(nullable = false, length = 36)
+    private String senderUserId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 32)
+    private User.Role senderRole;
+
+    @Column(nullable = false, length = 4000)
+    private String content;
+
+    private Instant sentAt;
+}

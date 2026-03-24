@@ -34,7 +34,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        if (isWhitelisted(path)) {
+        if (isWhitelisted(path) || path.startsWith("/ws")) {
             chain.doFilter(request, response);
             return;
         }
@@ -62,12 +62,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private String resolveKey(HttpServletRequest request) {
         String auth = request.getHeader("Authorization");
-        if (auth != null && auth.startsWith("Bearer ")) {
-            // TODO: parse JWT subject để rate limit theo user thay vì IP
-            // String token = auth.substring(7);
-            // String subject = jwtService.extractSubject(token);
-            // return "rl:user:" + subject;
-        }
+//        if (auth != null && auth.startsWith("Bearer "))
         return "rl:ip:" + getClientIp(request);
     }
 
