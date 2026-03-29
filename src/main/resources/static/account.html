@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account - HotelM</title>
+    <link rel="stylesheet" href="/assets/app.css" />
+</head>
+<body>
+<div id="app-topbar"></div>
+<div class="container">
+    <h2>Account</h2>
+    <div class="grid">
+        <div class="card">
+            <h3>Personal info</h3>
+            <p><strong>Name:</strong> <span id="profile-name"></span></p>
+            <p><strong>Email:</strong> <span id="profile-email"></span></p>
+            <p><strong>Phone:</strong> <span id="profile-phone"></span></p>
+            <p><strong>Role:</strong> <span id="profile-role"></span></p>
+        </div>
+        <div class="card">
+            <h3>Account actions</h3>
+            <ul>
+                <li><a href="/bookings.html">Booking history</a></li>
+                <li><a href="/bookings.html">Create booking</a></li>
+                <li><a href="/bookings.html">Cancel booking</a></li>
+                <li>Payment (frontend placeholder)</li>
+                <li>Refund request (frontend placeholder)</li>
+                <li>Room review (frontend placeholder)</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script src="/script/authStore.js"></script>
+<script src="/script/guard.js"></script>
+<script src="/script/app-shell.js"></script>
+<script src="/script/account.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Rooms - HotelM</title>
+    <link rel="stylesheet" href="/assets/app.css" />
+</head>
+<body>
+<div id="app-topbar"></div>
+<div class="container">
+    <h2>Search room</h2>
+    <div class="actions">
+        <input id="q" placeholder="Keyword" />
+        <input id="capacity" type="number" placeholder="Min capacity" />
+        <button id="search-btn" class="primary" type="button">Search</button>
+    </div>
+    <div id="search-results" class="grid"></div>
+</div>
+
+<script src="/script/api/baseApi.js"></script>
+<script src="/script/api/roomApi.js"></script>
+<script src="/script/authStore.js"></script>
+<script src="/script/app-shell.js"></script>
+<script src="/script/search.js"></script>
+</body>
+</html>
+

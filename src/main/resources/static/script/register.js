@@ -36,7 +36,7 @@ async function submitForm() {
             email:       document.getElementById("email").value.trim(),
             phoneNumber: document.getElementById("phoneNumber").value.trim(),
             password:    document.getElementById("password").value,
-            role:        document.getElementById("role").value,
+            role:        "USER",
         };
 
         // 3. Gọi API skeleton đã chuẩn hóa
@@ -50,8 +50,11 @@ async function submitForm() {
             }
 
             const data = await window.UserApi.createUser(payload);
-            showToast("✅ Đăng ký thành công! Xin chào " + data.fullName, "success");
+            showToast("Dang ky thanh cong! Xin chao " + data.fullName + ". Dang chuyen den trang dang nhap...", "success");
             document.querySelectorAll("input").forEach(i => i.value = "");
+            setTimeout(function () {
+                window.location.href = "/login.html";
+            }, 1200);
 
         } catch (err) {
             // Ưu tiên hiển thị message từ backend nếu có.

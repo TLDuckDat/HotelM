@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - HotelM</title>
+    <link rel="stylesheet" href="/assets/app.css" />
+</head>
+<body>
+<div id="app-topbar"></div>
+<div class="container">
+    <div id="dashboard-error" class="error" style="display:none;"></div>
+
+    <div class="page-links">
+        <a href="/rooms.html">Room list</a>
+        <a href="/bookings.html">Booking list</a>
+        <a href="/search.html">Room search</a>
+        <a href="/contact.html">Contact</a>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Total users</h3>
+            <div id="stat-users">0</div>
+        </div>
+        <div class="card">
+            <h3>Total rooms</h3>
+            <div id="stat-rooms">0</div>
+        </div>
+        <div class="card">
+            <h3>Total bookings</h3>
+            <div id="stat-bookings">0</div>
+        </div>
+        <div class="card">
+            <h3>Pending bookings</h3>
+            <div id="stat-pending">0</div>
+        </div>
+    </div>
+</div>
+
+<script src="/script/api/baseApi.js"></script>
+<script src="/script/api/userApi.js"></script>
+<script src="/script/api/roomApi.js"></script>
+<script src="/script/api/bookingApi.js"></script>
+<script src="/script/authStore.js"></script>
+<script src="/script/guard.js"></script>
+<script src="/script/app-shell.js"></script>
+<script src="/script/dashboard.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rooms - HotelM</title>
+    <link rel="stylesheet" href="/assets/app.css" />
+</head>
+<body>
+<div id="app-topbar"></div>
+<div class="container">
+    <h2>Room list</h2>
+    <div class="actions">
+        <input id="room-keyword" placeholder="Search by name or status" />
+        <button id="room-search-btn" class="primary" type="button">Search</button>
+    </div>
+    <div id="rooms-error" class="error" style="display:none;"></div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Capacity</th>
+                <th>Status</th>
+                <th>Detail</th>
+            </tr>
+            </thead>
+            <tbody id="rooms-body">
+            <tr><td colspan="6">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="/script/api/baseApi.js"></script>
+<script src="/script/api/roomApi.js"></script>
+<script src="/script/authStore.js"></script>
+<script src="/script/app-shell.js"></script>
+<script src="/script/rooms.js"></script>
+</body>
+</html>
+
