@@ -17,17 +17,14 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    // Lấy tất cả user
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    // Lấy user theo ID
     public Optional<User> getUserById(String id) {
         return userRepository.findById(id);
     }
 
-    // Tạo user mới
     public User createUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email đã tồn tại: " + user.getEmail());
@@ -42,7 +39,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // Cập nhật user
     public User updateUser(String id, User updatedUser) {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy user với ID: " + id));

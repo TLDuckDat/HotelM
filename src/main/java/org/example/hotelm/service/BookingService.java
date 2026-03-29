@@ -27,7 +27,7 @@ public class BookingService {
     @Autowired
     private RoomRepository roomRepository;
 
-    // lấy toàn bộ danh sách Booking
+    // lấy all ds Booking
     public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
     }
