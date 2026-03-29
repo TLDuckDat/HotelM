@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: HotelM
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/HOTELM_DB?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  cache:
+    type: redis
+
+server:
+  port: 8080
+
+jwt:
+  secret: your-256-bit-secret-key-change-this-in-production-minimum-32-chars
+  expiration: 86400000
+
+rate-limit:
+  enabled: true
+  api:
+    capacity: 100
+    refill-tokens: 100
+    refill-duration-seconds: 60
