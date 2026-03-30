@@ -32,4 +32,6 @@ public interface UserRepository extends JpaRepository<User,String> {
     List<User> searchChatStaff(@Param("keyword") String keyword,
                                @Param("activeStatus") User.UserStatus activeStatus,
                                @Param("staffRoles") List<User.Role> staffRoles);
+    List<User> findByRoleInAndStatus(List<User.Role> roles, User.UserStatus status);
+
 }

@@ -49,7 +49,7 @@ public class BookingController {
     public ResponseEntity<BookingResponse> createBooking(@Valid @RequestBody BookingCreateRequest request) {
         User user = new User();
         user.setUserID(request.userId());
-        Room room = new Room();
+        Room room = new Room(); 
         room.setRoomID(request.roomId());
         Booking created = bookingService.createBooking(bookingMapper.toEntity(request, user, room));
         return ResponseEntity.status(HttpStatus.CREATED).body(bookingMapper.toResponse(created));
