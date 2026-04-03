@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - HotelM</title>
+    <link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body>
+<div id="app-topbar"></div>
+<div class="container">
+    <h2>Admin Dashboard</h2>
+    <div id="admin-message" class="notice" style="display:none;"></div>
+
+    <div class="card">
+        <h3>User management</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="admin-users-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+        <h3>Booking management</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>User</th>
+                    <th>Room</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="admin-bookings-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+        <h3>Other admin modules</h3>
+        <p>Room CRUD, reviews, refunds, contacts, revenue and occupancy are prepared as UI scope. Backend APIs for these modules are needed for full integration.</p>
+    </div>
+</div>
+
+<script src="script/api/baseApi.js"></script>
+<script src="script/api/userApi.js"></script>
+<script src="script/api/bookingApi.js"></script>
+<script src="script/authStore.js"></script>
+<script src="script/guard.js"></script>
+<script src="script/app-shell.js"></script>
+<script src="script/admin-dashboard.js"></script>
+</body>
+</html>
+
