@@ -39,11 +39,11 @@
                 setMessage("Login success", "success");
 
                 if (matched.role === "ADMIN") {
-                    window.location.href = "/admin-dashboard.html";
+                    window.location.href = "admin-dashboard.html";
                     return;
                 }
 
-                window.location.href = "/dashboard.html";
+                window.location.href = "dashboard.html";
             })
             .catch(function (error) {
                 var msg = error && error.payload && error.payload.message

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard - HotelM</title>
-    <link rel="stylesheet" href="/assets/app.css" />
+    <link rel="stylesheet" href="/assets/css/app.css" />
 </head>
 <body>
 <div id="app-topbar"></div>
@@ -12,20 +12,38 @@
     <h2>Admin Dashboard</h2>
     <div id="admin-message" class="notice" style="display:none;"></div>
 
+    <div class="grid" style="margin-bottom:16px;">
+        <div class="card"><h3>Total Users</h3><p id="admin-stat-users">0</p></div>
+        <div class="card"><h3>Total Rooms</h3><p id="admin-stat-rooms">0</p></div>
+        <div class="card"><h3>Total Bookings</h3><p id="admin-stat-bookings">0</p></div>
+        <div class="card"><h3>Pending Bookings</h3><p id="admin-stat-pending">0</p></div>
+    </div>
+
     <div class="card">
-        <h3>User management</h3>
+        <h3>Room management</h3>
+        <form id="admin-create-room-form" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:12px;">
+            <input id="admin-room-name" placeholder="Room name" required />
+            <input id="admin-room-capacity" type="number" min="1" placeholder="Capacity" required />
+            <input id="admin-room-desc" placeholder="Description" />
+            <select id="admin-room-status" required>
+                <option value="AVAILABLE">AVAILABLE</option>
+                <option value="BOOKED">BOOKED</option>
+                <option value="MAINTENANCE">MAINTENANCE</option>
+            </select>
+            <button class="primary" type="submit">Add room</button>
+        </form>
         <div class="table-wrap">
             <table>
                 <thead>
                 <tr>
-                    <th>User ID</th>
+                    <th>Room ID</th>
                     <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
                     <th>Action</th>
                 </tr>
                 </thead>
-                <tbody id="admin-users-body"></tbody>
+                <tbody id="admin-rooms-body"></tbody>
             </table>
         </div>
     </div>
@@ -49,13 +67,32 @@
     </div>
 
     <div class="card" style="margin-top:16px;">
+        <h3>User management</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="admin-users-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
         <h3>Other admin modules</h3>
-        <p>Room CRUD, reviews, refunds, contacts, revenue and occupancy are prepared as UI scope. Backend APIs for these modules are needed for full integration.</p>
+        <p>Review, refund and contact management are prepared on frontend with API adapters. If endpoint is missing, UI will show a clear not-available message.</p>
     </div>
 </div>
 
 <script src="/script/api/baseApi.js"></script>
 <script src="/script/api/userApi.js"></script>
+<script src="/script/api/roomApi.js"></script>
 <script src="/script/api/bookingApi.js"></script>
 <script src="/script/authStore.js"></script>
 <script src="/script/guard.js"></script>

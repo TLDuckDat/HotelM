@@ -11,9 +11,13 @@ This frontend is served by Spring Boot static resources and now includes app pag
 - `/room-detail.html?id=<roomID>`
 - `/search.html`
 - `/bookings.html`
+- `/create-booking.html`
 - `/account.html`
 - `/admin-dashboard.html`
 - `/contact.html`
+- `/payments.html`
+- `/refunds.html`
+- `/reviews.html`
 
 ## Current backend endpoints used
 
@@ -26,6 +30,10 @@ This frontend is served by Spring Boot static resources and now includes app pag
 - `POST /bookings`
 - `PATCH /bookings/{id}/status?status=CONFIRMED`
 - `POST /bookings/{id}/cancel`
+- `POST /contacts` (frontend adapter ready)
+- `/payments` (frontend adapter ready)
+- `/refunds` (frontend adapter ready)
+- `/reviews` (frontend adapter ready)
 
 ## Notes
 

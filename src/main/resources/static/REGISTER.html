@@ -1,63 +1,68 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Đăng ký tài khoản</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet" />
     <link rel="stylesheet" href="/assets/register.css">
 </head>
+
 <body>
-<div class="card">
-    <div class="logo">
-        <div class="logo-icon">✦</div>
-        <h1>Rosalia</h1>
-        <p>Tạo tài khoản mới</p>
+    <div class="card">
+        <div class="logo">
+            <div class="logo-icon">✦</div>
+            <h1>Rosalia</h1>
+            <p>Tạo tài khoản mới</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="form-group">
+            <label for="fullName">Họ và tên</label>
+            <input type="text" id="fullName" placeholder="Nguyễn Văn A" />
+            <div class="field-error" id="err-fullName">Vui lòng nhập họ tên</div>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="example@email.com" />
+            <div class="field-error" id="err-email">Email không hợp lệ</div>
+        </div>
+
+        <div class="form-group">
+            <label for="phoneNumber">Số điện thoại</label>
+            <input type="tel" id="phoneNumber" placeholder="0909 123 456" />
+            <div class="field-error" id="err-phoneNumber">Vui lòng nhập số điện thoại</div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Mật khẩu</label>
+            <input type="password" id="password" placeholder="Tối thiểu 6 ký tự" />
+            <div class="field-error" id="err-password">Mật khẩu tối thiểu 6 ký tự</div>
+        </div>
+
+        <input type="hidden" id="role" value="USER" />
+
+        <button class="btn" id="submitBtn" onclick="submitForm()">
+            <span class="btn-text">Đăng ký</span>
+            <div class="spinner"></div>
+        </button>
+
+        <div class="toast" id="toast"></div>
+
+        <p class="login-link">Da co tai khoan? <a href="/login.html">Dang nhap</a></p>
     </div>
 
-    <div class="divider"></div>
-
-    <div class="form-group">
-        <label for="fullName">Họ và tên</label>
-        <input type="text" id="fullName" placeholder="Nguyễn Văn A" />
-        <div class="field-error" id="err-fullName">Vui lòng nhập họ tên</div>
-    </div>
-
-    <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" placeholder="example@email.com" />
-        <div class="field-error" id="err-email">Email không hợp lệ</div>
-    </div>
-
-    <div class="form-group">
-        <label for="phoneNumber">Số điện thoại</label>
-        <input type="tel" id="phoneNumber" placeholder="0909 123 456" />
-        <div class="field-error" id="err-phoneNumber">Vui lòng nhập số điện thoại</div>
-    </div>
-
-    <div class="form-group">
-        <label for="password">Mật khẩu</label>
-        <input type="password" id="password" placeholder="Tối thiểu 6 ký tự" />
-        <div class="field-error" id="err-password">Mật khẩu tối thiểu 6 ký tự</div>
-    </div>
-
-    <input type="hidden" id="role" value="USER" />
-
-    <button class="btn" id="submitBtn" onclick="submitForm()">
-        <span class="btn-text">Đăng ký</span>
-        <div class="spinner"></div>
-    </button>
-
-    <div class="toast" id="toast"></div>
-
-    <p class="login-link">Da co tai khoan? <a href="/login.html">Dang nhap</a></p>
-</div>
-
-<script src="/script/api/baseApi.js"></script>
-<script src="/script/api/userApi.js"></script>
-<script src="/script/api/roomApi.js"></script>
-<script src="/script/api/bookingApi.js"></script>
-<script src="/script/api/roomTypeApi.js"></script>
-<script src="/script/register.js"></script>
+    <script src="/script/api/baseApi.js"></script>
+    <script src="/script/api/userApi.js"></script>
+    <script src="/script/api/roomApi.js"></script>
+    <script src="/script/api/bookingApi.js"></script>
+    <script src="/script/api/roomTypeApi.js"></script>
+    <script src="/script/register.js"></script>
 </body>
+
 </html>

@@ -1,34 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - HotelM</title>
-    <link rel="stylesheet" href="/assets/app.css" />
+    <link rel="stylesheet" href="/assets/css/app.css" />
 </head>
+
 <body>
-<div class="container" style="max-width: 460px; margin-top: 50px;">
-    <div class="card">
-        <h2>Login</h2>
-        <p>Use account from database to access dashboard pages.</p>
-        <div id="message" class="notice">Please login to continue</div>
-        <form id="login-form">
-            <label for="email">Email</label>
-            <input id="email" type="email" required />
+    <div class="container" style="max-width: 460px; margin-top: 50px;">
+        <div class="card">
+            <h2>Login</h2>
+            <p>Use account from database to access dashboard pages.</p>
+            <div id="message" class="notice">Please login to continue</div>
+            <form id="login-form">
+                <label for="email">Email</label>
+                <input id="email" type="email" required />
 
-            <label for="password">Password</label>
-            <input id="password" type="password" required />
+                <label for="password">Password</label>
+                <input id="password" type="password" required />
 
-            <button class="primary" type="submit">Login</button>
-        </form>
-        <p>Need an account? <a href="/register.html">Register</a></p>
+                <button class="primary" type="submit">Login</button>
+            </form>
+            <p>Need an account? <a href="/register.html">Register</a></p>
+        </div>
     </div>
-</div>
 
-<script src="/script/api/baseApi.js"></script>
-<script src="/script/api/userApi.js"></script>
-<script src="/script/authStore.js"></script>
-<script src="/script/login.js"></script>
+    <script src="/script/api/baseApi.js"></script>
+    <script src="/script/api/userApi.js"></script>
+    <script src="/script/authStore.js"></script>
+    <script src="/script/login.js"></script>
 </body>
-</html>
 
+</html>

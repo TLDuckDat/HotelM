@@ -1,17 +1,17 @@
 const restaurantImages = [
-    'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800',
-    'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800',
-    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800',
-    'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800',
-    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800',
-    'https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=800'
+    'assets/image/restaurant/restaurant/banner1.jpg',
+    'assets/image/restaurant/restaurant/banner2.jpg',
+    'assets/image/restaurant/restaurant/banner3.jpg',
+    'assets/image/restaurant/restaurant/banner4.jpg',
+    'assets/image/restaurant/restaurant/banner5.jpg',
+    'assets/image/restaurant/restaurant/banner6.jpg'
 ];
 
 const barImages = [
-    'https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=800',
-    'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800',
-    'https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=800',
-    'https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=800'
+    'assets/image/restaurant/bar/banner1.jpg',
+    'assets/image/restaurant/bar/banner2.jpg',
+    'assets/image/restaurant/bar/banner3.jpg',
+    'assets/image/restaurant/bar/banner4.jpg',
 ];
 
 const carousels = {

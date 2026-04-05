@@ -1,10 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rooms - SOT Resort & Hotel</title>
+
+    <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <link rel="stylesheet" href="assets/css/profile.css" />
+</head>
+
+<body>
+
+    <header class="topbar">
+        <a href="index.html" class="topbar-logo">
+            <img src="assets/image/logo.svg" alt="SOT Logo">
+            <span>SOT</span>
+        </a>
+        <div class="topbar-right">
+            <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            <div class="topbar-greeting">Welcome, <strong id="topbar-username">...</strong></div>
+            <div class="topbar-avatar"><i class="fas fa-user"></i></div>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar-wrap"><i class="fas fa-user"></i></div>
+                <div class="sidebar-name" id="sidebar-username">Loading…</div>
+                <div class="sidebar-role" id="sidebar-role">—</div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item" onclick="location.href='account.html'">
+                    <i class="fas fa-user-circle"></i> My Account
+                </button>
+                <button class="nav-item" onclick="location.href='dashboard.html'">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </button>
+                <button class="nav-item" onclick="location.href='bookings.html'">
+                    <i class="fas fa-calendar-check"></i> My Bookings
+                </button>
+                <button class="nav-item active">
+                    <i class="fas fa-bed"></i> Browse Rooms
+                </button>
+
+                <div class="sidebar-divider"></div>
+
+                <button class="nav-item danger" onclick="RoomsPage.handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
+            </nav>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main">
+            <div class="page-header">
+                <h1>Browse Rooms</h1>
+                <p>View all available room types</p>
+            </div>
+
+            <div id="rooms-list" class="rooms-grid">
+                <!-- JS render tại đây -->
+            </div>
+
+        </main>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+    <!-- Scripts -->
+    <script src="script/api/baseApi.js"></script>
+    <script src="script/api/roomApi.js"></script>
+    <script src="script/api/roomTypeApi.js"></script>
+    <script src="script/api/userApi.js"></script>
+
+    <script src="script/authStore.js"></script>
+    <script src="script/guard.js"></script>
+
+    <script src="script/rooms.js"></script>
+
+</body>
+
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rooms - HotelM</title>
-    <link rel="stylesheet" href="/assets/app.css" />
+    <link rel="stylesheet" href="assets/css/app.css" />
 </head>
 <body>
 <div id="app-topbar"></div>
@@ -35,11 +131,11 @@
     </div>
 </div>
 
-<script src="/script/api/baseApi.js"></script>
-<script src="/script/api/roomApi.js"></script>
-<script src="/script/authStore.js"></script>
-<script src="/script/app-shell.js"></script>
-<script src="/script/rooms.js"></script>
+<script src="script/api/baseApi.js"></script>
+<script src="script/api/roomApi.js"></script>
+<script src="script/authStore.js"></script>
+<script src="script/app-shell.js"></script>
+<script src="script/rooms.js"></script>
 </body>
 </html>
-
+ -->

@@ -13,13 +13,28 @@
         return baseApi.get(ROOM_ENDPOINT, options);
     }
 
+    function getRoomById(id, options) {
+        return baseApi.get(ROOM_ENDPOINT + "/" + encodeURIComponent(id), options);
+    }
+
     function createRoom(roomPayload, options) {
         return baseApi.post(ROOM_ENDPOINT, roomPayload, options);
     }
 
+    function updateRoom(id, roomPayload, options) {
+        return baseApi.put(ROOM_ENDPOINT + "/" + encodeURIComponent(id), roomPayload, options);
+    }
+
+    function deleteRoom(id, options) {
+        return baseApi.del(ROOM_ENDPOINT + "/" + encodeURIComponent(id), options);
+    }
+
     global.RoomApi = {
         getRooms: getRooms,
-        createRoom: createRoom
+        getRoomById: getRoomById,
+        createRoom: createRoom,
+        updateRoom: updateRoom,
+        deleteRoom: deleteRoom
     };
 })(window);
 

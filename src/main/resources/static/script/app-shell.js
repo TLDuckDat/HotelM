@@ -16,12 +16,16 @@
             + "  <div><strong>HotelM</strong> - " + title + "</div>"
             + "  <div>"
             + "    <span class='badge'>" + name + " (" + role + ")</span>"
-            + "    <a href='/index.html'>Home</a>"
-            + "    <a href='/dashboard.html'>Dashboard</a>"
-            + "    <a href='/rooms.html'>Rooms</a>"
-            + "    <a href='/bookings.html'>Bookings</a>"
-            + "    <a href='/account.html'>Account</a>"
-            + "    <a href='/admin-dashboard.html'>Admin</a>"
+            + "    <a href='index.html'>Home</a>"
+            + "    <a href='dashboard.html'>Dashboard</a>"
+            + "    <a href='rooms.html'>Rooms</a>"
+            + "    <a href='bookings.html'>Bookings</a>"
+            + "    <a href='create-booking.html'>Create Booking</a>"
+            + "    <a href='payments.html'>Payments</a>"
+            + "    <a href='refunds.html'>Refunds</a>"
+            + "    <a href='reviews.html'>Reviews</a>"
+            + "    <a href='account.html'>Account</a>"
+            + "    <a href='admin-dashboard.html'>Admin</a>"
             + "    <button id='logout-btn' type='button'>Logout</button>"
             + "  </div>"
             + "</div>";
@@ -32,7 +36,7 @@
                 if (global.AuthStore) {
                     global.AuthStore.clearCurrentUser();
                 }
-                window.location.href = "/login.html";
+                window.location.href = "login.html";
             });
         }
     }

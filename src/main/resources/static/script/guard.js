@@ -2,7 +2,7 @@
     "use strict";
 
     function goToLogin() {
-        window.location.href = "/login.html";
+        window.location.href = "login.html";
     }
 
     function requireLogin() {
@@ -20,7 +20,7 @@
         }
 
         if (!global.AuthStore.hasRole("ADMIN")) {
-            window.location.href = "/dashboard.html";
+            window.location.href = "dashboard.html";
             return false;
         }
 
