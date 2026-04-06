@@ -29,32 +29,43 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
 
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .authorizeHttpRequests(auth -> auth
+//                                // Public endpoints
+//                                .requestMatchers("/auth/**").permitAll()
+//                                .requestMatchers(HttpMethod.GET, "/rooms/**").permitAll()
+//                                .requestMatchers(HttpMethod.GET, "/room-types/**").permitAll()
+//
+//                                // Chỉ ADMIN mới quản lý được rooms, room-types, users
+//                                .requestMatchers(HttpMethod.POST, "/rooms/**").hasRole("ADMIN")
+//                                .requestMatchers(HttpMethod.PUT, "/rooms/**").hasRole("ADMIN")
+//                                .requestMatchers(HttpMethod.DELETE, "/rooms/**").hasRole("ADMIN")
+//                                .requestMatchers(HttpMethod.PATCH, "/rooms/**").hasAnyRole("ADMIN", "RECEPTIONIST")
+//
+//                                .requestMatchers("/room-types/**").hasRole("ADMIN")
+////                              .requestMatchers("/users/**").hasRole("ADMIN")
+//                                .requestMatchers("/users/**").permitAll()
+//                                .requestMatchers("/chat/**").permitAll()
+//                                // Các endpoint khác cần đăng nhập
+//                                .anyRequest().authenticated()
+//                )
+//                .authenticationProvider(authenticationProvider())
+//                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+//
+//        return http.build();
+//    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                                // Public endpoints
-                                .requestMatchers("/auth/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/rooms/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/room-types/**").permitAll()
-
-                                // Chỉ ADMIN mới quản lý được rooms, room-types, users
-                                .requestMatchers(HttpMethod.POST, "/rooms/**").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.PUT, "/rooms/**").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, "/rooms/**").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.PATCH, "/rooms/**").hasAnyRole("ADMIN", "RECEPTIONIST")
-
-                                .requestMatchers("/room-types/**").hasRole("ADMIN")
-//                              .requestMatchers("/users/**").hasRole("ADMIN")
-                                .requestMatchers("/users/**").permitAll()
-                                .requestMatchers("/chat/**").permitAll()
-                                // Các endpoint khác cần đăng nhập
-                                .anyRequest().authenticated()
-                )
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                        .anyRequest().permitAll()
+                );
 
         return http.build();
     }

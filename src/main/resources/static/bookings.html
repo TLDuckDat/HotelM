@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Bookings - SOT Resort & Hotel</title>
+    <link rel="icon" href="/assets/image/logo.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/profile.css" />
+</head>
+<body>
+
+<header class="topbar">
+    <a href="index.html" class="topbar-logo">
+        <img src="/assets/image/logo.svg" alt="SOT Logo">
+        <span>SOT</span>
+    </a>
+    <div class="topbar-right">
+        <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        <div class="topbar-greeting">Welcome, <strong id="topbar-username">Guest</strong></div>
+        <div class="topbar-avatar"><i class="fas fa-user"></i></div>
+    </div>
+</header>
+
+<div class="layout">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar-wrap"><i class="fas fa-user"></i></div>
+            <div class="sidebar-name" id="sidebar-username">Loading…</div>
+            <div class="sidebar-role" id="sidebar-role">—</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-item" onclick="location.href='account.html'"><i class="fas fa-user-circle"></i> My Account</button>
+            <button class="nav-item" onclick="location.href='dashboard.html'"><i class="fas fa-chart-line"></i> Dashboard</button>
+            <button class="nav-item active"><i class="fas fa-calendar-check"></i> My Bookings</button>
+            <button class="nav-item" onclick="location.href='rooms.html'"><i class="fas fa-bed"></i> Browse Rooms</button>
+            <div class="sidebar-divider"></div>
+            <button class="nav-item danger" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <div class="page-header">
+            <h1>My Bookings</h1>
+            <p>View and manage your reservations</p>
+        </div>
+
+        <div id="bookings-message" class="message-box"></div>
+
+        <div class="card" style="padding:0; overflow:hidden;">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Room</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookings-body">
+                        <tr><td colspan="6" class="loading">Loading bookings...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <button class="btn-primary" onclick="location.href='create-booking.html'" style="padding:12px 24px;">
+                <i class="fas fa-plus"></i> Create New Booking
+            </button>
+        </div>
+    </main>
+</div>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+<script src="/script/api/baseApi.js"></script>
+<script src="/script/api/roomApi.js"></script>
+<script src="/script/api/bookingApi.js"></script>
+<script src="/script/authStore.js"></script>
+<script src="/script/guard.js"></script>
+<script src="/script/bookings.js"></script>
+
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bookings - HotelM</title>
+    <link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body>
+<div id="app-topbar"></div>
+<div class="container">
+    <h2>Booking list</h2>
+
+    <div id="bookings-message" class="notice" style="display:none;"></div>
+
+    <div class="card">
+        <h3>Create booking</h3>
+        <form id="create-booking-form">
+            <label for="roomId">Room</label>
+            <select id="roomId" required></select>
+
+            <label for="checkIn">Check in</label>
+            <input id="checkIn" type="datetime-local" required />
+
+            <label for="checkOut">Check out</label>
+            <input id="checkOut" type="datetime-local" required />
+
+            <label for="note">Note</label>
+            <textarea id="note" rows="3"></textarea>
+
+            <button class="primary" type="submit">Create booking</button>
+        </form>
+    </div>
+
+    <div class="table-wrap" style="margin-top: 16px;">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Room</th>
+                <th>Check in</th>
+                <th>Check out</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody id="bookings-body">
+            <tr><td colspan="7">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="script/api/baseApi.js"></script>
+<script src="script/api/roomApi.js"></script>
+<script src="script/api/bookingApi.js"></script>
+<script src="script/authStore.js"></script>
+<script src="script/guard.js"></script>
+<script src="script/app-shell.js"></script>
+<script src="script/bookings.js"></script>
+</body>
+</html>
+ -->

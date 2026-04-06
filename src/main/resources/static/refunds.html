@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Refund Requests - HotelM</title>
+    <link rel="stylesheet" href="/assets/css/app.css" />
+</head>
+<body>
+<div id="app-topbar"></div>
+<div class="container">
+    <h2>Refund Requests</h2>
+    <div id="refunds-message" class="notice">Create and track your refund requests.</div>
+
+    <div class="card">
+        <h3>Create refund request</h3>
+        <form id="refund-form">
+            <label for="refund-booking-id">Booking</label>
+            <select id="refund-booking-id" required></select>
+
+            <label for="refund-reason">Reason</label>
+            <textarea id="refund-reason" rows="3" required></textarea>
+
+            <button class="primary" type="submit">Submit request</button>
+        </form>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+        <h3>My refund requests</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Booking</th>
+                    <th>Status</th>
+                    <th>Reason</th>
+                </tr>
+                </thead>
+                <tbody id="refunds-body">
+                <tr><td colspan="4">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="/script/api/baseApi.js"></script>
+<script src="/script/api/bookingApi.js"></script>
+<script src="/script/api/refundApi.js"></script>
+<script src="/script/authStore.js"></script>
+<script src="/script/guard.js"></script>
+<script src="/script/app-shell.js"></script>
+<script src="/script/refunds.js"></script>
+</body>
+</html>
+
