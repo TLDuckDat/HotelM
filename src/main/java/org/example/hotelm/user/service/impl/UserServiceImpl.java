@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(UserCreateRequest request) {
         String normalizedEmail = normalizeEmail(request.email());
-        if (userRepository.existsByEmail(normalizedEmail)) {
+        if (userRepository.findByEmailIgnoreCase(normalizedEmail).isPresent()) {
             throw new ConflictException("Email đã tồn tại: " + normalizedEmail);
         }
         User user = new User();

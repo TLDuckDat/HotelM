@@ -13,16 +13,30 @@
 			return null;
 		}
 
+		// try {
+		// 	return JSON.parse(raw);
+		// } catch (error) {
+		// 	localStorage.removeItem(STORAGE_KEY);
+		// 	return null;
+		// }
 		try {
-			return JSON.parse(raw);
-		} catch (error) {
-			localStorage.removeItem(STORAGE_KEY);
-			return null;
-		}
+        var user = JSON.parse(raw);
+        // TỰ ĐỘNG KHÔI PHỤC TOKEN NẾU CÓ
+        if (user && user.token && global.HotelMApiBase) {
+            global.HotelMApiBase.setAuthToken(user.token);
+        }
+        return user;
+    } catch (error) {
+        localStorage.removeItem(STORAGE_KEY);
+        return null;
+    }
 	}
 
 	function clearCurrentUser() {
 		localStorage.removeItem(STORAGE_KEY);
+		if (global.HotelMApiBase && typeof global.HotelMApiBase.clearAuthToken === "function") {
+			global.HotelMApiBase.clearAuthToken();
+		}
 	}
 
 	function isLoggedIn() {

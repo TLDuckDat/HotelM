@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -25,14 +26,14 @@ public class RegisterServiceImpl implements RegisterService {
 
     @Override
     public AuthResponse register(RegisterRequest request) {
-        // Kiểm tra email đã tồn tại chưa
-        if (userRepository.existsByEmail(request.email())) {
-            throw new ConflictException("Email '" + request.email() + "' đã được sử dụng");
+        String normalizedEmail = normalizeEmail(request.email());
+        if (userRepository.findByEmailIgnoreCase(normalizedEmail).isPresent()) {
+            throw new ConflictException("Email '" + normalizedEmail + "' đã được sử dụng");
         }
 
         User user = new User();
         user.setFullName(request.fullName());
-        user.setEmail(request.email());
+        user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(User.Role.USER);
         user.setStatus(User.UserStatus.ACTIVE);
@@ -45,5 +46,9 @@ public class RegisterServiceImpl implements RegisterService {
         );
 
         return new AuthResponse(token, "Bearer", user.getUserID(), user.getEmail());
+    }
+
+    private static String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
     }
 }

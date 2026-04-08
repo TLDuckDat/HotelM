@@ -1,88 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create Booking - SOT Resort & Hotel</title>
     <link rel="icon" href="/assets/image/logo.svg" type="image/svg+xml">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/profile.css" />
 </head>
+
 <body>
 
-<header class="topbar">
-    <a href="index.html" class="topbar-logo">
-        <img src="/assets/image/logo.svg" alt="SOT Logo">
-        <span>SOT</span>
-    </a>
-    <div class="topbar-right">
-        <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
-        <div class="topbar-greeting">Welcome, <strong id="topbar-username">Guest</strong></div>
-        <div class="topbar-avatar"><i class="fas fa-user"></i></div>
-    </div>
-</header>
-
-<div class="layout">
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-user">
-            <div class="sidebar-avatar-wrap"><i class="fas fa-user"></i></div>
-            <div class="sidebar-name" id="sidebar-username">Loading...</div>
-            <div class="sidebar-role" id="sidebar-role">-</div>
+    <header class="topbar">
+        <a href="index.html" class="topbar-logo">
+            <img src="/assets/image/logo.svg" alt="SOT Logo">
+            <span>SOT</span>
+        </a>
+        <div class="topbar-right">
+            <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            <div class="topbar-greeting">Welcome, <strong id="topbar-username">Guest</strong></div>
+            <a href="account.html" class="topbar-avatar"><i class="fas fa-user"></i></a>
         </div>
+    </header>
 
-        <nav class="sidebar-nav">
-            <button class="nav-item" onclick="location.href='account.html'"><i class="fas fa-user-circle"></i> My Account</button>
-            <button class="nav-item" onclick="location.href='dashboard.html'"><i class="fas fa-chart-line"></i> Dashboard</button>
-            <button class="nav-item" onclick="location.href='bookings.html'"><i class="fas fa-calendar-check"></i> My Bookings</button>
-            <button class="nav-item" onclick="location.href='rooms.html'"><i class="fas fa-bed"></i> Browse Rooms</button>
-            <button class="nav-item active"><i class="fas fa-calendar-plus"></i> Create Booking</button>
-            <div class="sidebar-divider"></div>
-            <button class="nav-item danger" onclick="CreateBookingPage.handleLogout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
-        </nav>
-    </aside>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar-wrap"><i class="fas fa-user"></i></div>
+                <div class="sidebar-name" id="sidebar-username">Loading...</div>
+                <div class="sidebar-role" id="sidebar-role">-</div>
+            </div>
 
-    <main class="main">
-        <div class="page-header">
-            <h1>Create New Booking</h1>
-            <p>Select room and booking time</p>
-        </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item" onclick="location.href='account.html'"><i class="fas fa-user-circle"></i> My
+                    Account</button>
+                <button class="nav-item" onclick="location.href='dashboard.html'"><i class="fas fa-chart-line"></i>
+                    Dashboard</button>
+                <button class="nav-item" onclick="location.href='bookings.html'"><i class="fas fa-calendar-check"></i>
+                    My Bookings</button>
+                <button class="nav-item" onclick="location.href='rooms.html'"><i class="fas fa-bed"></i> Browse
+                    Rooms</button>
+                <button class="nav-item active"><i class="fas fa-calendar-plus"></i> Create Booking</button>
+                <div class="sidebar-divider"></div>
+                <button class="nav-item danger" onclick="CreateBookingPage.handleLogout()"><i
+                        class="fas fa-sign-out-alt"></i> Sign Out</button>
+            </nav>
+        </aside>
 
-        <div id="create-booking-message" class="message-box"></div>
+        <main class="main">
+            <div class="page-header">
+                <h1>Create New Booking</h1>
+                <p>Select room and booking time</p>
+            </div>
 
-        <div class="card" style="max-width: 680px;">
-            <form id="create-booking-form">
-                <label for="roomId">Room</label>
-                <select id="roomId" required></select>
+            <div id="create-booking-message" class="message-box"></div>
 
-                <label for="checkIn">Check In</label>
-                <input id="checkIn" type="datetime-local" required />
-
-                <label for="checkOut">Check Out</label>
-                <input id="checkOut" type="datetime-local" required />
-
-                <label for="note">Note</label>
-                <textarea id="note" rows="4" placeholder="Additional request (optional)"></textarea>
-
-                <div style="display:flex; gap:12px; margin-top:16px;">
-                    <button class="btn-primary" type="submit">Create Booking</button>
-                    <button class="btn-secondary" type="button" onclick="location.href='bookings.html'">Back to List</button>
+            <div class="card booking-card">
+                <div class="booking-card-header">
+                    <i class="fas fa-calendar-plus"></i>
+                    <div>
+                        <div class="booking-card-title">Booking Details</div>
+                        <div class="booking-card-sub">Fill in the details below to reserve your room</div>
+                    </div>
                 </div>
-            </form>
-        </div>
-    </main>
-</div>
 
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
-<button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <form id="create-booking-form">
+                    <div class="form-field">
+                        <label class="form-label" for="roomId"><i class="fas fa-bed"></i> Room</label>
+                        <select id="roomId" class="form-select" required></select>
+                    </div>
 
-<script src="/script/api/baseApi.js"></script>
-<script src="/script/api/roomApi.js"></script>
-<script src="/script/api/bookingApi.js"></script>
-<script src="/script/authStore.js"></script>
-<script src="/script/guard.js"></script>
-<script src="/script/create-booking.js"></script>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label class="form-label" for="checkIn"><i class="fas fa-arrow-right-to-bracket"></i> Check
+                                In</label>
+                            <input id="checkIn" class="form-input" type="datetime-local" required />
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="checkOut"><i class="fas fa-arrow-right-from-bracket"></i>
+                                Check Out</label>
+                            <input id="checkOut" class="form-input" type="datetime-local" required />
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label" for="note"><i class="fas fa-pen-to-square"></i> Note</label>
+                        <textarea id="note" class="form-textarea" rows="4"
+                            placeholder="Any special requests or notes (optional)"></textarea>
+                    </div>
+
+                    <div class="booking-actions">
+                        <button class="btn-primary" type="submit"><i class="fas fa-check"></i> Confirm Booking</button>
+                        <button class="btn-secondary" type="button" onclick="location.href='bookings.html'"><i
+                                class="fas fa-arrow-left"></i> Back to List</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+    <script src="/script/api/baseApi.js"></script>
+    <script src="/script/api/roomApi.js"></script>
+    <script src="/script/api/bookingApi.js"></script>
+    <script src="/script/authStore.js"></script>
+    <script src="/script/guard.js"></script>
+    <script src="/script/create-booking.js"></script>
 
 </body>
-</html>
 
+</html>

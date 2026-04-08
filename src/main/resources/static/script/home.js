@@ -121,6 +121,7 @@ function renderGallery() {
 
 // ====================== MODALS ======================
 let loginModal, registerModal;
+let homeRegisterSubmitInFlight = false;
 
 function initModals() {
     loginModal = document.getElementById('loginModal');
@@ -181,24 +182,29 @@ async function handleLogin(e) {
     msg.textContent = '';
 
     try {
-        if (window.UserApi && typeof window.UserApi.getUsers === 'function') {
-            const users = await window.UserApi.getUsers();
-            const matched = users.find(u => u.email === email && u.password === password);
+        if (window.HotelMApiBase && window.UserApi && typeof window.UserApi.getUserById === 'function') {
+            const auth = await window.HotelMApiBase.post('/auth/login', { email, password });
+            window.HotelMApiBase.setAuthToken(auth.accessToken);
+            const profile = await window.UserApi.getUserById(auth.userId);
 
-            if (!matched) throw new Error('Invalid email or password');
-            if (matched.status === "BANNED") throw new Error('Your account is banned');
-
-            if (window.AuthStore && typeof window.AuthStore.setCurrentUser === 'function') {
-                window.AuthStore.setCurrentUser(matched);
-            } else {
-                localStorage.setItem('sotCurrentUser', JSON.stringify(matched));
+            if (profile.status === 'BANNED') {
+                window.HotelMApiBase.clearAuthToken();
+                throw new Error('Your account is banned');
             }
 
-            msg.textContent = `Welcome back, ${matched.fullName || matched.name}!`;
+            const stored = { ...profile, accessToken: auth.accessToken };
+
+            if (window.AuthStore && typeof window.AuthStore.setCurrentUser === 'function') {
+                window.AuthStore.setCurrentUser(stored);
+            } else {
+                localStorage.setItem('sotCurrentUser', JSON.stringify(stored));
+            }
+
+            msg.textContent = `Welcome back, ${profile.fullName || profile.name}!`;
             msg.className = 'form-message success';
 
             setTimeout(() => {
-                window.location.href = matched.role === "ADMIN" ? "admin-dashboard.html" : "dashboard.html";
+                window.location.href = profile.role === 'ADMIN' ? 'admin-dashboard.html' : 'dashboard.html';
             }, 800);
 
         } else {
@@ -215,7 +221,18 @@ async function handleLogin(e) {
         }
 
     } catch (err) {
-        msg.textContent = err.message || 'Login failed. Please try again.';
+        if (window.HotelMApiBase && err && err.status != null) {
+            window.HotelMApiBase.clearAuthToken();
+        }
+        let text = 'Login failed. Please try again.';
+        if (err && err.status === 401) {
+            text = 'Invalid email or password';
+        } else if (err && err.payload && err.payload.message) {
+            text = err.payload.message;
+        } else if (err && err.message) {
+            text = err.message;
+        }
+        msg.textContent = text;
         msg.className = 'form-message error';
     } finally {
         btn.classList.remove('loading');
@@ -226,6 +243,7 @@ async function handleLogin(e) {
 // ====================== REGISTER HANDLER ======================
 async function handleRegister(e) {
     e.preventDefault();
+    if (homeRegisterSubmitInFlight) return;
 
     const btn = document.getElementById('registerBtn');
     const msg = document.getElementById('registerMessage');
@@ -236,6 +254,7 @@ async function handleRegister(e) {
         return;
     }
 
+    homeRegisterSubmitInFlight = true;
     btn.classList.add('loading');
     btn.disabled = true;
     msg.textContent = '';
@@ -280,6 +299,7 @@ async function handleRegister(e) {
         msg.textContent = '❌ ' + errorMsg;
         msg.className = 'form-message error';
     } finally {
+        homeRegisterSubmitInFlight = false;
         btn.classList.remove('loading');
         btn.disabled = false;
     }

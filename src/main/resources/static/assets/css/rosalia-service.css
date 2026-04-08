@@ -1,15 +1,4 @@
-:root {
-    --primary: #C9A050;
-    --dark: #3D2817;
-    --light: #F5F1E8;
-    --white: #ffffff;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+@import url('../css/home.css');
 
 body {
     font-family: 'Lato', sans-serif;

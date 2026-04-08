@@ -22,11 +22,16 @@
     }
 
     function updateBookingStatus(id, status, options) {
-        var requestOptions = Object.assign({}, options, {
-            query: Object.assign({}, options && options.query, { status: status })
-        });
+        // var requestOptions = Object.assign({}, options, {
+        //     query: Object.assign({}, options && options.query, { status: status })
+        // });
 
-        return baseApi.patch(BOOKING_ENDPOINT + "/" + encodeURIComponent(id) + "/status", null, requestOptions);
+        // return baseApi.patch(BOOKING_ENDPOINT + "/" + encodeURIComponent(id) + "/status", null, requestOptions);
+        return baseApi.patch(
+            BOOKING_ENDPOINT + "/" + encodeURIComponent(id) + "/status",
+            { status: status },  // send as JSON body
+            options
+        );
     }
 
     function cancelBooking(id, options) {

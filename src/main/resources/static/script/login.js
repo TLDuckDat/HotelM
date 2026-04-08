@@ -19,26 +19,31 @@
 
         setMessage("Checking account...", "notice");
 
-        global.UserApi.getUsers()
-            .then(function (users) {
-                var matched = (users || []).find(function (item) {
-                    return item.email === email && item.password === password;
+        if (!global.HotelMApiBase || !global.UserApi) {
+            setMessage("API scripts not loaded", "error");
+            return;
+        }
+
+        global.HotelMApiBase.post("/auth/login", { email: email, password: password })
+            .then(function (auth) {
+                global.HotelMApiBase.setAuthToken(auth.accessToken);
+                return global.UserApi.getUserById(auth.userId).then(function (profile) {
+                    return { auth: auth, profile: profile };
                 });
-
-                if (!matched) {
-                    setMessage("Invalid email or password", "error");
-                    return;
-                }
-
-                if (matched.status && matched.status === "BANNED") {
+            })
+            .then(function (result) {
+                var profile = result.profile;
+                if (profile.status && profile.status === "BANNED") {
+                    global.HotelMApiBase.clearAuthToken();
                     setMessage("Your account is banned", "error");
                     return;
                 }
 
-                global.AuthStore.setCurrentUser(matched);
+                var stored = Object.assign({}, profile, { accessToken: result.auth.accessToken });
+                global.AuthStore.setCurrentUser(stored);
                 setMessage("Login success", "success");
 
-                if (matched.role === "ADMIN") {
+                if (profile.role === "ADMIN") {
                     window.location.href = "admin-dashboard.html";
                     return;
                 }
@@ -46,9 +51,19 @@
                 window.location.href = "dashboard.html";
             })
             .catch(function (error) {
-                var msg = error && error.payload && error.payload.message
-                    ? error.payload.message
-                    : "Cannot connect to backend";
+                if (global.HotelMApiBase) {
+                    global.HotelMApiBase.clearAuthToken();
+                }
+                var msg = "Cannot connect to backend";
+                if (error && error.status === 401) {
+                    msg = "Invalid email or password";
+                } else if (error && error.payload) {
+                    if (typeof error.payload === "string") {
+                        msg = error.payload;
+                    } else if (error.payload.message) {
+                        msg = error.payload.message;
+                    }
+                }
                 setMessage(msg, "error");
             });
     }

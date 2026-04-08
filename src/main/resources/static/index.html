@@ -202,6 +202,31 @@
         </div>
     </section>
 
+    <!-- ===== CHAT BUBBLE ===== -->
+    <div id="chat-widget">
+        <div id="chat-toggle">
+            <i class="fas fa-comments"></i>
+        </div>
+
+        <div id="chat-box">
+            <div class="chat-header">
+                <span>AI Receptionist</span>
+                <button id="chat-close">&times;</button>
+            </div>
+
+            <div class="chat-body">
+                <div class="chat-message bot">
+                    Xin chào! Tôi có thể giúp gì cho bạn?
+                </div>
+            </div>
+
+            <div class="chat-footer">
+                <input type="text" placeholder="Nhập tin nhắn...">
+                <button>➤</button>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <div class="container">
             <div class="newsletter">
@@ -231,6 +256,7 @@
     <script src="script/api/roomTypeApi.js" defer></script>
 
     <script src="script/home.js" defer></script>
+    <script src="script/chat.js" defer></script>
 </body>
 
 </html>

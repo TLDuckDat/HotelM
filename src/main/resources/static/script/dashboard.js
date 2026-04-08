@@ -27,6 +27,19 @@
         });
     }
 
+    function renderUserUI() {
+        const user = window.AuthStore?.getCurrentUser();
+        if (!user) return;
+
+        const topbarName = document.getElementById('topbar-username');
+        const sidebarName = document.getElementById('sidebar-username');
+        const sidebarRole = document.getElementById('sidebar-role');
+
+        if (topbarName) topbarName.textContent = user.fullName || 'Guest';
+        if (sidebarName) sidebarName.textContent = user.fullName || 'Guest';
+        if (sidebarRole) sidebarRole.textContent = user.role || 'USER';
+    }
+
     function handleLogout() {
         if (global.AuthStore) global.AuthStore.clearCurrentUser();
         window.location.href = 'login.html';
@@ -42,8 +55,22 @@
         document.getElementById('sidebar-overlay').classList.remove('active');
     };
 
+    function renderUserUI() {
+        const user = window.AuthStore?.getCurrentUser();
+        if (!user) return;
+
+        const topbarName = document.getElementById('topbar-username');
+        const sidebarName = document.getElementById('sidebar-username');
+        const sidebarRole = document.getElementById('sidebar-role');
+
+        if (topbarName) topbarName.textContent = user.fullName || 'Guest';
+        if (sidebarName) sidebarName.textContent = user.fullName || 'Guest';
+        if (sidebarRole) sidebarRole.textContent = user.role || 'USER';
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         loadDashboard();
+        renderUserUI();
     });
 
 })(window);

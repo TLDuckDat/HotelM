@@ -20,6 +20,8 @@ function validate() {
     return valid;
 }
 
+let registerSubmitInFlight = false;
+
 function showToast(msg, type) {
     const el = document.getElementById("toast");
     el.textContent = msg;
@@ -27,8 +29,13 @@ function showToast(msg, type) {
 }
 
 async function submitForm() {
+    if (registerSubmitInFlight) {
+        return;
+    }
     // 1. Validate trước
     if (!validate()) return;
+
+    registerSubmitInFlight = true;
 
     // 2. Gom dữ liệu từ form thành object JSON
     const payload = {
@@ -63,6 +70,7 @@ async function submitForm() {
             : null;
         showToast("❌ " + (backendMessage || "Không kết nối được server. Kiểm tra backend!"), "error");
     } finally {
+        registerSubmitInFlight = false;
         btn.classList.remove("loading");
         btn.disabled = false;
     }
@@ -71,9 +79,19 @@ async function submitForm() {
 // Cho phép gọi từ HTML onclick.
 window.submitForm = submitForm;
 
-// Cho phép nhấn Enter để submit.
+// Enter trong ô input: submit một lần (tránh double-request khi double-click hoặc Enter + click).
 document.addEventListener("keydown", function (e) {
-if (e.key === "Enter") {
+    if (e.key !== "Enter" || e.repeat || registerSubmitInFlight) {
+        return;
+    }
+    const el = e.target;
+    if (!el || el.tagName !== "INPUT") {
+        return;
+    }
+    const card = document.querySelector(".card");
+    if (!card || !card.contains(el)) {
+        return;
+    }
+    e.preventDefault();
     submitForm();
-}
 });
