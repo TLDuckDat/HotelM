@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Room Reviews - HotelM</title>
+    <link rel="stylesheet" href="/assets/css/app.css" />
+</head>
+<body>
+<div id="app-topbar"></div>
+<div class="container">
+    <h2>Room Reviews</h2>
+    <div id="reviews-message" class="notice">Create and manage your room reviews.</div>
+
+    <div class="card">
+        <h3>Create review</h3>
+        <form id="review-form">
+            <label for="review-booking-id">Booking</label>
+            <select id="review-booking-id" required></select>
+
+            <label for="review-rating">Rating (1-5)</label>
+            <select id="review-rating" required>
+                <option value="5">5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+                <option value="1">1</option>
+            </select>
+
+            <label for="review-content">Review</label>
+            <textarea id="review-content" rows="4" required></textarea>
+
+            <button class="primary" type="submit">Submit review</button>
+        </form>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+        <h3>My reviews</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Booking</th>
+                    <th>Rating</th>
+                    <th>Review</th>
+                </tr>
+                </thead>
+                <tbody id="reviews-body">
+                <tr><td colspan="4">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="/script/api/baseApi.js"></script>
+<script src="/script/api/bookingApi.js"></script>
+<script src="/script/api/reviewApi.js"></script>
+<script src="/script/authStore.js"></script>
+<script src="/script/guard.js"></script>
+<script src="/script/app-shell.js"></script>
+<script src="/script/reviews.js"></script>
+</body>
+</html>
+
