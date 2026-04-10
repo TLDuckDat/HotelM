@@ -16,5 +16,5 @@
 
 ## Notes
 
-Chi tiet endpoint se duoc cap nhat theo OpenAPI/Swagger hoac tai lieu endpoint thuc te trong code controller.
+Chi tiết endpoint sẽ được cập nhật theo OpenAPI/Swagger hoặc tài liệu endpoint thực tế trong code controller.
 

@@ -43,6 +43,7 @@
 
     function request(method, endpoint, options) {
         var config = options || {};
+        var normalizedEndpoint = endpoint.charAt(0) === "/" ? endpoint : "/" + endpoint;
         var url = buildUrl(endpoint, config.query);
         var headers = Object.assign(
             {
@@ -70,6 +71,16 @@
         }).then(function (response) {
             return parseResponsePayload(response).then(function (payload) {
                 if (!response.ok) {
+                    if (response.status === 401 && normalizedEndpoint !== "/auth/login") {
+                        if (global.AuthStore && typeof global.AuthStore.clearCurrentUser === "function") {
+                            global.AuthStore.clearCurrentUser();
+                        }
+
+                        if (global.location && global.location.pathname.indexOf("login.html") === -1) {
+                            global.location.href = "login.html";
+                        }
+                    }
+
                     var error = new Error("Request failed with status " + response.status);
                     error.status = response.status;
                     error.payload = payload;

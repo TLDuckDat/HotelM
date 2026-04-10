@@ -182,8 +182,12 @@
         if (!user) return;
 
         // Load rooms initially (no date filter yet)
-        loadRoomOptions().catch(function () {
-            setMessage("Cannot load room list.", "error");
+        loadRoomOptions().catch(function (err) {
+            var msg = "Cannot load room list.";
+            if (err && err.payload && err.payload.message) {
+                msg = err.payload.message;
+            }
+            setMessage(msg, "error");
         });
 
         // Re-check availability whenever dates change

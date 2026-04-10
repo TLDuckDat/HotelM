@@ -1,16 +1,16 @@
 # Frontend Workspace
 
-Frontend source duoc tach ra de to chuc code ro rang hon, nhung runtime hien tai van duoc Spring Boot serve tu `backend/src/main/resources/static/` de tranh break behavior.
+Frontend source được tách ra để tổ chức code rõ ràng hơn, nhưng runtime hiện tại vẫn được Spring Boot serve từ `backend/src/main/resources/static/` để tránh phá vỡ hành vi hiện có.
 
 ## Structure
 
-- `frontend/index.html`: entry page tham chieu.
-- `frontend/pages/`: tat ca HTML pages.
-- `frontend/assets/`: css, image, static assets.
-- `frontend/js/`: javascript modules va api adapters.
+- `frontend/index.html`: trang vào tham chiếu.
+- `frontend/pages/`: tất cả trang HTML.
+- `frontend/assets/`: CSS, hình ảnh, static assets.
+- `frontend/js/`: JavaScript modules và API adapters.
 
 ## Current Runtime Compatibility
 
-- Backend van serve static pages trong `backend/src/main/resources/static/`.
-- Thu muc `frontend/` hien tai la workspace cho team frontend sap xep va nang cap.
-- Co the them pipeline copy/build sang backend static o buoc tiep theo.
+- Backend vẫn serve static pages trong `backend/src/main/resources/static/`.
+- Thư mục `frontend/` hiện tại là workspace cho team frontend sắp xếp và nâng cấp.
+- Có thể thêm pipeline copy/build sang backend static ở bước tiếp theo.
