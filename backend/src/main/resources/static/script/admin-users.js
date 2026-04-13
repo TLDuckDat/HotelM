@@ -1,7 +1,7 @@
 (function (global) {
     "use strict";
 
-    // ── Shared UI helpers (reused across pages via copy, or extracted to admin-shared.js) ──
+    // ── Helpers ──
 
     function setMessage(text, type) {
         var box = document.getElementById("admin-message");
@@ -11,31 +11,67 @@
         box.style.display = "block";
     }
 
-    // ── Stats ──
-
-    function renderStats(users, rooms, bookings) {
-        document.getElementById("admin-stat-users").textContent = String((users || []).length);
-        document.getElementById("admin-stat-rooms").textContent = String((rooms || []).length);
-        document.getElementById("admin-stat-bookings").textContent = String((bookings || []).length);
-        var pending = (bookings || []).filter(function (b) { return b.status === "PENDING"; }).length;
-        document.getElementById("admin-stat-pending").textContent = String(pending);
+    function roleBadge(role) {
+        var cls = (role || "").toUpperCase() === "ADMIN" ? "badge-admin" : "badge-user";
+        return "<span class='badge " + cls + "'>" + (role || "—") + "</span>";
     }
 
-    function loadData() {
-        return Promise.all([
-            global.UserApi.getUsers(),
-            global.RoomApi.getRooms(),
-            global.BookingApi.getBookings()
-        ]).then(function (result) {
-            renderStats(result[0] || [], result[1] || [], result[2] || []);
+    // ── Render ──
+
+    function renderUsers(users) {
+        var body = document.getElementById("admin-users-body");
+        if (!body) return;
+
+        if (!users || users.length === 0) {
+            body.innerHTML = "<tr><td colspan='5' class='table-empty'>No users found</td></tr>";
+            return;
+        }
+
+        body.innerHTML = users.map(function (user) {
+            var id = user.userID || user.id || "";
+            return "<tr>"
+                + "<td>" + id + "</td>"
+                + "<td>" + (user.fullName || "") + "</td>"
+                + "<td>" + (user.email || "") + "</td>"
+                + "<td>" + roleBadge(user.role) + "</td>"
+                + "<td><button class='btn-delete' data-delete-user='" + id + "'>"
+                + "<i class='fas fa-trash-alt'></i> Delete</button></td>"
+                + "</tr>";
+        }).join("");
+
+        body.querySelectorAll("button[data-delete-user]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                deleteUser(btn.getAttribute("data-delete-user"));
+            });
+        });
+    }
+
+    // ── API calls ──
+
+    function loadUsers() {
+        global.UserApi.getUsers().then(function (users) {
+            renderUsers(users);
         }).catch(function (error) {
             var msg = error && error.payload && error.payload.message
-                ? error.payload.message : "Cannot load dashboard data";
+                ? error.payload.message : "Cannot load users";
             setMessage(msg, "error");
         });
     }
 
-    // ── Sidebar / Notification (shared UI behaviour) ──
+    function deleteUser(userId) {
+        if (!userId) return;
+
+        global.UserApi.deleteUser(userId).then(function () {
+            setMessage("User deleted", "success");
+            loadUsers();
+        }).catch(function (error) {
+            var msg = error && error.payload && error.payload.message
+                ? error.payload.message : "Delete user failed";
+            setMessage(msg, "error");
+        });
+    }
+
+    // ── Sidebar / Notification ──
 
     window.toggleSidebar = function () {
         document.getElementById("sidebar").classList.toggle("open");
@@ -66,7 +102,7 @@
     function init() {
         if (!global.Guard.requireAdmin()) return;
 
-        global.AppShell.renderTopbar("Admin Dashboard");
+        global.AppShell.renderTopbar("User Management");
 
         var user = global.AuthStore.getCurrentUser();
         if (user) {
@@ -78,14 +114,14 @@
             if (sideRoleEl) sideRoleEl.textContent = user.role || "ADMIN";
         }
 
-        loadData();
+        loadUsers();
     }
 
     document.addEventListener("DOMContentLoaded", init);
 
     // ── Public API ──
 
-    global.AdminDashboard = {
+    global.AdminUsers = {
         handleLogout: function () {
             if (global.AuthStore) global.AuthStore.clearCurrentUser();
             window.location.href = "index.html";

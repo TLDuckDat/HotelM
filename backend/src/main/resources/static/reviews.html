@@ -1,66 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Room Reviews - HotelM</title>
-    <link rel="stylesheet" href="/assets/css/app.css" />
+    <title>Room Reviews - SOT Resort & Hotel</title>
+    <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/profile.css" />
 </head>
+
 <body>
-<div id="app-topbar"></div>
-<div class="container">
-    <h2>Room Reviews</h2>
-    <div id="reviews-message" class="notice">Create and manage your room reviews.</div>
-
-    <div class="card">
-        <h3>Create review</h3>
-        <form id="review-form">
-            <label for="review-booking-id">Booking</label>
-            <select id="review-booking-id" required></select>
-
-            <label for="review-rating">Rating (1-5)</label>
-            <select id="review-rating" required>
-                <option value="5">5</option>
-                <option value="4">4</option>
-                <option value="3">3</option>
-                <option value="2">2</option>
-                <option value="1">1</option>
-            </select>
-
-            <label for="review-content">Review</label>
-            <textarea id="review-content" rows="4" required></textarea>
-
-            <button class="primary" type="submit">Submit review</button>
-        </form>
-    </div>
-
-    <div class="card" style="margin-top:16px;">
-        <h3>My reviews</h3>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Booking</th>
-                    <th>Rating</th>
-                    <th>Review</th>
-                </tr>
-                </thead>
-                <tbody id="reviews-body">
-                <tr><td colspan="4">Loading...</td></tr>
-                </tbody>
-            </table>
+    <header class="topbar">
+        <a href="index.html" class="topbar-logo">
+            <img src="assets/image/logo.svg" alt="SOT Logo">
+            <span>SOT</span>
+        </a>
+        <div class="topbar-right">
+            <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            <div class="topbar-greeting">Welcome, <strong id="topbar-username">Guest</strong></div>
+            <a href="account.html" class="topbar-avatar"><i class="fas fa-user"></i></a>
         </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar-wrap"><i class="fas fa-user"></i></div>
+                <div class="sidebar-name" id="sidebar-username">Loading…</div>
+                <div class="sidebar-role" id="sidebar-role">—</div>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item" onclick="location.href='account.html'">
+                    <i class="fas fa-user-circle"></i> My Account
+                </button>
+                <!-- <button class="nav-item" onclick="location.href='dashboard.html'">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </button> -->
+                <button class="nav-item" onclick="location.href='bookings.html'">
+                    <i class="fas fa-calendar-check"></i> My Bookings
+                </button>
+                <button class="nav-item" onclick="location.href='rooms.html'">
+                    <i class="fas fa-bed"></i> Browse Rooms
+                </button>
+                <div class="sidebar-divider"></div>
+                <button class="nav-item" onclick="location.href='payments.html'">
+                    <i class="fas fa-credit-card"></i> Payments
+                </button>
+                <button class="nav-item" onclick="location.href='refunds.html'">
+                    <i class="fas fa-undo"></i> Refund Requests
+                </button>
+                <button class="nav-item active" onclick="location.href='reviews.html'">
+                    <i class="fas fa-star"></i> Room Reviews
+                </button>
+                <div class="sidebar-divider"></div>
+                <button class="nav-item danger" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <div class="page-header">
+                <div>
+                    <h1>Room Reviews</h1>
+                    <p>Share your experience and read your past reviews</p>
+                </div>
+            </div>
+
+            <div class="review-stats">
+                <div class="review-stat-card">
+                    <div class="review-stat-icon"><i class="fas fa-comment-alt"></i></div>
+                    <div>
+                        <div class="review-stat-label">Total Reviews</div>
+                        <div class="review-stat-value" id="stat-total">—</div>
+                    </div>
+                </div>
+                <div class="review-stat-card">
+                    <div class="review-stat-icon"><i class="fas fa-star"></i></div>
+                    <div>
+                        <div class="review-stat-label">Avg. Rating</div>
+                        <div class="review-stat-value" id="stat-avg">—</div>
+                    </div>
+                </div>
+                <div class="review-stat-card">
+                    <div class="review-stat-icon"><i class="fas fa-medal"></i></div>
+                    <div>
+                        <div class="review-stat-label">5-Star Reviews</div>
+                        <div class="review-stat-value" id="stat-five">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-grid">
+                <div class="card" style="align-self: start;">
+                    <div class="card-title"><i class="fas fa-pen-nib"></i> Write a Review</div>
+                    <div id="reviews-message" style="display:none;"></div>
+
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label class="form-label">Select Booking</label>
+                        <select class="form-input" id="review-booking-id" required>
+                            <option value="">Choose a booking…</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Your Rating</label>
+                        <!-- CSS-only interactive stars; syncs to hidden select below -->
+                        <div class="star-rating-input">
+                            <input type="radio" id="star5" name="rating" value="5">
+                            <label for="star5">★</label>
+                            <input type="radio" id="star4" name="rating" value="4">
+                            <label for="star4">★</label>
+                            <input type="radio" id="star3" name="rating" value="3">
+                            <label for="star3">★</label>
+                            <input type="radio" id="star2" name="rating" value="2">
+                            <label for="star2">★</label>
+                            <input type="radio" id="star1" name="rating" value="1">
+                            <label for="star1">★</label>
+                        </div>
+                        <!-- Keep for reviews.js compatibility -->
+                        <select id="review-rating" style="display:none;" required>
+                            <option value="5">5</option>
+                            <option value="4">4</option>
+                            <option value="3">3</option>
+                            <option value="2">2</option>
+                            <option value="1">1</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Your Review</label>
+                        <textarea class="form-input" id="review-content" rows="5" placeholder="Tell us about your stay…"
+                            required style="resize:vertical;"></textarea>
+                    </div>
+                    <button class="btn-primary" type="button" id="review-submit-btn">
+                        <i class="fas fa-paper-plane"></i> Submit Review
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-comments"></i> My Reviews</div>
+                    <div id="review-cards-wrap" class="review-cards" style="margin-top: 20px;">
+                        <p style="color: var(--text-muted); font-size: 0.88rem;">Loading reviews…</p>
+                    </div>
+                    <!-- Keep for reviews.js compatibility -->
+                    <table style="display:none;">
+                        <tbody id="reviews-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
     </div>
-</div>
 
-<script src="/script/api/baseApi.js"></script>
-<script src="/script/api/bookingApi.js"></script>
-<script src="/script/api/reviewApi.js"></script>
-<script src="/script/authStore.js"></script>
-<script src="/script/guard.js"></script>
-<script src="/script/app-shell.js"></script>
-<script src="/script/reviews.js"></script>
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+    <script src="/script/api/baseApi.js"></script>
+    <script src="/script/api/bookingApi.js"></script>
+    <script src="/script/api/reviewApi.js"></script>
+    <script src="/script/authStore.js"></script>
+    <script src="/script/guard.js"></script>
+    <script src="/script/reviews.js"></script>
 </body>
-</html>
 
+</html>

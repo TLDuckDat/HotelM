@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Chat — SOT Admin</title>
+    <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/admin.css">
+    <link rel="stylesheet" href="assets/css/admin-chat.css">
+</head>
+
+<body>
+
+    <!-- ── TOPBAR ── -->
+    <header class="topbar">
+        <a href="index.html" class="topbar-logo">
+            <img src="assets/image/logo.svg" alt="SOT Logo">
+            <span>SOT</span>
+        </a>
+        <div class="topbar-right">
+            <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            <div class="topbar-greeting">Welcome, <strong id="topbar-username">Admin</strong></div>
+            <a href="admin-dashboard.html" class="topbar-avatar"><i class="fas fa-user-shield"></i></a>
+        </div>
+    </header>
+
+    <!-- ── LAYOUT ── -->
+    <div class="layout">
+
+        <!-- ── SIDEBAR ── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar-wrap"><i class="fas fa-user-shield"></i></div>
+                <div class="sidebar-name" id="sidebar-username">Admin</div>
+                <div class="sidebar-role">ADMIN</div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-group-label">Overview</div>
+                <button class="nav-item" onclick="location.href='admin-dashboard.html'">
+                    <i class="fas fa-chart-pie"></i> Dashboard
+                </button>
+
+                <div class="nav-group-label">Management</div>
+                <button class="nav-item" onclick="location.href='admin-dashboard.html?panel=rooms'">
+                    <i class="fas fa-bed"></i> Rooms
+                </button>
+                <button class="nav-item" onclick="location.href='admin-dashboard.html?panel=bookings'">
+                    <i class="fas fa-calendar-check"></i> Bookings
+                </button>
+                <button class="nav-item" onclick="location.href='admin-dashboard.html?panel=users'">
+                    <i class="fas fa-users"></i> Users
+                </button>
+
+                <div class="sidebar-divider"></div>
+                <div class="nav-group-label">Finance & Feedback</div>
+                <button class="nav-item" onclick="location.href='admin-payments.html'">
+                    <i class="fas fa-credit-card"></i> Payments
+                </button>
+                <button class="nav-item" onclick="location.href='admin-refunds.html'">
+                    <i class="fas fa-undo"></i> Refund Requests
+                </button>
+                <button class="nav-item" onclick="location.href='admin-reviews.html'">
+                    <i class="fas fa-star"></i> Room Reviews
+                </button>
+                <button class="nav-item active">
+                    <i class="fas fa-comments"></i> Live Chat
+                    <span id="sidebar-unread-badge" class="sidebar-unread-badge"></span>
+                </button>
+
+                <div class="sidebar-divider"></div>
+                <button class="nav-item danger" onclick="localStorage.clear(); location.href='index.html'">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
+            </nav>
+        </aside>
+
+        <!-- ── MAIN ── -->
+        <main class="main" style="display: flex;">
+            <div class="chat-layout">
+
+                <!-- LEFT: Conversation list -->
+                <div class="conv-pane" id="conv-pane">
+                    <div class="conv-pane-header">
+                        <h2>
+                            <i class="fas fa-comments"
+                                style="color: var(--primary); margin-right: 8px; font-size: 0.95rem;"></i>
+                            Live Chat
+                        </h2>
+                        <div class="conv-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="conv-search-input" placeholder="Search guests…">
+                        </div>
+                    </div>
+
+                    <div class="conv-list" id="conv-list">
+                        <div class="conv-empty" id="conv-empty">
+                            <i class="fas fa-inbox"
+                                style="font-size: 2rem; color: rgba(201,160,80,0.3); display: block; margin-bottom: 10px;"></i>
+                            No conversations yet
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Chat view -->
+                <div class="chat-pane" id="chat-pane">
+
+                    <!-- Empty state -->
+                    <div class="chat-pane-empty" id="chat-empty-state">
+                        <i class="fas fa-comment-dots"></i>
+                        <p>Select a conversation to start chatting</p>
+                    </div>
+
+                    <!-- Active conversation -->
+                    <div id="chat-active" style="display: none; flex-direction: column; flex: 1; overflow: hidden;">
+
+                        <div class="chat-header">
+                            <button class="chat-back-btn" id="chat-back-btn" onclick="showConvPane()">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <div class="chat-header-avatar" id="chat-header-avatar">?</div>
+                            <div class="chat-header-info">
+                                <div class="chat-header-name" id="chat-header-name">Guest</div>
+                                <div class="chat-header-status" id="chat-header-status">Online</div>
+                            </div>
+                            <div class="chat-header-actions">
+                                <button class="chat-header-btn" title="Mark as resolved"
+                                    onclick="resolveConversation()">
+                                    <i class="fas fa-check-double"></i>
+                                </button>
+                                <button class="chat-header-btn" title="Delete conversation"
+                                    onclick="deleteConversation()">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="chat-messages" id="chat-messages"></div>
+
+                        <div class="chat-input-bar">
+                            <textarea id="admin-reply-input" placeholder="Type a reply…" rows="1"
+                                onkeydown="handleReplyKey(event)"></textarea>
+                            <button class="send-btn" id="send-btn" onclick="sendAdminReply()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile sidebar overlay + toggle -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+    <script src="assets/js/admin-chat.js"></script>
+
+</body>
+
+</html>

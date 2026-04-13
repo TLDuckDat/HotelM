@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin — Reviews · SOT Resort & Hotel</title>
+    <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/admin.css" />
+
+</head>
+<body>
+
+<header class="topbar">
+    <a href="index.html" class="topbar-logo">
+        <img src="assets/image/logo.svg" alt="SOT Logo">
+        <span>SOT</span>
+    </a>
+    <div class="topbar-right">
+        <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        <div class="topbar-greeting">Welcome, <strong id="topbar-username">Admin</strong></div>
+        <a href="admin-dashboard.html" class="topbar-avatar"><i class="fas fa-user-shield"></i></a>
+        <div class="notification-dropdown">
+            <button class="notification-btn" onclick="toggleNotification(event)">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge"></span>
+            </button>
+            <div class="notification-content" id="notificationMenu">
+                <div class="notification-header">Notifications</div>
+                <div class="notification-list"><div class="notification-empty">No new notifications</div></div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="layout">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar-wrap"><i class="fas fa-user-shield"></i></div>
+            <div class="sidebar-name" id="sidebar-username">Loading…</div>
+            <div class="sidebar-role">ADMIN</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-group-label">Overview</div>
+            <button class="nav-item" onclick="location.href='admin-dashboard.html'">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </button>
+            <div class="nav-group-label">Management</div>
+            <button class="nav-item" onclick="location.href='admin-dashboard.html'">
+                <i class="fas fa-bed"></i> Rooms
+            </button>
+            <button class="nav-item" onclick="location.href='admin-dashboard.html'">
+                <i class="fas fa-calendar-check"></i> Bookings
+            </button>
+            <button class="nav-item" onclick="location.href='admin-dashboard.html'">
+                <i class="fas fa-users"></i> Users
+            </button>
+            <div class="nav-group-label">Finance & Feedback</div>
+            <button class="nav-item" onclick="location.href='admin-payments.html'">
+                <i class="fas fa-credit-card"></i> Payments
+            </button>
+            <button class="nav-item" onclick="location.href='admin-refunds.html'">
+                <i class="fas fa-undo"></i> Refunds
+            </button>
+            <button class="nav-item active" onclick="location.href='admin-reviews.html'">
+                <i class="fas fa-star"></i> Reviews
+            </button>
+            <button class="nav-item" onclick="location.href='admin-chat.html'">
+                    <i class="fas fa-comments"></i> Live Chat
+                    <span id="sidebar-unread-badge" class="sidebar-unread-badge"></span>
+                </button>
+            <div class="sidebar-divider"></div>
+            <button class="nav-item danger" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <div class="page-header">
+            <div>
+                <h1>Review Management</h1>
+                <p>Publish, hide, or delete guest room reviews</p>
+            </div>
+        </div>
+
+        <div id="admin-message" class="flash-message"></div>
+
+        <!-- Stats -->
+        <div class="stat-row">
+            <div class="stat-mini">
+                <div class="stat-mini-icon"><i class="fas fa-comment-alt"></i></div>
+                <div>
+                    <div class="stat-mini-val" id="stat-total">0</div>
+                    <div class="stat-mini-lbl">Total Reviews</div>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-mini-icon"><i class="fas fa-star"></i></div>
+                <div>
+                    <div class="stat-mini-val" id="stat-avg">—</div>
+                    <div class="stat-mini-lbl">Avg. Rating</div>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-mini-icon"><i class="fas fa-eye"></i></div>
+                <div>
+                    <div class="stat-mini-val" id="stat-published">0</div>
+                    <div class="stat-mini-lbl">Published</div>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-mini-icon"><i class="fas fa-eye-slash"></i></div>
+                <div>
+                    <div class="stat-mini-val" id="stat-hidden">0</div>
+                    <div class="stat-mini-lbl">Hidden</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter + View Toggle -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+            <div class="filter-bar" style="margin-bottom:0;">
+                <div class="filter-group">
+                    <label>Rating</label>
+                    <select class="form-input" id="filter-rating" onchange="applyFilters()">
+                        <option value="">All Ratings</option>
+                        <option value="5">★★★★★ (5)</option>
+                        <option value="4">★★★★ (4)</option>
+                        <option value="3">★★★ (3)</option>
+                        <option value="2">★★ (2)</option>
+                        <option value="1">★ (1)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select class="form-input" id="filter-status" onchange="applyFilters()">
+                        <option value="">All</option>
+                        <option value="PUBLISHED">Published</option>
+                        <option value="HIDDEN">Hidden</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Search</label>
+                    <input class="form-input" id="filter-search" type="text" placeholder="Guest or content…" oninput="applyFilters()" />
+                </div>
+                <button class="btn-primary" onclick="resetFilters()">
+                    <i class="fas fa-rotate-right"></i> Reset
+                </button>
+            </div>
+            <div class="view-toggle">
+                <button class="view-btn active" id="view-table-btn" onclick="setView('table')">
+                    <i class="fas fa-table"></i> Table
+                </button>
+                <button class="view-btn" id="view-cards-btn" onclick="setView('cards')">
+                    <i class="fas fa-th-large"></i> Cards
+                </button>
+            </div>
+        </div>
+
+        <!-- Table View -->
+        <div class="card" id="table-view">
+            <div class="card-title"><i class="fas fa-list"></i> All Reviews</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Review ID</th>
+                            <th>Guest</th>
+                            <th>Booking</th>
+                            <th>Rating</th>
+                            <th>Content</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reviews-body">
+                        <tr><td colspan="7" class="table-empty"><i class="fas fa-spinner fa-spin"></i> Loading…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Cards View -->
+        <div id="cards-view" style="display:none;">
+            <div class="review-cards-grid" id="reviews-cards-grid">
+                <p style="color:var(--text-muted); font-size:.9rem;">Loading reviews…</p>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+<!-- Confirm Modal -->
+<div id="confirm-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:500; align-items:center; justify-content:center;">
+    <div style="background:var(--white); border-radius:var(--radius); padding:32px 36px; max-width:420px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,.25);">
+        <div style="font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:600; color:var(--dark); margin-bottom:10px;" id="modal-title">Confirm Action</div>
+        <div style="color:var(--text-muted); font-size:.9rem; margin-bottom:24px;" id="modal-body">Are you sure?</div>
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+            <button onclick="closeModal()" style="padding:9px 20px; border:1px solid var(--border); background:var(--white); border-radius:8px; cursor:pointer; font-size:.85rem; color:var(--dark);">Cancel</button>
+            <button id="modal-confirm-btn" style="padding:9px 20px; border:none; border-radius:8px; cursor:pointer; font-size:.85rem; font-weight:700;">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script src="script/api/baseApi.js"></script>
+<script src="script/api/reviewApi.js"></script>
+<script src="script/authStore.js"></script>
+<script src="script/guard.js"></script>
+<script src="script/admin-reviews.js"></script>
+</body>
+</html>

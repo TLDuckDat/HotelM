@@ -28,27 +28,41 @@ const galleryImages = [
     'assets/image/home/moment/moment6.jpg'
 ];
 
-// ====================== REGISTER VALIDATION ======================
-function validateRegisterForm() {
-    let valid = true;
+// Hàm tự động load Modal từ file riêng vào Index
+async function loadAuthModals() {
+    try {
+        const response = await fetch('auth-modals.html');
+        const html = await response.text();
+        const placeholder = document.getElementById('auth-modals-placeholder');
+        if (placeholder) {
+            placeholder.innerHTML = html;
 
-    const fields = [
-        { id: "registerName", check: v => v.trim().length > 0 },
-        { id: "registerEmail", check: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
-        { id: "registerPhone", check: v => v.trim().length >= 9 },
-        { id: "registerPassword", check: v => v.length >= 6 },
-    ];
+            // Khởi tạo lại tham chiếu Element (LoginModal, RegisterModal, ForgotPasswordModal)
+            if (typeof initModals === 'function') initModals();
+            if (typeof initForgotPasswordModal === 'function') initForgotPasswordModal();
 
-    fields.forEach(({ id, check }) => {
-        const input = document.getElementById(id);
-        if (!input) return;
+            // Gán sự kiện submit cho Form sau khi đã nạp vào DOM
+            const lForm = document.getElementById('loginForm');
+            const rForm = document.getElementById('registerForm');
+            const fForm = document.getElementById('forgotPasswordForm');
 
-        const ok = check(input.value);
-        input.classList.toggle("error-field", !ok);
-        if (!ok) valid = false;
-    });
+            // handleLogin và handleRegister được lấy từ file auth-modals.js
+            if (lForm) lForm.addEventListener('submit', handleLogin);
+            if (rForm) rForm.addEventListener('submit', handleRegister);
+            if (fForm) fForm.addEventListener('submit', handleForgotPassword);
 
-    return valid;
+            // Đóng modal khi click ra ngoài (backdrop)
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                backdrop.addEventListener('click', () => {
+                    if (typeof closeLoginModal === 'function') closeLoginModal();
+                    if (typeof closeRegisterModal === 'function') closeRegisterModal();
+                    if (typeof closeForgotPasswordModal === 'function') closeForgotPasswordModal();
+                });
+            });
+        }
+    } catch (error) {
+        console.error("Lỗi nạp file auth-modals.html:", error);
+    }
 }
 
 // ====================== RENDER FUNCTIONS ======================
@@ -119,191 +133,6 @@ function renderGallery() {
     `).join('');
 }
 
-// ====================== MODALS ======================
-let loginModal, registerModal;
-let homeRegisterSubmitInFlight = false;
-
-function initModals() {
-    loginModal = document.getElementById('loginModal');
-    registerModal = document.getElementById('registerModal');
-}
-
-function openLoginModal() {
-    closeRegisterModal();
-    if (loginModal) loginModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function openRegisterModal() {
-    closeLoginModal();
-    if (registerModal) registerModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeLoginModal() {
-    if (loginModal) loginModal.classList.remove('active');
-    document.body.style.overflow = 'auto';
-}
-
-function closeRegisterModal() {
-    if (registerModal) registerModal.classList.remove('active');
-    document.body.style.overflow = 'auto';
-}
-
-function switchToRegister(e) {
-    if (e) e.preventDefault();
-    closeLoginModal();
-    setTimeout(openRegisterModal, 300);
-}
-
-function switchToLogin(e) {
-    if (e) e.preventDefault();
-    closeRegisterModal();
-    setTimeout(openLoginModal, 300);
-}
-
-// ====================== LOGIN HANDLER ======================
-async function handleLogin(e) {
-    e.preventDefault();
-
-    const btn = document.getElementById('loginBtn');
-    const msg = document.getElementById('loginMessage');
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-
-    if (!email || !password) {
-        msg.textContent = 'Please enter email and password';
-        msg.className = 'form-message error';
-        return;
-    }
-
-    btn.classList.add('loading');
-    btn.disabled = true;
-    msg.textContent = '';
-
-    try {
-        if (window.HotelMApiBase && window.UserApi && typeof window.UserApi.getUserById === 'function') {
-            const auth = await window.HotelMApiBase.post('/auth/login', { email, password });
-            window.HotelMApiBase.setAuthToken(auth.accessToken);
-            const profile = await window.UserApi.getUserById(auth.userId);
-
-            if (profile.status === 'BANNED') {
-                window.HotelMApiBase.clearAuthToken();
-                throw new Error('Your account is banned');
-            }
-
-            const stored = { ...profile, accessToken: auth.accessToken };
-
-            if (window.AuthStore && typeof window.AuthStore.setCurrentUser === 'function') {
-                window.AuthStore.setCurrentUser(stored);
-            } else {
-                localStorage.setItem('sotCurrentUser', JSON.stringify(stored));
-            }
-
-            msg.textContent = `Welcome back, ${profile.fullName || profile.name}!`;
-            msg.className = 'form-message success';
-
-            setTimeout(() => {
-                window.location.href = profile.role === 'ADMIN' ? 'admin-dashboard.html' : 'dashboard.html';
-            }, 800);
-
-        } else {
-            // Fallback mock
-            const users = JSON.parse(localStorage.getItem('sotUsers') || '[]');
-            const user = users.find(u => u.email === email);
-            if (!user) throw new Error('User not found. Please register first.');
-
-            localStorage.setItem('sotCurrentUser', JSON.stringify(user));
-            msg.textContent = `Welcome back, ${user.name || user.fullName}!`;
-            msg.className = 'form-message success';
-
-            setTimeout(() => location.reload(), 1000);
-        }
-
-    } catch (err) {
-        if (window.HotelMApiBase && err && err.status != null) {
-            window.HotelMApiBase.clearAuthToken();
-        }
-        let text = 'Login failed. Please try again.';
-        if (err && err.status === 401) {
-            text = 'Invalid email or password';
-        } else if (err && err.payload && err.payload.message) {
-            text = err.payload.message;
-        } else if (err && err.message) {
-            text = err.message;
-        }
-        msg.textContent = text;
-        msg.className = 'form-message error';
-    } finally {
-        btn.classList.remove('loading');
-        btn.disabled = false;
-    }
-}
-
-// ====================== REGISTER HANDLER ======================
-async function handleRegister(e) {
-    e.preventDefault();
-    if (homeRegisterSubmitInFlight) return;
-
-    const btn = document.getElementById('registerBtn');
-    const msg = document.getElementById('registerMessage');
-
-    if (!validateRegisterForm()) {
-        msg.textContent = 'Please check your information again';
-        msg.className = 'form-message error';
-        return;
-    }
-
-    homeRegisterSubmitInFlight = true;
-    btn.classList.add('loading');
-    btn.disabled = true;
-    msg.textContent = '';
-
-    const payload = {
-        fullName: document.getElementById('registerName').value.trim(),
-        email: document.getElementById('registerEmail').value.trim(),
-        phoneNumber: document.getElementById('registerPhone').value.trim(),
-        password: document.getElementById('registerPassword').value,
-        role: "USER"
-    };
-
-    try {
-        if (window.UserApi && typeof window.UserApi.createUser === 'function') {
-            const data = await window.UserApi.createUser(payload);
-
-            msg.textContent = `Account created successfully! Welcome ${data.fullName || data.name}`;
-            msg.className = 'form-message success';
-
-            setTimeout(() => {
-                closeRegisterModal();
-                openLoginModal();
-            }, 1500);
-
-        } else {
-            // Fallback mock
-            let users = JSON.parse(localStorage.getItem('sotUsers') || '[]');
-            users.push({ ...payload, name: payload.fullName });
-            localStorage.setItem('sotUsers', JSON.stringify(users));
-
-            msg.textContent = 'Account created successfully!';
-            msg.className = 'form-message success';
-
-            setTimeout(() => {
-                closeRegisterModal();
-                openLoginModal();
-            }, 1200);
-        }
-
-    } catch (err) {
-        const errorMsg = err?.payload?.message || err?.message || 'Cannot connect to server';
-        msg.textContent = '❌ ' + errorMsg;
-        msg.className = 'form-message error';
-    } finally {
-        homeRegisterSubmitInFlight = false;
-        btn.classList.remove('loading');
-        btn.disabled = false;
-    }
-}
 
 // ====================== NAV USER ======================
 function checkExistingUser() {
@@ -318,7 +147,31 @@ function checkExistingUser() {
     const navActions = document.getElementById('nav-actions');
     if (!navActions || !user) return;
 
+    // Xác định role để điều hướng link
+    const isAdmin = user.role === 'ADMIN';
+    
+    // Điều hướng Profile/Dashboard
+    const profileHref = isAdmin ? 'admin-dashboard.html' : 'account.html';
+    const profileLabel = isAdmin ? 'Admin Dashboard' : 'Profile';
+
+    // Điều hướng Rooms và Bookings dựa trên Role
+    const roomsHref = isAdmin ? 'admin-rooms.html' : 'rooms.html';
+    const bookingsHref = isAdmin ? 'admin-bookings.html' : 'bookings.html';
+
     navActions.innerHTML = `
+    <div class="notification-dropdown">
+        <button class="notification-btn" onclick="toggleNotification(event)">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge"></span>
+        </button>
+        <div class="notification-content" id="notificationMenu">
+            <div class="notification-header">Notifications</div>
+            <div class="notification-list">
+                <div class="notification-empty">No new notifications</div>
+            </div>
+        </div>
+    </div>
+    
     <div class="user-dropdown">
         <div class="user-avatar" onclick="toggleUserMenu()">
             <img src="assets/image/logo.svg" alt="avatar">
@@ -332,10 +185,9 @@ function checkExistingUser() {
                 <div class="menu-username">${user.fullName || user.name || 'User'}</div>
             </div>
             
-            <a href="account.html" class="menu-item">Profile</a>
-            <a href="dashboard.html" class="menu-item">Dashboard</a>
-            <a href="rooms.html" class="menu-item">Rooms</a>
-            <a href="bookings.html" class="menu-item">Bookings</a>
+            <a href="${profileHref}" class="menu-item">${profileLabel}</a>
+            <a href="${roomsHref}" class="menu-item">Rooms</a>
+            <a href="${bookingsHref}" class="menu-item">Bookings</a>
 
             <button class="menu-item logout" onclick="logoutUser()">Logout</button>
         </div>
@@ -370,6 +222,9 @@ function logoutUser() {
 document.addEventListener('DOMContentLoaded', () => {
     // Khởi tạo modal elements
     initModals();
+
+    // chạy modal auth
+    loadAuthModals();
 
     // Render nội dung trang
     renderServices();
@@ -412,6 +267,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.switchToRegister = switchToRegister;
     window.switchToLogin = switchToLogin;
     window.logoutUser = logoutUser;
+    window.openForgotPasswordModal = openForgotPasswordModal;
+    window.closeForgotPasswordModal = closeForgotPasswordModal;
+    window.switchToForgotPassword = switchToForgotPassword;
+    window.switchToLoginFromForgot = switchToLoginFromForgot;
 
     // Form submit
     const loginForm = document.getElementById('loginForm');
@@ -429,5 +288,25 @@ document.addEventListener('DOMContentLoaded', () => {
             closeLoginModal();
             closeRegisterModal();
         });
+    });
+
+    // notfication
+    window.toggleNotification = function (e) {
+        e.stopPropagation();
+        const menu = document.getElementById("notificationMenu");
+        // Đóng user menu nếu đang mở (để tránh chồng chéo)
+        const userMenu = document.getElementById("userMenu");
+        if (userMenu) userMenu.classList.remove("active");
+
+        menu.classList.toggle("active");
+    };
+
+    // Click ra ngoài để đóng
+    document.addEventListener("click", function (e) {
+        const notiDropdown = document.querySelector(".notification-dropdown");
+        if (notiDropdown && !notiDropdown.contains(e.target)) {
+            const menu = document.getElementById("notificationMenu");
+            if (menu) menu.classList.remove("active");
+        }
     });
 });

@@ -23,7 +23,7 @@
         }
 
         if (!user || !getUserId(user)) {
-            window.location.href = "login.html";
+            window.location.href = "index.html";
             return null;
         }
 
@@ -203,7 +203,7 @@
     global.CreateBookingPage = {
         handleLogout: function () {
             if (global.AuthStore) global.AuthStore.clearCurrentUser();
-            window.location.href = "login.html";
+            window.location.href = "index.html";
         }
     };
 

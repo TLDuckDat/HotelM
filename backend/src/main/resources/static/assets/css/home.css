@@ -360,7 +360,7 @@ header.scrolled .btn-nav-outline {
     background: #e7ddce;
     border: 1px solid #e5e5e5;
     border-radius: 16px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
     padding: 15px;
     display: none;
     flex-direction: column;
@@ -566,6 +566,81 @@ header.scrolled .btn-nav-outline {
     display: block;
     background: #fef2f2;
     color: #ef4444;
+}
+
+/* --- NOTIFICATION DROPDOWN STYLE --- */
+.notification-dropdown {
+    position: relative;
+    margin-right: 5px;
+}
+
+.notification-btn {
+    background: transparent;
+    border: none;
+    color: var(--white);
+    /* Tự động theo màu biến của bạn */
+    font-size: 1.2rem;
+    cursor: pointer;
+    position: relative;
+    padding: 8px;
+    transition: 0.3s;
+}
+
+header.scrolled .notification-btn,
+.topbar .notification-btn {
+    color: var(--primary);
+    /* Đổi sang màu vàng gold khi cuộn hoặc trong dashboard */
+}
+
+.notification-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 8px;
+    height: 8px;
+    background: #ff4757;
+    border-radius: 50%;
+    border: 2px solid var(--dark);
+}
+
+.notification-content {
+    position: absolute;
+    top: 130%;
+    right: 0;
+    width: 280px;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    display: none;
+    /* Ẩn mặc định */
+    flex-direction: column;
+    z-index: 1000;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.notification-content.active {
+    display: flex;
+}
+
+.notification-header {
+    padding: 12px 15px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+    color: var(--dark);
+    background: var(--light);
+}
+
+.notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notification-empty {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
 }
 
 /* Hero */
@@ -867,7 +942,7 @@ footer {
     justify-content: center;
     cursor: pointer;
     font-size: 22px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     transition: 0.3s;
 }
 
@@ -881,7 +956,7 @@ footer {
     height: 380px;
     background: white;
     border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     display: none;
     flex-direction: column;
     overflow: hidden;
@@ -906,7 +981,7 @@ footer {
     height: 30px;
     border-radius: 50%;
     border: none;
-    background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
     color: white;
     font-size: 16px;
     cursor: pointer;

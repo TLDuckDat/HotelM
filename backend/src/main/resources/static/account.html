@@ -23,8 +23,20 @@
         <div class="topbar-right">
             <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
             <div class="topbar-greeting">Welcome, <strong id="topbar-username">Guest</strong></div>
-            <a href="account.html" class="topbar-avatar"><i class="fas fa-user"></i>
-</a>
+            <a href="account.html" class="topbar-avatar"><i class="fas fa-user"></i></a>
+
+            <div class="notification-dropdown">
+                <button class="notification-btn" onclick="toggleNotification(event)">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge"></span>
+                </button>
+                <div class="notification-content" id="notificationMenu">
+                    <div class="notification-header">Notifications</div>
+                    <div class="notification-list">
+                        <div class="notification-empty">No new notifications</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -40,14 +52,26 @@
                 <button class="nav-item active" data-panel="panel-account" onclick="switchPanel(this)">
                     <i class="fas fa-user-circle"></i> My Account
                 </button>
-                <button class="nav-item" onclick="location.href='dashboard.html'">
+                <!-- <button class="nav-item" onclick="location.href='dashboard.html'">
                     <i class="fas fa-chart-line"></i> Dashboard
-                </button>
+                </button> -->
                 <button class="nav-item" onclick="location.href='bookings.html'">
                     <i class="fas fa-calendar-check"></i> My Bookings
                 </button>
                 <button class="nav-item" onclick="location.href='rooms.html'">
                     <i class="fas fa-bed"></i> Browse Rooms
+                </button>
+
+                <div class="sidebar-divider"></div>
+
+                <button class="nav-item" onclick="location.href='payments.html'">
+                    <i class="fas fa-credit-card"></i> Payments
+                </button>
+                <button class="nav-item" onclick="location.href='refunds.html'">
+                    <i class="fas fa-undo"></i> Refund Requests
+                </button>
+                <button class="nav-item" onclick="location.href='reviews.html'">
+                    <i class="fas fa-star"></i> Room Reviews
                 </button>
 
                 <div class="sidebar-divider"></div>
@@ -105,6 +129,9 @@
                             </button>
                             <button class="btn-secondary" onclick="location.href='rooms.html'">
                                 <i class="fas fa-bed"></i> Browse Rooms
+                            </button>
+                            <button class="btn-primary" id="btn-edit-profile" onclick="enableEditMode()">
+                                <i class="fas fa-user-edit"></i> Edit Profile Information
                             </button>
                         </div>
                     </div>

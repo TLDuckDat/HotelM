@@ -1,65 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Payments - HotelM</title>
-    <link rel="stylesheet" href="/assets/css/app.css" />
+    <title>Payments - SOT Resort & Hotel</title>
+    <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/profile.css" />
 </head>
+
 <body>
-<div id="app-topbar"></div>
-<div class="container">
-    <h2>Payments</h2>
-    <div id="payments-message" class="notice">Track and submit payment information.</div>
-
-    <div class="card">
-        <h3>Create payment</h3>
-        <form id="payment-form">
-            <label for="payment-booking-id">Booking</label>
-            <select id="payment-booking-id" required></select>
-
-            <label for="payment-method">Method</label>
-            <select id="payment-method" required>
-                <option value="CARD">Card</option>
-                <option value="BANK_TRANSFER">Bank Transfer</option>
-                <option value="CASH">Cash</option>
-            </select>
-
-            <label for="payment-amount">Amount</label>
-            <input id="payment-amount" type="number" min="0" step="0.01" required />
-
-            <button class="primary" type="submit">Submit payment</button>
-        </form>
-    </div>
-
-    <div class="card" style="margin-top:16px;">
-        <h3>My payments</h3>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Booking</th>
-                    <th>Amount</th>
-                    <th>Method</th>
-                    <th>Status</th>
-                </tr>
-                </thead>
-                <tbody id="payments-body">
-                <tr><td colspan="5">Loading...</td></tr>
-                </tbody>
-            </table>
+    <header class="topbar">
+        <a href="index.html" class="topbar-logo">
+            <img src="assets/image/logo.svg" alt="SOT Logo">
+            <span>SOT</span>
+        </a>
+        <div class="topbar-right">
+            <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            <div class="topbar-greeting">Welcome, <strong id="topbar-username">Guest</strong></div>
+            <a href="account.html" class="topbar-avatar"><i class="fas fa-user"></i></a>
         </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar-wrap"><i class="fas fa-user"></i></div>
+                <div class="sidebar-name" id="sidebar-username">Loading…</div>
+                <div class="sidebar-role" id="sidebar-role">—</div>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item" onclick="location.href='account.html'">
+                    <i class="fas fa-user-circle"></i> My Account
+                </button>
+                <!-- <button class="nav-item" onclick="location.href='dashboard.html'">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </button> -->
+                <button class="nav-item" onclick="location.href='bookings.html'">
+                    <i class="fas fa-calendar-check"></i> My Bookings
+                </button>
+                <button class="nav-item" onclick="location.href='rooms.html'">
+                    <i class="fas fa-bed"></i> Browse Rooms
+                </button>
+                <div class="sidebar-divider"></div>
+                <button class="nav-item active" onclick="location.href='payments.html'">
+                    <i class="fas fa-credit-card"></i> Payments
+                </button>
+                <button class="nav-item" onclick="location.href='refunds.html'">
+                    <i class="fas fa-undo"></i> Refund Requests
+                </button>
+                <button class="nav-item" onclick="location.href='reviews.html'">
+                    <i class="fas fa-star"></i> Room Reviews
+                </button>
+                <div class="sidebar-divider"></div>
+                <button class="nav-item danger" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <div class="page-header">
+                <div>
+                    <h1>Payments</h1>
+                    <p>Track and submit your payment records</p>
+                </div>
+            </div>
+
+            <div class="pay-stats">
+                <div class="pay-stat-card">
+                    <div class="pay-stat-icon"><i class="fas fa-receipt"></i></div>
+                    <div>
+                        <div class="pay-stat-label">Total Payments</div>
+                        <div class="pay-stat-value" id="stat-total">—</div>
+                    </div>
+                </div>
+                <div class="pay-stat-card">
+                    <div class="pay-stat-icon"><i class="fas fa-check-circle"></i></div>
+                    <div>
+                        <div class="pay-stat-label">Completed</div>
+                        <div class="pay-stat-value" id="stat-completed">—</div>
+                    </div>
+                </div>
+                <div class="pay-stat-card">
+                    <div class="pay-stat-icon"><i class="fas fa-coins"></i></div>
+                    <div>
+                        <div class="pay-stat-label">Total Paid</div>
+                        <div class="pay-stat-value" id="stat-amount">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-grid">
+                <div class="card" style="align-self: start;">
+                    <div class="card-title"><i class="fas fa-plus-circle"></i> New Payment</div>
+                    <div id="payments-message" class="notice" style="display:none;"></div>
+
+                    <div class="form-group" style="margin-top:20px;">
+                        <label class="form-label">Booking</label>
+                        <select class="form-input" id="payment-booking-id" required>
+                            <option value="">Select a booking…</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Payment Method</label>
+                        <select class="form-input" id="payment-method" required>
+                            <option value="CARD">💳 Card</option>
+                            <option value="BANK_TRANSFER">🏦 Bank Transfer</option>
+                            <option value="CASH">💵 Cash</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Amount</label>
+                        <input class="form-input" id="payment-amount" type="number" min="0" step="0.01"
+                            placeholder="0.00" required />
+                    </div>
+                    <button class="btn-primary" id="payment-submit-btn" type="button">
+                        <i class="fas fa-paper-plane"></i> Submit Payment
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-list-ul"></i> My Payments</div>
+                    <div class="table-wrap" style="margin-top: 20px;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Booking</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payments-body">
+                                <tr>
+                                    <td colspan="5">Loading…</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-</div>
 
-<script src="/script/api/baseApi.js"></script>
-<script src="/script/api/bookingApi.js"></script>
-<script src="/script/api/paymentApi.js"></script>
-<script src="/script/authStore.js"></script>
-<script src="/script/guard.js"></script>
-<script src="/script/app-shell.js"></script>
-<script src="/script/payments.js"></script>
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+    <script src="/script/api/baseApi.js"></script>
+    <script src="/script/api/bookingApi.js"></script>
+    <script src="/script/api/paymentApi.js"></script>
+    <script src="/script/authStore.js"></script>
+    <script src="/script/guard.js"></script>
+    <script src="/script/payments.js"></script>
 </body>
-</html>
 
+</html>

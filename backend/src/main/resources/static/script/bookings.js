@@ -159,24 +159,23 @@
             //     : `<span style="color:var(--text-muted);font-size:0.8rem;">—</span>`;
 
             //Xóa bỏ câu lệnh điều kiện canReview - cho phép rating bất cứ lúc nào  
-        const reviewBtn = `<button class="btn-review" 
-                                data-review-booking="${bookingId}" 
-                                data-review-room="${rid}" 
-                                data-review-room-name="${roomName}" 
-                                data-review-user="${userId}">
-                               <i class="fas fa-star"></i> Review
-                           </button>`;
+        // const reviewBtn = `<button class="btn-review" 
+        //                         data-review-booking="${bookingId}" 
+        //                         data-review-room="${rid}" 
+        //                         data-review-room-name="${roomName}" 
+        //                         data-review-user="${userId}">
+        //                        <i class="fas fa-star"></i> Review
+        //                    </button>`;
             return `
                 <tr>
-                    <td>${b.bookingId || b.bookingID || ''}</td>
                     <td>${roomName}</td>
                     <td>${formatDate(b.checkIn)}</td>
                     <td>${formatDate(b.checkOut)}</td>
                     <td>${badge(b.status)}</td>
                     <td><button class="btn-danger" data-cancel="${b.bookingId || b.bookingID}">Cancel</button></td>
-                    <td>${reviewBtn}</td>
                 </tr>
-            `;
+            `; //<td>${b.bookingId || b.bookingID || ''}</td> || thêm vào dòng này ở trên roomName để hiển thị id nếu cần
+                //<td>${reviewBtn}</td> || thêm vào dòng này ở cuối nếu cần
         }).join('');
 
         body.querySelectorAll('[data-cancel]').forEach(btn => {
@@ -239,7 +238,7 @@
 
     window.handleLogout = function () {
         global.AuthStore.clearCurrentUser();
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
     };
 
     window.toggleSidebar = function () {

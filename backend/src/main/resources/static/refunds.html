@@ -1,57 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Refund Requests - HotelM</title>
-    <link rel="stylesheet" href="/assets/css/app.css" />
+    <title>Refund Requests - SOT Resort & Hotel</title>
+    <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/profile.css" />
 </head>
+
 <body>
-<div id="app-topbar"></div>
-<div class="container">
-    <h2>Refund Requests</h2>
-    <div id="refunds-message" class="notice">Create and track your refund requests.</div>
-
-    <div class="card">
-        <h3>Create refund request</h3>
-        <form id="refund-form">
-            <label for="refund-booking-id">Booking</label>
-            <select id="refund-booking-id" required></select>
-
-            <label for="refund-reason">Reason</label>
-            <textarea id="refund-reason" rows="3" required></textarea>
-
-            <button class="primary" type="submit">Submit request</button>
-        </form>
-    </div>
-
-    <div class="card" style="margin-top:16px;">
-        <h3>My refund requests</h3>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Booking</th>
-                    <th>Status</th>
-                    <th>Reason</th>
-                </tr>
-                </thead>
-                <tbody id="refunds-body">
-                <tr><td colspan="4">Loading...</td></tr>
-                </tbody>
-            </table>
+    <header class="topbar">
+        <a href="index.html" class="topbar-logo">
+            <img src="assets/image/logo.svg" alt="SOT Logo">
+            <span>SOT</span>
+        </a>
+        <div class="topbar-right">
+            <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            <div class="topbar-greeting">Welcome, <strong id="topbar-username">Guest</strong></div>
+            <a href="account.html" class="topbar-avatar"><i class="fas fa-user"></i></a>
         </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar-wrap"><i class="fas fa-user"></i></div>
+                <div class="sidebar-name" id="sidebar-username">Loading…</div>
+                <div class="sidebar-role" id="sidebar-role">—</div>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item" onclick="location.href='account.html'">
+                    <i class="fas fa-user-circle"></i> My Account
+                </button>
+                <!-- <button class="nav-item" onclick="location.href='dashboard.html'">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </button> -->
+                <button class="nav-item" onclick="location.href='bookings.html'">
+                    <i class="fas fa-calendar-check"></i> My Bookings
+                </button>
+                <button class="nav-item" onclick="location.href='rooms.html'">
+                    <i class="fas fa-bed"></i> Browse Rooms
+                </button>
+                <div class="sidebar-divider"></div>
+                <button class="nav-item" onclick="location.href='payments.html'">
+                    <i class="fas fa-credit-card"></i> Payments
+                </button>
+                <button class="nav-item active" onclick="location.href='refunds.html'">
+                    <i class="fas fa-undo"></i> Refund Requests
+                </button>
+                <button class="nav-item" onclick="location.href='reviews.html'">
+                    <i class="fas fa-star"></i> Room Reviews
+                </button>
+                <div class="sidebar-divider"></div>
+                <button class="nav-item danger" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <div class="page-header">
+                <div>
+                    <h1>Refund Requests</h1>
+                    <p>Submit and track your refund requests</p>
+                </div>
+            </div>
+
+            <div class="refund-stats">
+                <div class="refund-stat-card">
+                    <div class="refund-stat-icon"><i class="fas fa-file-invoice"></i></div>
+                    <div>
+                        <div class="refund-stat-label">Total Requests</div>
+                        <div class="refund-stat-value" id="stat-total">—</div>
+                    </div>
+                </div>
+                <div class="refund-stat-card">
+                    <div class="refund-stat-icon"><i class="fas fa-clock"></i></div>
+                    <div>
+                        <div class="refund-stat-label">Pending</div>
+                        <div class="refund-stat-value" id="stat-pending">—</div>
+                    </div>
+                </div>
+                <div class="refund-stat-card">
+                    <div class="refund-stat-icon"><i class="fas fa-check-double"></i></div>
+                    <div>
+                        <div class="refund-stat-label">Approved</div>
+                        <div class="refund-stat-value" id="stat-approved">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-grid">
+                <div class="card" style="align-self: start;">
+                    <div class="card-title"><i class="fas fa-undo-alt"></i> New Refund Request</div>
+                    <div class="info-banner">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Refund requests are reviewed within 3–5 business days. Approved refunds will be returned
+                            via your original payment method.</span>
+                    </div>
+                    <div id="refunds-message" style="display:none;"></div>
+
+                    <div class="form-group">
+                        <label class="form-label">Select Booking</label>
+                        <select class="form-input" id="refund-booking-id" required>
+                            <option value="">Choose a booking…</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Reason for Refund</label>
+                        <textarea class="form-input" id="refund-reason" rows="4"
+                            placeholder="Please describe why you are requesting a refund…" required
+                            style="resize:vertical;"></textarea>
+                    </div>
+                    <button class="btn-primary" type="button" id="refund-submit-btn">
+                        <i class="fas fa-paper-plane"></i> Submit Request
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-list-ul"></i> My Refund Requests</div>
+                    <div class="table-wrap" style="margin-top: 20px;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>Booking</th>
+                                    <th>Status</th>
+                                    <th>Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody id="refunds-body">
+                                <tr>
+                                    <td colspan="4">Loading…</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-</div>
 
-<script src="/script/api/baseApi.js"></script>
-<script src="/script/api/bookingApi.js"></script>
-<script src="/script/api/refundApi.js"></script>
-<script src="/script/authStore.js"></script>
-<script src="/script/guard.js"></script>
-<script src="/script/app-shell.js"></script>
-<script src="/script/refunds.js"></script>
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+    <script src="/script/api/baseApi.js"></script>
+    <script src="/script/api/bookingApi.js"></script>
+    <script src="/script/api/refundApi.js"></script>
+    <script src="/script/authStore.js"></script>
+    <script src="/script/guard.js"></script>
+    <script src="/script/refunds.js"></script>
 </body>
-</html>
 
+</html>

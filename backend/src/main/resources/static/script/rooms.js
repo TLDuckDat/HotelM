@@ -1,6 +1,10 @@
 (function (global) {
     "use strict";
 
+    // Khai báo biến lưu trữ dữ liệu gốc để lọc
+    let rawRooms = [];
+    let rawTypes = [];
+
     // ====================== LOAD USER ======================
     function loadUser() {
         if (!global.Guard.requireLogin()) return;
@@ -16,7 +20,97 @@
     // ====================== LOGOUT ======================
     function handleLogout() {
         global.AuthStore.clearCurrentUser();
-        window.location.href = "login.html";
+        window.location.href = "index.html";
+    }
+
+    // --- LOGIC LỌC MỚI THÊM VÀO ---
+    function applyFilters() {
+        const typeVal = document.getElementById('filter-type').value;
+        const capVal = document.getElementById('filter-capacity').value;
+        const priceVal = document.getElementById('filter-price').value;
+
+        const filtered = rawRooms.filter(room => {
+            // Lọc loại phòng
+            const rTypeId = (room.roomTypeId || room.typeID || room.roomTypeID)?.toString();
+            const matchType = !typeVal || rTypeId === typeVal;
+
+            // Lọc sức chứa
+            const matchCap = !capVal || (room.maxCapacity >= parseInt(capVal));
+
+            // Lọc giá (Giả định room có trường price hoặc lấy từ roomType)
+            let matchPrice = true;
+            if (priceVal) {
+                const [min, max] = priceVal.split('-').map(Number);
+                const rPrice = room.price || room.roomType?.price || 0;
+                matchPrice = rPrice >= min && rPrice <= max;
+            }
+
+            return matchType && matchCap && matchPrice;
+        });
+
+        renderRooms(filtered, rawTypes);
+    }
+
+    function initFilterEvents(types) {
+        const filterForm = document.getElementById('filter-form');
+        const toggleBtn = document.getElementById('toggle-filter');
+        const chevron = document.getElementById('filter-chevron');
+
+        // 1. Logic ẩn/hiện form
+        if (toggleBtn && filterForm) {
+            toggleBtn.addEventListener('click', () => {
+                // Kiểm tra trạng thái hiện tại
+                if (filterForm.style.display === 'none') {
+                    filterForm.style.display = 'grid';
+                    chevron.style.transform = 'rotate(0deg)';
+                } else {
+                    filterForm.style.display = 'none';
+                    chevron.style.transform = 'rotate(180deg)';
+                }
+            });
+        }
+
+        // 2. Đổ dữ liệu vào select loại phòng
+        const typeSelect = document.getElementById('filter-type');
+        if (typeSelect && typeSelect.options.length <= 1) {
+            types.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.typeID || t.id;
+                opt.textContent = t.typeName || t.name;
+                typeSelect.appendChild(opt);
+            });
+        }
+
+        // 3. Gắn sự kiện lọc cho các ô input
+        const controls = ['filter-type', 'filter-capacity', 'filter-price'];
+        controls.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                // Dùng event 'input' cho cả 3 để lọc ngay lập tức khi thay đổi
+                el.addEventListener('input', applyFilters);
+            }
+        });
+
+        // 4. Nút Reset
+        const resetBtn = document.getElementById('btn-reset');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                document.getElementById('filter-form').reset();
+                renderRooms(rawRooms, rawTypes);
+            });
+        }
+
+        const filterContainer = document.getElementById('filter-container');
+        const toggleFilter = document.getElementById('toggle-filter');
+        const filterChevron = document.getElementById('filter-chevron');
+
+        if (toggleFilter) {
+            toggleFilter.addEventListener('click', () => {
+                filterContainer.classList.toggle('collapsed');
+                // Xoay icon 180 độ khi đóng
+                filterChevron.style.transform = filterContainer.classList.contains('collapsed') ? 'rotate(180deg)' : 'rotate(0deg)';
+            });
+        }
     }
 
     // ====================== RENDER ROOMS ======================
@@ -95,7 +189,12 @@
             global.RoomApi.getRooms(),
             global.RoomTypeApi.getRoomTypes().catch(function () { return []; })
         ]).then(function (result) {
-            renderRooms(result[0] || [], result[1] || []);
+            // QUAN TRỌNG: Phải gán dữ liệu vào biến raw trước khi render
+            rawRooms = result[0] || [];
+            rawTypes = result[1] || [];
+
+            initFilterEvents(rawTypes); // Khởi tạo sự kiện ẩn/hiện và lọc
+            renderRooms(rawRooms, rawTypes); // Hiển thị danh sách ban đầu
         }).catch(function (err) {
             list.innerHTML = "<p class='error'>Failed to load rooms.</p>";
             console.error(err);

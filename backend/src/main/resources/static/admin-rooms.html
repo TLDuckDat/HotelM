@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard - SOT Resort & Hotel</title>
+    <title>Room Management - SOT Resort & Hotel</title>
     <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -44,12 +44,12 @@
             </div>
             <nav class="sidebar-nav">
                 <div class="nav-group-label">Overview</div>
-                <button class="nav-item active" onclick="location.href='admin-dashboard.html'">
+                <button class="nav-item" onclick="location.href='admin-dashboard.html'">
                     <i class="fas fa-chart-pie"></i> Dashboard
                 </button>
 
                 <div class="nav-group-label">Management</div>
-                <button class="nav-item" onclick="location.href='admin-rooms.html'">
+                <button class="nav-item active" onclick="location.href='admin-rooms.html'">
                     <i class="fas fa-bed"></i> Rooms
                 </button>
                 <button class="nav-item" onclick="location.href='admin-bookings.html'">
@@ -76,7 +76,7 @@
                 </button>
 
                 <div class="sidebar-divider"></div>
-                <button class="nav-item danger" onclick="AdminDashboard.handleLogout()">
+                <button class="nav-item danger" onclick="AdminRooms.handleLogout()">
                     <i class="fas fa-sign-out-alt"></i> Sign Out
                 </button>
             </nav>
@@ -87,55 +87,60 @@
 
             <div class="page-header">
                 <div>
-                    <h1>Admin Dashboard</h1>
-                    <p>Manage your resort operations</p>
+                    <h1>Room Management</h1>
+                    <p>Add, edit, or remove rooms</p>
                 </div>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-users"></i></div>
-                    <div class="stat-body">
-                        <div class="stat-value" id="admin-stat-users">0</div>
-                        <div class="stat-label">Total Users</div>
+            <div class="card" style="margin-bottom: 28px;">
+                <div class="card-title"><i class="fas fa-plus-circle"></i> Add New Room</div>
+                <form id="admin-create-room-form">
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label class="form-label">Room Name</label>
+                            <input id="admin-room-name" class="form-input" placeholder="e.g. Deluxe Suite" required />
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Capacity</label>
+                            <input id="admin-room-capacity" class="form-input" type="number" min="1" placeholder="2" required />
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Status</label>
+                            <select id="admin-room-status" class="form-input">
+                                <option value="AVAILABLE">AVAILABLE</option>
+                                <option value="BOOKED">BOOKED</option>
+                                <option value="MAINTENANCE">MAINTENANCE</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-bed"></i></div>
-                    <div class="stat-body">
-                        <div class="stat-value" id="admin-stat-rooms">0</div>
-                        <div class="stat-label">Total Rooms</div>
+                    <div class="form-field" style="margin-top: 14px;">
+                        <label class="form-label">Description</label>
+                        <input id="admin-room-desc" class="form-input" placeholder="Short description (optional)" />
                     </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
-                    <div class="stat-body">
-                        <div class="stat-value" id="admin-stat-bookings">0</div>
-                        <div class="stat-label">Total Bookings</div>
+                    <div style="margin-top: 20px;">
+                        <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> Add Room</button>
                     </div>
-                </div>
-                <div class="stat-card accent">
-                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                    <div class="stat-body">
-                        <div class="stat-value" id="admin-stat-pending">0</div>
-                        <div class="stat-label">Pending Bookings</div>
-                    </div>
-                </div>
+                </form>
             </div>
 
-            <div class="quick-nav-grid">
-                <button class="quick-nav-card" onclick="location.href='admin-rooms.html'">
-                    <i class="fas fa-bed"></i>
-                    <span>Manage Rooms</span>
-                </button>
-                <button class="quick-nav-card" onclick="location.href='admin-bookings.html'">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Manage Bookings</span>
-                </button>
-                <button class="quick-nav-card" onclick="location.href='admin-users.html'">
-                    <i class="fas fa-users"></i>
-                    <span>Manage Users</span>
-                </button>
+            <div class="card">
+                <div class="card-title"><i class="fas fa-list"></i> All Rooms</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Room ID</th>
+                                <th>Name</th>
+                                <th>Capacity</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-rooms-body">
+                            <tr><td colspan="5" class="table-empty">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
@@ -145,11 +150,9 @@
 
     <script src="script/api/baseApi.js"></script>
     <script src="script/authStore.js"></script>
-    <script src="script/api/userApi.js"></script>
     <script src="script/api/roomApi.js"></script>
-    <script src="script/api/bookingApi.js"></script>
     <script src="script/guard.js"></script>
     <script src="script/app-shell.js"></script>
-    <script src="script/admin-dashboard.js"></script>
+    <script src="script/admin-rooms.js"></script>
 </body>
 </html>

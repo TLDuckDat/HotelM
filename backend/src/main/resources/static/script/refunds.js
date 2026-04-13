@@ -6,6 +6,7 @@
         if (!el) return;
         el.className = type || "notice";
         el.textContent = text;
+        el.style.display = "block";
     }
 
     function loadBookingOptions() {
@@ -41,9 +42,10 @@
         }
 
         body.innerHTML = refunds.map(function (r) {
+            var bookingId = r.bookingId || (r.booking && r.booking.bookingID) || "";
             return "<tr>"
                 + "<td>" + (r.refundID || r.id || "") + "</td>"
-                + "<td>" + (r.bookingId || "") + "</td>"
+                + "<td>" + bookingId + "</td>"
                 + "<td>" + (r.status || "PENDING") + "</td>"
                 + "<td>" + (r.reason || "") + "</td>"
                 + "</tr>";
@@ -60,6 +62,17 @@
                     if (r.user && r.user.userID) return r.user.userID === user.userID;
                     return true;
                 });
+
+                // Update stat cards
+                var pending  = mine.filter(function (r) { return (r.status || "PENDING") === "PENDING"; }).length;
+                var approved = mine.filter(function (r) { return r.status === "APPROVED"; }).length;
+                var elTotal    = document.getElementById("stat-total");
+                var elPending  = document.getElementById("stat-pending");
+                var elApproved = document.getElementById("stat-approved");
+                if (elTotal)    elTotal.textContent    = mine.length;
+                if (elPending)  elPending.textContent  = pending;
+                if (elApproved) elApproved.textContent = approved;
+
                 renderRefunds(mine);
             })
             .catch(function (err) {
@@ -71,15 +84,13 @@
             });
     }
 
-    function submitRefund(event) {
-        event.preventDefault();
-
-        var user = global.AuthStore.getCurrentUser();
+    function submitRefund() {
+        var user      = global.AuthStore.getCurrentUser();
         var bookingId = document.getElementById("refund-booking-id").value;
-        var reason = document.getElementById("refund-reason").value.trim();
+        var reason    = document.getElementById("refund-reason").value.trim();
 
         if (!bookingId || !reason) {
-            setMessage("Please choose booking and enter reason.", "error");
+            setMessage("Please choose a booking and enter a reason.", "error");
             return;
         }
 
@@ -87,11 +98,12 @@
 
         global.RefundApi.createRefund({
             bookingId: bookingId,
-            userId: user.userID,
-            reason: reason
+            userId:    user.userID,
+            reason:    reason
         }).then(function () {
             setMessage("Refund request submitted.", "success");
-            document.getElementById("refund-form").reset();
+            document.getElementById("refund-booking-id").value = "";
+            document.getElementById("refund-reason").value     = "";
             loadRefunds();
         }).catch(function (err) {
             var msg = err && err.payload
@@ -101,10 +113,31 @@
         });
     }
 
+    function handleLogout() {
+        if (global.AuthStore) global.AuthStore.clearCurrentUser();
+        window.location.href = "index.html";
+    }
+    window.handleLogout = handleLogout;
+
+    window.toggleSidebar = function () {
+        document.getElementById("sidebar").classList.toggle("open");
+        document.getElementById("sidebar-overlay").classList.toggle("active");
+    };
+    window.closeSidebar = function () {
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("sidebar-overlay").classList.remove("active");
+    };
+
     function init() {
         if (!global.Guard.requireLogin()) return;
 
-        global.AppShell.renderTopbar("Refund Requests");
+        var user = global.AuthStore.getCurrentUser();
+        if (user) {
+            var el;
+            el = document.getElementById("topbar-username"); if (el) el.textContent = user.fullName || "Guest";
+            el = document.getElementById("sidebar-username"); if (el) el.textContent = user.fullName || "Guest";
+            el = document.getElementById("sidebar-role");    if (el) el.textContent = user.role || "USER";
+        }
 
         Promise.all([
             loadBookingOptions(),
@@ -113,9 +146,9 @@
             setMessage("Cannot initialize refund page.", "error");
         });
 
-        document.getElementById("refund-form").addEventListener("submit", submitRefund);
+        var btn = document.getElementById("refund-submit-btn");
+        if (btn) btn.addEventListener("click", submitRefund);
     }
 
     document.addEventListener("DOMContentLoaded", init);
-})(window);
-
+})(window); 

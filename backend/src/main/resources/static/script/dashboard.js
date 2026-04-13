@@ -42,7 +42,7 @@
 
     function handleLogout() {
         if (global.AuthStore) global.AuthStore.clearCurrentUser();
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
     }
 
     window.toggleSidebar = function () {

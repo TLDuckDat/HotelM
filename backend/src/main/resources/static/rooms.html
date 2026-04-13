@@ -43,14 +43,26 @@
                 <button class="nav-item" onclick="location.href='account.html'">
                     <i class="fas fa-user-circle"></i> My Account
                 </button>
-                <button class="nav-item" onclick="location.href='dashboard.html'">
+                <!-- <button class="nav-item" onclick="location.href='dashboard.html'">
                     <i class="fas fa-chart-line"></i> Dashboard
-                </button>
+                </button> -->
                 <button class="nav-item" onclick="location.href='bookings.html'">
                     <i class="fas fa-calendar-check"></i> My Bookings
                 </button>
                 <button class="nav-item active">
                     <i class="fas fa-bed"></i> Browse Rooms
+                </button>
+
+                <div class="sidebar-divider"></div>
+
+                <button class="nav-item" onclick="location.href='payments.html'">
+                    <i class="fas fa-credit-card"></i> Payments
+                </button>
+                <button class="nav-item" onclick="location.href='refunds.html'">
+                    <i class="fas fa-undo"></i> Refund Requests
+                </button>
+                <button class="nav-item" onclick="location.href='reviews.html'">
+                    <i class="fas fa-star"></i> Room Reviews
                 </button>
 
                 <div class="sidebar-divider"></div>
@@ -66,6 +78,63 @@
             <div class="page-header">
                 <h1>Browse Rooms</h1>
                 <p>View all available room types</p>
+            </div>
+
+            <div class="card filter-card" style="padding: 24px !important;">
+                <div id="toggle-filter"
+                    style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                    <div class="card-title" style="margin-bottom: 0; font-size: 1.1rem;">
+                        <i class="fas fa-filter" style="margin-right: 8px;"></i> Bộ lọc tìm kiếm
+                    </div>
+                    <i class="fas fa-chevron-up" id="filter-chevron"
+                        style="transition: 0.3s; color: var(--primary);"></i>
+                </div>
+
+                <div id="filter-container" style="transition: all 0.3s ease;">
+                    <form id="filter-form"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 24px; margin-top: 20px; align-items: end;">
+
+                        <div class="form-field">
+                            <label class="form-label" style="display: block; margin-bottom: 10px;">Loại phòng</label>
+                            <select id="filter-type" class="form-select">
+                                <option value="">Tất cả loại phòng</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" style="display: block; margin-bottom: 10px;">Sức chứa</label>
+                            <input type="number" id="filter-capacity" class="form-input" placeholder="Số người..."
+                                min="1">
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" style="display: block; margin-bottom: 10px;">Khoảng giá</label>
+                            <select id="filter-price" class="form-select">
+                                <option value="">Tất cả giá</option>
+                                <option value="0-500000">Dưới 500.000đ</option>
+                                <option value="500000-1000000">500k - 1 triệu</option>
+                                <option value="1000000-999999999">Trên 1 triệu</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" style="display: block; margin-bottom: 10px;">Đánh giá</label>
+                            <select id="filter-rating" class="form-select">
+                                <option value="">Tất cả đánh giá</option>
+                                <option value="5">5 sao</option>
+                                <option value="4">4 sao trở lên</option>
+                                <option value="3">3 sao trở lên</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <button type="button" id="btn-reset" class="btn-secondary"
+                                style="width: 100%; height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fas fa-redo-alt" style="font-size: 0.8rem;"></i> Xóa lọc
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <div id="rooms-list" class="rooms-grid">
