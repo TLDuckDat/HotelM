@@ -5,6 +5,7 @@ import org.example.hotelm.booking.entity.Booking;
 import org.example.hotelm.booking.repository.BookingRepository;
 import org.example.hotelm.booking.service.BookingService;
 import org.example.hotelm.common.exception.ResourceNotFoundException;
+import org.example.hotelm.room.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
+    private final RoomRepository roomRepository;
 
     @Override
     public List<Booking> getAllBookings() {
@@ -34,6 +36,19 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking createBooking(Booking booking) {
         booking.setBookingID(null);
+
+        // Tự động tính totalPrice = basePrice * số đêm
+        if (booking.getRoom() != null && booking.getRoom().getRoomID() != null) {
+            roomRepository.findById(booking.getRoom().getRoomID()).ifPresent(room -> {
+                if (room.getRoomType() != null && room.getRoomType().getBasePrice() != null) {
+                    long nights = java.time.temporal.ChronoUnit.DAYS.between(
+                            booking.getCheckIn().toLocalDate(),
+                            booking.getCheckOut().toLocalDate());
+                    booking.setTotalPrice(room.getRoomType().getBasePrice() * Math.max(nights, 1));
+                }
+            });
+        }
+
         return bookingRepository.save(booking);
     }
 

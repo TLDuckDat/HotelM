@@ -7,6 +7,8 @@ import org.example.hotelm.room.entity.Room;
 @Data
 @Builder
 public class RoomResponse {
+    private String branchId;
+    private String branchName;
 
     private String roomId;
     private String roomName;

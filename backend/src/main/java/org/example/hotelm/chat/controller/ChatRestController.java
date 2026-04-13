@@ -2,11 +2,7 @@ package org.example.hotelm.chat.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.hotelm.chat.dto.ChatMessageRequest;
-import org.example.hotelm.chat.dto.ChatMessageResponse;
-import org.example.hotelm.chat.dto.ChatThreadResponse;
-import org.example.hotelm.chat.dto.CreateThreadRequest;
-import org.example.hotelm.chat.dto.StaffUserResponse;
+import org.example.hotelm.chat.dto.*;
 import org.example.hotelm.chat.mapper.ChatMapper;
 import org.example.hotelm.chat.service.ChatService;
 import org.springframework.http.HttpStatus;

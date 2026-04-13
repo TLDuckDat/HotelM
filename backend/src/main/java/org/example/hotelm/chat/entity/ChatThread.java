@@ -1,11 +1,7 @@
 package org.example.hotelm.chat.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.example.hotelm.user.entity.User;
 
 import java.time.Instant;

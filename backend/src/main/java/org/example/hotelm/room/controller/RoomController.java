@@ -57,4 +57,15 @@ public class RoomController {
                                                      @RequestParam Room.RoomStatus status) {
         return ResponseEntity.ok(roomService.updateRoomStatus(id, status));
     }
+
+    @GetMapping("/by-branch/{branchId}")
+    public ResponseEntity<List<RoomResponse>> getRoomsByBranch(@PathVariable String branchId) {
+        return ResponseEntity.ok(roomService.getRoomsByBranch(branchId));
+    }
+
+    // Lấy phòng AVAILABLE của một chi nhánh (dùng khi khách muốn đặt)
+    @GetMapping("/by-branch/{branchId}/available")
+    public ResponseEntity<List<RoomResponse>> getAvailableRoomsByBranch(@PathVariable String branchId) {
+        return ResponseEntity.ok(roomService.getAvailableRoomsByBranch(branchId));
+    }
 }

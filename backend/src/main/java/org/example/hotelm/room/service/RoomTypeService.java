@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface RoomTypeService {
     List<RoomTypeResponse> getAllRoomTypes();
+
     RoomTypeResponse getRoomTypeById(String id);
     RoomTypeResponse createRoomType(RoomTypeCreateRequest request);
     RoomTypeResponse updateRoomType(String id, RoomTypeCreateRequest request);

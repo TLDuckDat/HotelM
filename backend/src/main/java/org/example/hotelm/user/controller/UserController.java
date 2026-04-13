@@ -1,15 +1,13 @@
 package org.example.hotelm.user.controller;
 
 import jakarta.validation.Valid;
-
-
+import lombok.RequiredArgsConstructor;
 import org.example.hotelm.user.dto.UserCreateRequest;
 import org.example.hotelm.user.dto.UserResponse;
 import org.example.hotelm.user.dto.UserStatusUpdateRequest;
 import org.example.hotelm.user.dto.UserUpdateRequest;
 import org.example.hotelm.user.entity.User;
 import org.example.hotelm.user.mapper.UserMapper;
-import lombok.RequiredArgsConstructor;
 import org.example.hotelm.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

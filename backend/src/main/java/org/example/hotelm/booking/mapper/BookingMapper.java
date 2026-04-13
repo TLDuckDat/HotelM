@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Component
 public class BookingMapper {
+
     public Booking toEntity(BookingCreateRequest request, User user, Room room) {
         Booking booking = new Booking();
         booking.setUser(user);

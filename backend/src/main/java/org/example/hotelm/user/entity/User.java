@@ -20,8 +20,6 @@ public class User {
 
     private String fullName;
     private String phoneNumber;
-
-    @Column(unique = true, nullable = false, length = 255)
     private String email;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;

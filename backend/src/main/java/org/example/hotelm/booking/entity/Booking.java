@@ -1,9 +1,9 @@
 package org.example.hotelm.booking.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.*;
 import org.example.hotelm.room.entity.Room;
 import org.example.hotelm.user.entity.User;
 

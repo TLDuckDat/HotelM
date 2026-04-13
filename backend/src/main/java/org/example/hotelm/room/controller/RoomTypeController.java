@@ -13,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/room-types")
 @RequiredArgsConstructor
+
 public class RoomTypeController {
 
     private final RoomTypeService roomTypeService;

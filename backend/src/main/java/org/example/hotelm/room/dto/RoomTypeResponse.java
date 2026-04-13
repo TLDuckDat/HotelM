@@ -11,4 +11,5 @@ public class RoomTypeResponse {
     private String typeName;
     private Double basePrice;
     private String description;
+
 }

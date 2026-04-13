@@ -42,6 +42,10 @@ public class RoomMapper {
                     .basePrice(room.getRoomType().getBasePrice());
         }
 
+        if (room.getBranch() != null) {
+            builder.branchId(room.getBranch().getBranchId())
+                    .branchName(room.getBranch().getBranchName());
+        }
         return builder.build();
     }
 

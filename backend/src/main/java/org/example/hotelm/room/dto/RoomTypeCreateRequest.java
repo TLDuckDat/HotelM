@@ -16,4 +16,5 @@ public class RoomTypeCreateRequest {
     private Double basePrice;
 
     private String description;
+
 }

@@ -15,4 +15,7 @@ public interface RoomService {
     void deleteRoom(String id);
     List<RoomResponse> getAvailableRooms();
     RoomResponse updateRoomStatus(String id, Room.RoomStatus status);
+
+    List<RoomResponse> getRoomsByBranch(String branchId);
+    List<RoomResponse> getAvailableRoomsByBranch(String branchId);
 }

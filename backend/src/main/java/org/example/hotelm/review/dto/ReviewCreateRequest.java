@@ -1,6 +1,8 @@
 package org.example.hotelm.review.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 
 public record ReviewCreateRequest(
         @NotBlank(message = "User ID is required")

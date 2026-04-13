@@ -10,4 +10,7 @@ import java.util.List;
 public interface RoomRepository extends JpaRepository<Room, String> {
 
     List<Room> findByStatus(Room.RoomStatus status);
+    List<Room> findByBranch_BranchId(String branchId);
+    List<Room> findByBranch_BranchIdAndStatus(String branchId, Room.RoomStatus status);
+
 }

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public record BookingCreateRequest(
+
         @NotBlank(message = "User ID is required")
         String userId,
         @NotBlank(message = "Room ID is required")

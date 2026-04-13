@@ -16,4 +16,5 @@ public class RoomUpdateRequest {
     private String description;
     private String imageUrl;
     private Room.RoomStatus status;
+
 }

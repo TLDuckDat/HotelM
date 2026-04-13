@@ -1,7 +1,6 @@
 package org.example.hotelm.common.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -61,32 +60,6 @@ public class GlobalExceptionHandler {
                 status.value(),
                 status.getReasonPhrase(),
                 ex.getMessage(),
-                request.getRequestURI()
-        );
-        return ResponseEntity.status(status).body(body);
-    }
-
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiError> handleDataIntegrityViolation(
-            DataIntegrityViolationException ex,
-            HttpServletRequest request
-    ) {
-        HttpStatus status = HttpStatus.CONFLICT;
-        String causeMsg = ex.getMostSpecificCause() != null
-                ? ex.getMostSpecificCause().getMessage()
-                : ex.getMessage();
-        String message = "Dữ liệu trùng hoặc vi phạm ràng buộc cơ sở dữ liệu";
-        if (causeMsg != null) {
-            String lower = causeMsg.toLowerCase();
-            if (lower.contains("duplicate") || lower.contains("unique")) {
-                message = "Email đã được sử dụng";
-            }
-        }
-        ApiError body = new ApiError(
-                OffsetDateTime.now(),
-                status.value(),
-                status.getReasonPhrase(),
-                message,
                 request.getRequestURI()
         );
         return ResponseEntity.status(status).body(body);
