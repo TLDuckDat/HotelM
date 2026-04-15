@@ -8,6 +8,7 @@ import org.example.hotelm.common.exception.ResourceNotFoundException;
 import org.example.hotelm.room.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -66,4 +67,10 @@ public class BookingServiceImpl implements BookingService {
         }
         bookingRepository.deleteById(bookingId);
     }
+
+    @Override
+    public boolean hasOverlappingBooking(String roomId, LocalDateTime checkIn, LocalDateTime checkOut) {
+        return !bookingRepository.findOverlapping(roomId, checkIn, checkOut).isEmpty();
+    }
+
 }

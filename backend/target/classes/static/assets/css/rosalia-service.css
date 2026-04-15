@@ -1,0 +1,370 @@
+@import url('../css/home.css');
+
+body {
+    font-family: 'Lato', sans-serif;
+    color: var(--dark);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    font-family: 'Playfair Display', serif;
+}
+
+header {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    transition: 0.3s;
+    height: 80px;
+}
+
+header.scrolled {
+    background: rgba(42, 24, 16, 0.95);
+    backdrop-filter: blur(5px);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+
+.logo-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--white);
+    transition: opacity 0.25s;
+}
+
+.logo-link:hover {
+    opacity: 0.92;
+}
+
+.logo-img {
+    width: 48px;
+    height: 48px;
+    display: block;
+    flex-shrink: 0;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+
+.logo-wordmark {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--white);
+    white-space: nowrap;
+}
+
+.desktop-nav a {
+    color: var(--white);
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    transition: 0.3s;
+}
+
+.desktop-nav a:hover,
+.desktop-nav a.active {
+    color: var(--primary);
+}
+
+.btn-book {
+    border: 2px solid var(--primary);
+    background: transparent;
+    color: var(--primary);
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.btn-book:hover {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.mobile-nav {
+    display: none;
+    flex-direction: column;
+    padding: 15px 20px;
+    background: rgba(42, 24, 16, 0.95);
+}
+
+.mobile-nav a {
+    color: var(--white);
+    text-decoration: none;
+    padding: 10px 0;
+    font-size: 14px;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(201, 160, 80, 0.15);
+}
+
+.mobile-nav a:hover,
+.mobile-nav a.active {
+    color: var(--primary);
+}
+
+.hero {
+    height: 70vh;
+    min-height: 500px;
+    background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+}
+
+.hero-content h1 {
+    font-size: clamp(3rem, 8vw, 6rem);
+    color: var(--white);
+    font-style: italic;
+    letter-spacing: 5px;
+}
+
+.wavy-bottom {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    line-height: 0;
+}
+
+.wavy-bottom svg {
+    width: 100%;
+    display: block;
+}
+
+.categories {
+    background: var(--light);
+    padding: 80px 0;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-title h2 {
+    font-size: 2.5rem;
+    color: var(--primary);
+}
+
+.cat-grid {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
+}
+
+.cat-item {
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cat-item:hover {
+    transform: translateY(-5px);
+}
+
+.cat-item i {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 15px;
+    display: block;
+}
+
+.cat-item h4 {
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    color: var(--dark);
+}
+
+.detail-row {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-row.reverse {
+    flex-direction: column;
+}
+
+.detail-img {
+    flex: 1;
+    overflow: hidden;
+}
+
+.detail-img img {
+    width: 100%;
+    height: 450px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s;
+}
+
+.detail-img:hover img {
+    transform: scale(1.03);
+}
+
+.detail-text {
+    flex: 1;
+    background: var(--dark);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 30px;
+    color: var(--white);
+}
+
+.detail-text h2 {
+    font-size: 1.5rem;
+    letter-spacing: 3px;
+    margin-bottom: 15px;
+}
+
+.gold-line {
+    width: 50px;
+    height: 2px;
+    background: var(--primary);
+    margin-bottom: 20px;
+}
+
+.detail-text p {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 25px;
+}
+
+.btn-explore {
+    align-self: flex-start;
+    border: 2px solid var(--primary);
+    padding: 10px 30px;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: var(--primary);
+    text-decoration: none;
+    transition: 0.3s;
+    font-family: 'Lato', sans-serif;
+}
+
+.btn-explore:hover {
+    background: var(--primary);
+    color: var(--white);
+}
+
+@media (min-width: 1024px) {
+    .detail-row {
+        flex-direction: row;
+    }
+
+    .detail-row.reverse {
+        flex-direction: row-reverse;
+    }
+
+    .detail-img img {
+        height: 100%;
+        min-height: 500px;
+    }
+
+    .detail-text {
+        padding: 60px;
+    }
+}
+
+footer {
+    background: var(--light);
+    padding: 80px 0 30px;
+    text-align: center;
+}
+
+footer h3 {
+    font-size: 1.2rem;
+    color: var(--dark);
+}
+
+.newsletter form {
+    display: flex;
+    max-width: 500px;
+    margin: 30px auto;
+}
+
+.newsletter input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid var(--dark);
+    outline: none;
+    font-family: 'Lato', sans-serif;
+}
+
+.newsletter button {
+    background: var(--dark);
+    color: white;
+    border: none;
+    padding: 0 25px;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    letter-spacing: 1px;
+}
+
+.contact-info {
+    margin-top: 30px;
+}
+
+.contact-info p {
+    font-size: 0.85rem;
+    color: rgba(61, 40, 23, 0.6);
+}
+
+.copyright {
+    margin-top: 30px;
+    border-top: 1px solid rgba(61, 40, 23, 0.15);
+    padding-top: 20px;
+}
+
+.copyright p {
+    font-size: 0.75rem;
+    color: rgba(61, 40, 23, 0.4);
+}
+
+@media (max-width: 768px) {
+
+    .desktop-nav,
+    header .btn-book {
+        display: none;
+    }
+
+    .mobile-menu-btn {
+        display: block;
+    }
+}

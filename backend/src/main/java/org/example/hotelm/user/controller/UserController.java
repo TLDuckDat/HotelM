@@ -26,7 +26,7 @@ public class UserController {
     // GET /users - Lấy tất cả user
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
-        List<UserResponse> data = userService.getAllUsers().stream()
+        List<UserResponse> data = userService.  getAllUsers().stream()
                 .map(userMapper::toResponse)
                 .toList();
         return ResponseEntity.ok(data);
