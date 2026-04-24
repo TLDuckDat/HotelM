@@ -38,9 +38,9 @@
                 + "<td class='reason-cell'>" + (r.reason || "—") + "</td>"
                 + "<td>" + statusBadge(status) + "</td>"
                 + "<td><div class='actions-cell'>"
-                + (canAct ? "<button class='btn-approve' onclick='confirmAction(\"approve\",\"" + id + "\")'><i class='fas fa-check'></i> Approve</button>" : "")
-                + (canAct ? "<button class='btn-reject'  onclick='confirmAction(\"reject\",\""  + id + "\")'><i class='fas fa-times'></i> Reject</button>" : "")
-                + "<button class='btn-del' onclick='confirmAction(\"delete\",\"" + id + "\")'><i class='fas fa-trash'></i></button>"
+                + (canAct ? "<button class='btn-approve' onclick='confirmAction(\"approve\",\"" + id + "\")'><i class='fas fa-check'></i> <span data-i18n='admin_actions_approve'>Approve</span></button>" : "")
+                + (canAct ? "<button class='btn-reject'  onclick='confirmAction(\"reject\",\""  + id + "\")'><i class='fas fa-times'></i> <span data-i18n='admin_actions_reject'>Reject</span></button>" : "")
+                + "<button class='btn-del' onclick='confirmAction(\"delete\",\"" + id + "\")'><i class='fas fa-trash'></i> <span data-i18n='admin_actions_delete'>Delete</span></button>"
                 + "</div></td>"
                 + "</tr>";
         }).join("");

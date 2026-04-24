@@ -23,113 +23,29 @@
                 </a>
             </div>
             <nav class="desktop-nav">
-                <a href="index.html">HOME</a>
+                <a href="index.html" data-i18n="nav-home">HOME</a>
                 <!-- <a href="/rosalia-villa.html">VILLA</a> -->
-                <a href="rosalia-service.html">SERVICE</a>
-                <a href="rosalia-about.html">ABOUT US</a>
+                <a href="rosalia-service.html" data-i18n="nav-service">SERVICE</a>
+                <a href="rosalia-about.html" data-i18n="nav-about">ABOUT US</a>
                 <!-- <a href="restaurant.html">RESTAURANT</a> -->
-                <a href="offer.html" class="active">OFFER</a>
+                <a href="offer.html" class="active" data-i18n="nav-offer">OFFER</a>
                 <!-- <a href="wedding.html">WEDDING</a> -->
             </nav>
             <div class="nav-actions" id="nav-actions">
-                <button class="btn-nav-outline" id="btn-login" onclick="openLoginModal()">SIGN IN</button>
-                <button class="btn-nav-primary" id="btn-register" onclick="openRegisterModal()">BOOK NOW</button>
+                <button class="btn-nav-outline" id="btn-login" onclick="openLoginModal()" data-i18n="nav_signin">SIGN
+                    IN</button>
+                <button class="btn-nav-primary" id="btn-register" onclick="openRegisterModal()"
+                    data-i18n="nav_book_now">BOOK NOW</button>
             </div>
             <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
         </div>
     </header>
 
-    <div id="loginModal" class="modal">
-        <div class="modal-backdrop"></div>
-        <div class="modal-container">
-            <button class="modal-close" onclick="closeLoginModal()"><i class="fas fa-times"></i></button>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <div class="modal-logo">
-                        <img src="assets/image/logo.svg" alt="logo">
-                        <span class="modal-brand">SOT</span>
-                    </div>
-                    <h2>Welcome Back</h2>
-                    <p>Sign in to access your luxury reservations</p>
-                </div>
-                <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
-                    <div class="form-field">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" id="loginEmail" class="form-input" placeholder="you@example.com" required>
-                    </div>
-                    <div class="form-field">
-                        <label class="form-label">Password</label>
-                        <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password"
-                            required>
-                    </div>
-                    <div class="form-options">
-                        <label class="checkbox-label"><input type="checkbox" class="checkbox"><span>Remember
-                                me</span></label>
-                        <a href="#" class="link-small">Forgot password?</a>
-                    </div>
-                    <button type="submit" class="btn-submit" id="loginBtn">
-                        <span class="btn-text">Sign In</span>
-                        <span class="btn-loader"></span>
-                    </button>
-                    <div id="loginMessage" class="form-message"></div>
-                </form>
-                <div class="modal-footer">
-                    <p>Don't have an account? <a href="#" class="link" onclick="switchToRegister(event)">Create one
-                            now</a></p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="registerModal" class="modal">
-        <div class="modal-backdrop"></div>
-        <div class="modal-container">
-            <button class="modal-close" onclick="closeRegisterModal()"><i class="fas fa-times"></i></button>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <div class="modal-logo">
-                        <img src="assets/image/logo.svg" alt="logo">
-                        <span class="modal-brand">SOT</span>
-                    </div>
-                    <h2>Begin Your Journey</h2>
-                    <p>Create an account to unlock exclusive benefits</p>
-                </div>
-                <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
-                    <div class="form-field">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" id="registerName" class="form-input" placeholder="Nguyen Van A" required>
-                    </div>
-                    <div class="form-field">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" id="registerEmail" class="form-input" placeholder="you@example.com"
-                            required>
-                    </div>
-                    <div class="form-field">
-                        <label class="form-label">Phone Number</label>
-                        <input type="tel" id="registerPhone" class="form-input" placeholder="0909 123 456" required>
-                    </div>
-                    <div class="form-field">
-                        <label class="form-label">Password</label>
-                        <input type="password" id="registerPassword" class="form-input" placeholder="Min 6 characters"
-                            minlength="6" required>
-                    </div>
-                    <button type="submit" class="btn-submit" id="registerBtn">
-                        <span class="btn-text">Create Account</span>
-                        <span class="btn-loader"></span>
-                    </button>
-                    <div id="registerMessage" class="form-message"></div>
-                </form>
-                <div class="modal-footer">
-                    <p>Already have an account? <a href="#" class="link" onclick="switchToLogin(event)">Sign in here</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="auth-modals-placeholder"></div>
 
     <!-- Hero -->
     <section class="hero">
-        <h1>Offer</h1>
+        <h1 data-i18n="offer_hero_title">Offer</h1>
         <div class="wavy-bottom">
             <svg viewBox="0 0 1440 200" preserveAspectRatio="none">
                 <path d="M0,100 Q360,0 720,100 T1440,100 L1440,200 L0,200 Z" fill="#F5F1E8" />
@@ -137,38 +53,69 @@
         </div>
     </section>
 
-    <!-- Offers -->
+    <!-- Offers Data-->
     <section class="offers-section">
         <div class="container">
             <div class="section-heading">
-                <h2>OFFERS</h2>
+                <h2 data-i18n="offer_section_title">OFFERS</h2>
                 <div class="filter-buttons" id="filter-buttons">
-                    <button class="filter-btn active" data-category="all">ALL</button>
-                    <button class="filter-btn" data-category="stay">STAY</button>
-                    <button class="filter-btn" data-category="spa">SPA</button>
-                    <button class="filter-btn" data-category="dine">DINE</button>
+                    <button class="filter-btn active" data-category="all" data-i18n="offer_filter_all">ALL</button>
+                    <button class="filter-btn" data-category="stay" data-i18n="offer_filter_stay">STAY</button>
+                    <button class="filter-btn" data-category="spa" data-i18n="offer_filter_spa">SPA</button>
+                    <button class="filter-btn" data-category="dine" data-i18n="offer_filter_dine">DINE</button>
                 </div>
             </div>
             <div id="offers-container"></div>
         </div>
     </section>
 
+    <div id="offer-data" style="display:none">
+
+        <div data-id="1" data-category="stay" data-image="assets/image/offer/clouds.jpg" data-title-key="offer1_title"
+            data-desc-key="offer1_desc" data-rate-key="offer1_rate"
+            data-inc-keys="offer1_inc0,offer1_inc1,offer1_inc2,offer1_inc3,offer1_inc4,offer1_inc5,offer1_inc6,offer1_inc7"
+            data-con-keys="offer1_con0,offer1_con1,offer1_con2,offer1_con3">
+        </div>
+
+        <div data-id="2" data-category="stay" data-image="assets/image/offer/summer.jpg" data-title-key="offer2_title"
+            data-desc-key="offer2_desc" data-rate-key="offer2_rate"
+            data-inc-keys="offer2_inc0,offer2_inc1,offer2_inc2,offer2_inc3,offer2_inc4,offer2_inc5"
+            data-con-keys="offer2_con0,offer2_con1">
+        </div>
+
+        <div data-id="3" data-category="spa" data-image="assets/image/offer/happy hour.jpg"
+            data-title-key="offer3_title" data-desc-key="offer3_desc" data-rate-key="offer3_rate"
+            data-inc-keys="offer3_inc0,offer3_inc1" data-con-keys="offer3_con0,offer3_con1,offer3_con2">
+        </div>
+
+        <div data-id="4" data-category="spa" data-image="assets/image/offer/relaxtion.jpg" data-title-key="offer4_title"
+            data-desc-key="offer4_desc" data-rate-key="offer4_rate" data-inc-keys="offer4_inc0,offer4_inc1"
+            data-con-keys="offer4_con0,offer4_con1">
+        </div>
+
+        <div data-id="5" data-category="dine" data-image="assets/image/offer/buffet.jpg" data-title-key="offer5_title"
+            data-desc-key="offer5_desc" data-rate-key="offer5_rate" data-inc-keys="offer5_inc0"
+            data-con-keys="offer5_con0,offer5_con1">
+        </div>
+
+    </div>
+
     <!-- Footer -->
     <footer>
         <div class="container">
             <div class="newsletter">
-                <h3>Subscribe to our e-newsletter:</h3>
+                <h3 data-i18n="footer_newsletter">Subscribe to our e-newsletter:</h3>
                 <form id="newsletter-form">
-                    <input type="email" placeholder="Your email address" required>
-                    <button type="submit">SUBSCRIBE</button>
+                    <input type="email" placeholder="Your email address" required data-i18n="footer_subscribe">
+                    <button type="submit" data-i18n="footer_subscribe">SUBSCRIBE</button>
                 </form>
             </div>
             <div class="contact-info">
-                <p>147 Mai Dich, Cau Giay, Ha Noi</p>
-                <p>0242 242 0777 | info@webhotel.vn</p>
+                <p data-i18n="footer_address">147 Mai Dich, Cau Giay, Ha Noi</p>
+                <p data-i18n="footer_phone">0242 242 0777 | info@webhotel.vn</p>
             </div>
             <div class="copyright">
-                <p>&copy; 2026 SOT. All rights reserved</p>
+                <p>© 2026 SOT. All rights reserved</p>
             </div>
         </div>
     </footer>
@@ -176,7 +123,10 @@
     <script src="script/api/baseApi.js"></script>
     <script src="script/authStore.js"></script>
     <script src="script/api/userApi.js"></script>
+
+    <script src="script/auth-modals.js"></script>
     <script src="script/home.js"></script>
+    <script src="script/language.js"></script>
     <script src="script/offer.js"></script>
 </body>
 

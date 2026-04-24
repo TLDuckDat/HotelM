@@ -14,67 +14,71 @@ Monorepo tách rõ backend/frontend nhưng vẫn giữ backend Spring Boot chạ
 
 ```text
 HotelM/
-├── pom.xml
-├── README.md
 ├── backend/
-│   ├── pom.xml
-│   ├── mvnw
-│   ├── mvnw.cmd
-│   ├── README.md
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/org/example/hotelm/
-│   │   │   │   ├── HotelMApplication.java            # Spring Boot entry point
-│   │   │   │   ├── auth/                             # Authentication module
-│   │   │   │   ├── booking/                          # Booking domain
-│   │   │   │   ├── chat/                             # Chat features
-│   │   │   │   ├── common/
-│   │   │   │   │   ├── config/                       # Security, CORS, app config
-│   │   │   │   │   ├── exception/                    # Global exception handling
-│   │   │   │   │   └── security/                     # JWT filter/service
-│   │   │   │   ├── contact/                          # Contact module
-│   │   │   │   ├── invoice/                          # Invoice domain
-│   │   │   │   ├── payment/                          # Payment domain
-│   │   │   │   ├── refund/                           # Refund domain
-│   │   │   │   ├── review/                           # Review domain
-│   │   │   │   ├── room/                             # Room + RoomType domain
-│   │   │   │   │   ├── controller/
-│   │   │   │   │   ├── dto/
-│   │   │   │   │   ├── entity/
-│   │   │   │   │   ├── mapper/
-│   │   │   │   │   ├── repository/
-│   │   │   │   │   └── service/
-│   │   │   │   └── user/                             # User domain
-│   │   │   └── resources/
-│   │   │       ├── application.yml
-│   │   │       ├── application.properties
-│   │   │       ├── application-dev.properties
-│   │   │       ├── application-prod.properties
-│   │   │       └── static/                           # Current frontend runtime served by backend
-│   │   └── test/
-│   │       └── java/org/...
-│   └── target/
+│   ├── src/main/
+│   │   ├── java/org/example/hotelm/
+│   │   │   ├── auth/
+│   │   │   ├── booking/
+│   │   │   ├── branch/
+│   │   │   ├── chat/
+│   │   │   ├── invoice/
+│   │   │   ├── kpi/
+│   │   │   ├── review/
+│   │   │   ├── room/
+│   │   │   ├── user/
+│   │   │   └── common/
+│   │   │       ├── config/
+│   │   │       ├── exception/
+│   │   │       └── security/
+│   │   │
+│   │   └── resources/
+│   │       ├── static/        
+│   │       └── application.yml
+│   │
+│   └── test/                 
+│
 ├── frontend/
-│   ├── index.html
-│   ├── README.md
-│   ├── assets/
-│   │   ├── css/
-│   │   └── image/
-│   ├── js/
-│   │   ├── api/                                      # baseApi, roomApi, bookingApi, ...
-│   │   └── *.js                                      # Page logic scripts
-│   └── pages/
-│       └── *.html
+│   ├── components/
+│   │   ├── app-shell/
+│   │   └── chatbox/
+│   │
+│   ├── core/
+│   │   ├── api/
+│   │   ├── guards/
+│   │   └── store/
+│   │
+│   ├── features/
+│   │   ├── about/
+│   │   ├── account/
+│   │   ├── admin/
+│   │   ├── auth/
+│   │   ├── booking/
+│   │   ├── contact/
+│   │   ├── dashboard/
+│   │   ├── home/
+│   │   ├── offer/
+│   │   ├── payment/
+│   │   ├── refund/
+│   │   ├── restaurant/
+│   │   ├── review/
+│   │   ├── room/
+│   │   ├── search/
+│   │   ├── service/
+│   │   ├── villa/
+│   │   └── wedding/
+│   │
+│   ├── images/
+│   └── index.html
+│
 ├── database/
 │   ├── init-db.sql
 │   └── seed-data.sql
+│
 ├── docs/
 │   ├── API.md
 │   └── ARCHITECTURE.md
-├── infra/
-│   └── nginx/
-│       └── nginx.conf
-└── hotel/
+│
+└── README.md
 ```
 
 ## Quick Start

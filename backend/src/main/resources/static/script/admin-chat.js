@@ -37,6 +37,7 @@ function deleteConvFromStorage(id) {
     localStorage.removeItem(CONV_KEY_PREFIX + id);
 }
 
+
 /* ────────────────────────────────────────────
    FORMAT HELPERS
    ──────────────────────────────────────────── */
@@ -315,6 +316,24 @@ function pollMessages() {
    ──────────────────────────────────────────── */
 
 document.addEventListener('DOMContentLoaded', () => {
+    /* ---  Cập nhật thông tin User ở Sidebar --- */
+    if (window.AuthStore) {
+        const user = window.AuthStore.getCurrentUser();
+        if (user) {
+            const sideNameEl = document.getElementById("sidebar-username");
+            const sideRoleEl = document.getElementById("sidebar-role");
+            const sideAvatarEl = document.getElementById("sidebar-avatar");
+
+            if (sideNameEl) sideNameEl.textContent = user.fullName || "Admin";
+            if (sideRoleEl) sideRoleEl.textContent = user.role || "ADMIN";
+            
+            // Nếu bạn có lưu link ảnh trong user.avatarUrl
+            if (sideAvatarEl && user.avatarUrl) {
+                sideAvatarEl.src = user.avatarUrl;
+            }
+        }
+    }
+    
 
     /* Search */
     document.getElementById('conv-search-input').addEventListener('input', e => {

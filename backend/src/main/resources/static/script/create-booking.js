@@ -147,7 +147,7 @@
             .then(function () {
                 setMessage("Booking created successfully! Redirecting...", "success");
                 setTimeout(function () {
-                    window.location.href = "bookings.html";
+                    window.location.href = "booking.html";
                 }, 1000);
             })
             .catch(function (err) {
@@ -324,7 +324,7 @@
 //             .then(function () {
 //                 setMessage("Booking created successfully.", "success");
 //                 setTimeout(function () {
-//                     window.location.href = "bookings.html";
+//                     window.location.href = "booking.html";
 //                 }, 700);
 //             })
 //             .catch(function (err) {

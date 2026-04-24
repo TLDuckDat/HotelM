@@ -1,143 +1,88 @@
-// ====================== MOCK DATA ======================
-const services = [
-    { id: 1, title: 'Wedding', subtitle: 'Luxurious, classy', image: 'assets/image/home/service/wedding.jpg' },
-    { id: 2, title: 'Spa', subtitle: 'Relieve stress and fatigue', image: 'assets/image/home/service/spa.jpg' },
-    { id: 3, title: 'Cuisine', subtitle: 'Exquisite culinary creations', image: 'assets/image/home/service/restaurant.jpg' }
-];
-
-const villas = [
-    { id: 1, name: 'DELUXE BALCONY', clan: 'Khon-Jorn', image: 'assets/image/home/villa/villa1.jpg' },
-    { id: 2, name: 'CLAY POOL COTTAGES', clan: 'Pa-Ta-Pea', image: 'assets/image/home/villa/villa2.jpg' },
-    { id: 3, name: 'PREMIUM SUITE', clan: 'Khon-Jorn', image: 'assets/image/home/villa/villa3.jpg' },
-    { id: 4, name: 'GARDEN VILLA', clan: 'Pa-Ta-Pea', image: 'assets/image/home/villa/villa4.jpg' }
-];
-
-const offers = [
-    { id: 1, title: 'Happy Hour', category: 'spa', image: 'assets/image/home/offer/offer1.jpg', description: 'Rejuvenate your beauty with our premium treatment packages!' },
-    { id: 2, title: 'Relaxation', category: 'spa', image: 'assets/image/home/offer/offer2.jpg', description: 'Enjoy relaxing and restorative treatments at SOT Spa.' },
-    { id: 3, title: '20% Seafood Discount', category: 'dine', image: 'assets/image/home/offer/offer3.jpg', description: 'Special package for premium seafood buffet on weekends.' },
-    { id: 4, title: 'Full Energy Stay', category: 'stay', image: 'assets/image/home/offer/offer4.jpg', description: 'Experience truly unforgettable romantic moments.' }
-];
-
-const galleryImages = [
-    'assets/image/home/moment/moment1.jpg',
-    'assets/image/home/moment/moment2.jpg',
-    'assets/image/home/moment/moment3.jpg',
-    'assets/image/home/moment/moment4.jpg',
-    'assets/image/home/moment/moment5.jpg',
-    'assets/image/home/moment/moment6.jpg'
-];
-
-// Hàm tự động load Modal từ file riêng vào Index
-async function loadAuthModals() {
-    try {
-        const response = await fetch('auth-modals.html');
-        const html = await response.text();
-        const placeholder = document.getElementById('auth-modals-placeholder');
-        if (placeholder) {
-            placeholder.innerHTML = html;
-
-            // Khởi tạo lại tham chiếu Element (LoginModal, RegisterModal, ForgotPasswordModal)
-            if (typeof initModals === 'function') initModals();
-            if (typeof initForgotPasswordModal === 'function') initForgotPasswordModal();
-
-            // Gán sự kiện submit cho Form sau khi đã nạp vào DOM
-            const lForm = document.getElementById('loginForm');
-            const rForm = document.getElementById('registerForm');
-            const fForm = document.getElementById('forgotPasswordForm');
-
-            // handleLogin và handleRegister được lấy từ file auth-modals.js
-            if (lForm) lForm.addEventListener('submit', handleLogin);
-            if (rForm) rForm.addEventListener('submit', handleRegister);
-            if (fForm) fForm.addEventListener('submit', handleForgotPassword);
-
-            // Đóng modal khi click ra ngoài (backdrop)
-            document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-                backdrop.addEventListener('click', () => {
-                    if (typeof closeLoginModal === 'function') closeLoginModal();
-                    if (typeof closeRegisterModal === 'function') closeRegisterModal();
-                    if (typeof closeForgotPasswordModal === 'function') closeForgotPasswordModal();
-                });
-            });
-        }
-    } catch (error) {
-        console.error("Lỗi nạp file auth-modals.html:", error);
-    }
+// ====================== HELPER ======================
+function currentLang() {
+    return localStorage.getItem('sot_lang') || 'en';
 }
 
-// ====================== RENDER FUNCTIONS ======================
-function renderServices() {
-    const container = document.getElementById('services-container');
-    if (!container) return;
-    container.innerHTML = services.map(s => `
-        <div class="service-card">
-            <img src="${s.image}" alt="${s.title}">
-            <h3>${s.title}</h3>
-            <p>${s.subtitle}</p>
-        </div>
-    `).join('');
-}
-
+// ====================== VILLAS ======================
 let villaIndex = 0;
+
+function getVillaData() {
+    return Array.from(document.querySelectorAll('#villa-data > div')).map(el => ({
+        nameKey: el.dataset.nameKey,   // e.g. "villa_deluxe_balcony"
+        clan: el.dataset.clan,
+        image: el.dataset.image
+    }));
+}
+
 function renderVillas() {
     const container = document.getElementById('villa-container');
     if (!container) return;
+    const villas = getVillaData();
+    if (!villas.length) return;
 
-    const displayVillas = [];
+    const display = [];
     for (let i = 0; i < 3; i++) {
-        displayVillas.push(villas[(villaIndex + i) % villas.length]);
+        display.push(villas[(villaIndex + i) % villas.length]);
     }
 
-    container.innerHTML = displayVillas.map(v => `
+    // Each name element carries data-i18n so applyTranslations() can swap it.
+    // We seed the textContent with the EN value as a visible default.
+    container.innerHTML = display.map(v => {
+        const enName = (window.TRANSLATIONS && window.TRANSLATIONS.en[v.nameKey]) || v.nameKey;
+        return `
         <div class="villa-card">
-            <img src="${v.image}" alt="${v.name}">
+            <img src="${v.image}" alt="${enName}">
             <div class="villa-info">
-                <h3>${v.name}</h3>
-                <p style="color: #C9A050">${v.clan}</p>
+                <h3 data-i18n="${v.nameKey}">${enName}</h3>
+                <p style="color:#C9A050">${v.clan}</p>
             </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 }
 
 function moveVilla(step) {
+    const villas = getVillaData();
     villaIndex = (villaIndex + step + villas.length) % villas.length;
     renderVillas();
+    // Re-apply current language to the freshly-rendered nodes
+    if (typeof applyTranslations === 'function') applyTranslations(currentLang());
+}
+
+// ====================== HOME OFFERS ======================
+function getHomeOfferData() {
+    return Array.from(document.querySelectorAll('#offer-data > div')).map(el => ({
+        id: el.dataset.id,
+        category: el.dataset.category,
+        titleKey: el.dataset.titleKey,
+        descKey: el.dataset.descKey,
+        image: el.dataset.image
+    }));
 }
 
 function renderOffers(category = 'all') {
     const container = document.getElementById('offers-container');
     if (!container) return;
 
-    const filtered = category === 'all'
-        ? offers
-        : offers.filter(o => o.category === category);
+    const offers = getHomeOfferData();
+    const en = (window.TRANSLATIONS && window.TRANSLATIONS.en) || {};
+    const filtered = category === 'all' ? offers : offers.filter(o => o.category === category);
 
+    // Each h3/p carries data-i18n so the language engine can update them on switch.
+    // EN text is seeded as the visible default.
     container.innerHTML = filtered.map(o => `
         <div class="offer-card">
-            <img src="${o.image}" alt="${o.title}">
+            <img src="${o.image}" alt="${en[o.titleKey] || o.titleKey}">
             <div class="content">
-                <h3>${o.title}</h3>
-                <p>${o.description}</p>
+                <h3 data-i18n="${o.titleKey}">${en[o.titleKey] || o.titleKey}</h3>
+                <p  data-i18n="${o.descKey}">${en[o.descKey] || o.descKey}</p>
             </div>
-        </div>
-    `).join('');
+        </div>`
+    ).join('');
 }
-
-function renderGallery() {
-    const container = document.getElementById('gallery-container');
-    if (!container) return;
-    container.innerHTML = galleryImages.map(img => `
-        <div class="gallery-item">
-            <img src="${img}" alt="Gallery">
-        </div>
-    `).join('');
-}
-
 
 // ====================== NAV USER ======================
 function checkExistingUser() {
     let user = null;
-
     if (window.AuthStore && typeof window.AuthStore.getCurrentUser === 'function') {
         user = window.AuthStore.getCurrentUser();
     } else {
@@ -147,36 +92,35 @@ function checkExistingUser() {
     const navActions = document.getElementById('nav-actions');
     if (!navActions || !user) return;
 
-    // Xác định role để điều hướng link
     const isAdmin = user.role === 'ADMIN';
-    
-    // Điều hướng Profile/Dashboard
     const profileHref = isAdmin ? 'admin-dashboard.html' : 'account.html';
     const profileLabel = isAdmin ? 'Admin Dashboard' : 'Profile';
-
-    // Điều hướng Rooms và Bookings dựa trên Role
-    const roomsHref = isAdmin ? 'admin-rooms.html' : 'rooms.html';
-    const bookingsHref = isAdmin ? 'admin-bookings.html' : 'bookings.html';
+    const roomsHref = isAdmin ? 'admin-room-list.html' : 'room-list.html';
+    const bookingsHref = isAdmin ? 'admin-booking.html' : 'booking.html';
 
     navActions.innerHTML = `
+    <button id="lang-toggle-btn" onclick="toggleLanguage()" title="Switch language">
+        <span class="lang-flag">🇻🇳</span>
+        <span class="lang-label">VI</span>
+    </button>
+
     <div class="notification-dropdown">
         <button class="notification-btn" onclick="toggleNotification(event)">
             <i class="fas fa-bell"></i>
             <span class="notification-badge"></span>
         </button>
         <div class="notification-content" id="notificationMenu">
-            <div class="notification-header">Notifications</div>
+            <div class="notification-header" data-i18n="notification_title">Notifications</div>
             <div class="notification-list">
-                <div class="notification-empty">No new notifications</div>
+                <div class="notification-empty" data-i18n="notification_empty">No new notifications</div>
             </div>
         </div>
     </div>
-    
+
     <div class="user-dropdown">
         <div class="user-avatar" onclick="toggleUserMenu()">
             <img src="assets/image/logo.svg" alt="avatar">
         </div>
-
         <div class="user-menu" id="userMenu">
             <div class="menu-header">
                 <img src="assets/image/logo.svg" class="menu-logo">
@@ -184,28 +128,41 @@ function checkExistingUser() {
                 <div class="menu-avatar"><i class="fas fa-user"></i></div>
                 <div class="menu-username">${user.fullName || user.name || 'User'}</div>
             </div>
-            
-            <a href="${profileHref}" class="menu-item">${profileLabel}</a>
-            <a href="${roomsHref}" class="menu-item">Rooms</a>
-            <a href="${bookingsHref}" class="menu-item">Bookings</a>
-
-            <button class="menu-item logout" onclick="logoutUser()">Logout</button>
+            <a href="${profileHref}" class="menu-item" data-i18n="${isAdmin ? 'menu_dashboard' : 'menu_profile'}">
+            ${profileLabel}
+        </a>
+        <a href="${roomsHref}" class="menu-item" data-i18n="menu_rooms">
+            Rooms
+        </a>
+        <a href="${bookingsHref}" class="menu-item" data-i18n="menu_bookings">
+            Bookings
+        </a>
+        <button class="menu-item logout" onclick="logoutUser()" data-i18n="menu_logout">
+            Logout
+        </button>
         </div>
-    </div>
-`;
+    </div>`;
+
+    //Gọi hàm dịch ngay sau khi chèn HTML vào DOM
+    if (typeof applyTranslations === 'function') {
+        applyTranslations(currentLang());
+    }
+
+    // Re-sync language button after nav is re-rendered
+    if (typeof updateToggleButton === 'function') updateToggleButton(currentLang());
 }
 
 function toggleUserMenu() {
-    const menu = document.getElementById("userMenu");
-    if (menu) menu.classList.toggle("active");
+    const menu = document.getElementById('userMenu');
+    if (menu) menu.classList.toggle('active');
 }
 
-document.addEventListener("click", function (e) {
-    const dropdown = document.querySelector(".user-dropdown");
+document.addEventListener('click', function (e) {
+    const dropdown = document.querySelector('.user-dropdown');
     if (!dropdown) return;
     if (!dropdown.contains(e.target)) {
-        const menu = document.getElementById("userMenu");
-        if (menu) menu.classList.remove("active");
+        const menu = document.getElementById('userMenu');
+        if (menu) menu.classList.remove('active');
     }
 });
 
@@ -218,26 +175,55 @@ function logoutUser() {
     location.reload();
 }
 
+// ====================== AUTH MODAL LOADER ======================
+async function loadAuthModals() {
+    try {
+        const response = await fetch('auth-modals.html');
+        const html = await response.text();
+        const placeholder = document.getElementById('auth-modals-placeholder');
+        if (placeholder) {
+            placeholder.innerHTML = html;
+
+            if (typeof initModals === 'function') initModals();
+            if (typeof initForgotPasswordModal === 'function') initForgotPasswordModal();
+
+            const lForm = document.getElementById('loginForm');
+            const rForm = document.getElementById('registerForm');
+            const fForm = document.getElementById('forgotPasswordForm');
+
+            if (lForm) lForm.addEventListener('submit', handleLogin);
+            if (rForm) rForm.addEventListener('submit', handleRegister);
+            if (fForm) fForm.addEventListener('submit', handleForgotPassword);
+
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                backdrop.addEventListener('click', () => {
+                    if (typeof closeLoginModal === 'function') closeLoginModal();
+                    if (typeof closeRegisterModal === 'function') closeRegisterModal();
+                    if (typeof closeForgotPasswordModal === 'function') closeForgotPasswordModal();
+                });
+            });
+        }
+    } catch (error) {
+        console.error('Error loading auth-modals.html:', error);
+    }
+}
+
 // ====================== INITIALIZATION ======================
 document.addEventListener('DOMContentLoaded', () => {
-    // Khởi tạo modal elements
-    initModals();
+    if (typeof initModals === 'function') initModals();
 
-    // chạy modal auth
     loadAuthModals();
 
-    // Render nội dung trang
-    renderServices();
+    // Render dynamic sections (seeds EN text + data-i18n attrs)
     renderVillas();
     renderOffers('all');
-    renderGallery();
+    // language.js boot will immediately call applyTranslations() after this,
+    // swapping to whatever language is stored.
 
     // Scroll header effect
     window.addEventListener('scroll', () => {
         const header = document.getElementById('main-header');
-        if (header) {
-            header.classList.toggle('scrolled', window.scrollY > 50);
-        }
+        if (header) header.classList.toggle('scrolled', window.scrollY > 50);
     });
 
     // Newsletter
@@ -250,16 +236,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Offer Filters
+    // Offer filters
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
             renderOffers(e.target.dataset.category);
+            // Re-apply current language to freshly-rendered cards
+            if (typeof applyTranslations === 'function') applyTranslations(currentLang());
         });
     });
 
-    // Expose functions ra global
+    // Expose globals
     window.openLoginModal = openLoginModal;
     window.openRegisterModal = openRegisterModal;
     window.closeLoginModal = closeLoginModal;
@@ -272,17 +260,13 @@ document.addEventListener('DOMContentLoaded', () => {
     window.switchToForgotPassword = switchToForgotPassword;
     window.switchToLoginFromForgot = switchToLoginFromForgot;
 
-    // Form submit
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
-
     if (loginForm) loginForm.addEventListener('submit', handleLogin);
     if (registerForm) registerForm.addEventListener('submit', handleRegister);
 
-    // Check user đã đăng nhập
     checkExistingUser();
 
-    // Đóng modal khi click backdrop
     document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
         backdrop.addEventListener('click', () => {
             closeLoginModal();
@@ -290,23 +274,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // notfication
+    // Notifications
     window.toggleNotification = function (e) {
         e.stopPropagation();
-        const menu = document.getElementById("notificationMenu");
-        // Đóng user menu nếu đang mở (để tránh chồng chéo)
-        const userMenu = document.getElementById("userMenu");
-        if (userMenu) userMenu.classList.remove("active");
-
-        menu.classList.toggle("active");
+        const menu = document.getElementById('notificationMenu');
+        const userMenu = document.getElementById('userMenu');
+        if (userMenu) userMenu.classList.remove('active');
+        menu.classList.toggle('active');
     };
 
-    // Click ra ngoài để đóng
-    document.addEventListener("click", function (e) {
-        const notiDropdown = document.querySelector(".notification-dropdown");
+    document.addEventListener('click', function (e) {
+        const notiDropdown = document.querySelector('.notification-dropdown');
         if (notiDropdown && !notiDropdown.contains(e.target)) {
-            const menu = document.getElementById("notificationMenu");
-            if (menu) menu.classList.remove("active");
+            const menu = document.getElementById('notificationMenu');
+            if (menu) menu.classList.remove('active');
         }
     });
 });

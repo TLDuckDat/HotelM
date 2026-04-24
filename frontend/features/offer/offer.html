@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offer - SOT Resort & Hotel</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/offer.css">
+</head>
+
+<body>
+
+    <header id="main-header">
+        <div class="container nav-container">
+            <div class="logo">
+                <a href="../../pages/index.html" class="logo-link" aria-label="SOT Resort — trang chủ">
+                    <img src="assets/image/logo.svg" class="logo-img" width="48" height="48" alt="">
+                    <span class="logo-wordmark">SOT</span>
+                </a>
+            </div>
+            <nav class="desktop-nav">
+                <a href="../../pages/index.html">HOME</a>
+                <!-- <a href="/rosalia-villa.html">VILLA</a> -->
+                <a href="../service/rosalia-service.html">SERVICE</a>
+                <a href="../about/rosalia-about.html">ABOUT US</a>
+                <!-- <a href="restaurant.html">RESTAURANT</a> -->
+                <a href="offer.html" class="active">OFFER</a>
+                <!-- <a href="wedding.html">WEDDING</a> -->
+            </nav>
+            <div class="nav-actions" id="nav-actions">
+                <button class="btn-nav-outline" id="btn-login" onclick="openLoginModal()">SIGN IN</button>
+                <button class="btn-nav-primary" id="btn-register" onclick="openRegisterModal()">BOOK NOW</button>
+            </div>
+            <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <button class="modal-close" onclick="closeLoginModal()"><i class="fas fa-times"></i></button>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-logo">
+                        <img src="assets/image/logo.svg" alt="logo">
+                        <span class="modal-brand">SOT</span>
+                    </div>
+                    <h2>Welcome Back</h2>
+                    <p>Sign in to access your luxury reservations</p>
+                </div>
+                <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-field">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="loginEmail" class="form-input" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password"
+                            required>
+                    </div>
+                    <div class="form-options">
+                        <label class="checkbox-label"><input type="checkbox" class="checkbox"><span>Remember
+                                me</span></label>
+                        <a href="#" class="link-small">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="btn-submit" id="loginBtn">
+                        <span class="btn-text">Sign In</span>
+                        <span class="btn-loader"></span>
+                    </button>
+                    <div id="loginMessage" class="form-message"></div>
+                </form>
+                <div class="modal-footer">
+                    <p>Don't have an account? <a href="#" class="link" onclick="switchToRegister(event)">Create one
+                            now</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <button class="modal-close" onclick="closeRegisterModal()"><i class="fas fa-times"></i></button>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-logo">
+                        <img src="assets/image/logo.svg" alt="logo">
+                        <span class="modal-brand">SOT</span>
+                    </div>
+                    <h2>Begin Your Journey</h2>
+                    <p>Create an account to unlock exclusive benefits</p>
+                </div>
+                <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="form-field">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="registerName" class="form-input" placeholder="Nguyen Van A" required>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="registerEmail" class="form-input" placeholder="you@example.com"
+                            required>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" id="registerPhone" class="form-input" placeholder="0909 123 456" required>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="registerPassword" class="form-input" placeholder="Min 6 characters"
+                            minlength="6" required>
+                    </div>
+                    <button type="submit" class="btn-submit" id="registerBtn">
+                        <span class="btn-text">Create Account</span>
+                        <span class="btn-loader"></span>
+                    </button>
+                    <div id="registerMessage" class="form-message"></div>
+                </form>
+                <div class="modal-footer">
+                    <p>Already have an account? <a href="#" class="link" onclick="switchToLogin(event)">Sign in here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Offer</h1>
+        <div class="wavy-bottom">
+            <svg viewBox="0 0 1440 200" preserveAspectRatio="none">
+                <path d="M0,100 Q360,0 720,100 T1440,100 L1440,200 L0,200 Z" fill="#F5F1E8" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- Offers -->
+    <section class="offers-section">
+        <div class="container">
+            <div class="section-heading">
+                <h2>OFFERS</h2>
+                <div class="filter-buttons" id="filter-buttons">
+                    <button class="filter-btn active" data-category="all">ALL</button>
+                    <button class="filter-btn" data-category="stay">STAY</button>
+                    <button class="filter-btn" data-category="spa">SPA</button>
+                    <button class="filter-btn" data-category="dine">DINE</button>
+                </div>
+            </div>
+            <div id="offers-container"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="newsletter">
+                <h3>Subscribe to our e-newsletter:</h3>
+                <form id="newsletter-form">
+                    <input type="email" placeholder="Your email address" required>
+                    <button type="submit">SUBSCRIBE</button>
+                </form>
+            </div>
+            <div class="contact-info">
+                <p>147 Mai Dich, Cau Giay, Ha Noi</p>
+                <p>0242 242 0777 | info@webhotel.vn</p>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2026 SOT. All rights reserved</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script/api/baseApi.js"></script>
+    <script src="script/authStore.js"></script>
+    <script src="script/api/userApi.js"></script>
+    <script src="script/home.js"></script>
+    <script src="script/offer.js"></script>
+</body>
+
+</html>

@@ -17,77 +17,136 @@
 <body>
 
     <header class="topbar">
-        <a href="index.html" class="topbar-logo">
-            <img src="assets/image/logo.svg" alt="SOT Logo">
-            <span>SOT</span>
+      <a href="index.html" class="topbar-logo">
+        <img src="assets/image/logo.svg" alt="SOT Logo" />
+        <span>SOT</span>
+      </a>
+      <div class="topbar-right">
+        <a href="index.html" class="back-home"
+          ><i class="fas fa-arrow-left"></i>
+          <span data-i18n="profile_back">Back to Home</span>
         </a>
-        <div class="topbar-right">
-            <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
-            <div class="topbar-greeting">Welcome, <strong id="topbar-username">Admin</strong></div>
-            <a href="admin-dashboard.html" class="topbar-avatar"><i class="fas fa-user-shield"></i></a>
-            <div class="notification-dropdown">
-                <button class="notification-btn" onclick="toggleNotification(event)">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-badge"></span>
-                </button>
-                <div class="notification-content" id="notificationMenu">
-                    <div class="notification-header">Notifications</div>
-                    <div class="notification-list">
-                        <div class="notification-empty">No new notifications</div>
-                    </div>
-                </div>
-            </div>
+        <div class="topbar-greeting">
+          <span data-i18n="profile_welcome">Welcome,</span>
+          <strong id="topbar-username"> Admin</strong>
         </div>
+        <a href="admin-dashboard.html" class="topbar-avatar"
+          ><i class="fas fa-user-shield"></i
+        ></a>
+        <div class="notification-dropdown">
+          <button class="notification-btn" onclick="toggleNotification(event)">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge"></span>
+          </button>
+          <div class="notification-content" id="notificationMenu">
+            <div class="notification-header" data-i18n="notification_title">
+              Notifications
+            </div>
+            <div class="notification-list">
+              <div class="notification-empty" data-i18n="notification_empty">
+                No new notifications
+              </div>
+            </div>
+          </div>
+        </div>
+        <button
+          id="lang-toggle-btn"
+          onclick="toggleLanguage()"
+          title="Switch to Vietnamese"
+        >
+          <span class="lang-flag">🇻🇳</span>
+          <span class="lang-label">VI</span>
+        </button>
+      </div>
     </header>
 
     <div class="layout">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-user">
-                <div class="sidebar-avatar-wrap"><i class="fas fa-user-shield"></i></div>
-                <div class="sidebar-name" id="sidebar-username">Loading…</div>
-                <div class="sidebar-role">ADMIN</div>
-            </div>
-            <nav class="sidebar-nav">
-                <div class="nav-group-label">Overview</div>
-                <button class="nav-item" onclick="location.href='admin-dashboard.html'">
-                    <i class="fas fa-chart-pie"></i> Dashboard
-                </button>
-                <div class="nav-group-label">Management</div>
-                <button class="nav-item" onclick="location.href='admin-dashboard.html'">
-                    <i class="fas fa-bed"></i> Rooms
-                </button>
-                <button class="nav-item" onclick="location.href='admin-dashboard.html'">
-                    <i class="fas fa-calendar-check"></i> Bookings
-                </button>
-                <button class="nav-item" onclick="location.href='admin-dashboard.html'">
-                    <i class="fas fa-users"></i> Users
-                </button>
-                <div class="nav-group-label">Finance & Feedback</div>
-                <button class="nav-item" onclick="location.href='admin-payments.html'">
-                    <i class="fas fa-credit-card"></i> Payments
-                </button>
-                <button class="nav-item active" onclick="location.href='admin-refunds.html'">
-                    <i class="fas fa-undo"></i> Refunds
-                </button>
-                <button class="nav-item" onclick="location.href='admin-reviews.html'">
-                    <i class="fas fa-star"></i> Reviews
-                </button>
-                <button class="nav-item" onclick="location.href='admin-chat.html'">
-                    <i class="fas fa-comments"></i> Live Chat
-                    <span id="sidebar-unread-badge" class="sidebar-unread-badge"></span>
-                </button>
-                <div class="sidebar-divider"></div>
-                <button class="nav-item danger" onclick="handleLogout()">
-                    <i class="fas fa-sign-out-alt"></i> Sign Out
-                </button>
-            </nav>
-        </aside>
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar-wrap">
+            <i class="fas fa-user-shield"></i>
+          </div>
+          <div class="sidebar-name" id="sidebar-username">Loading…</div>
+          <div class="sidebar-role" id="sidebar-role">ADMIN</div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-group-label" data-i18n="sidebar_overview">
+            Overview
+          </div>
+          <button
+            class="nav-item "
+            onclick="location.href = 'admin-dashboard.html'"
+          >
+            <i class="fas fa-chart-pie"></i>
+            <span data-i18n="sidebar_dashboard">Dashboard</span>
+          </button>
+
+          <div class="nav-group-label" data-i18n="sidebar_managements">
+            Management
+          </div>
+          <button class="nav-item" onclick="location.href = 'admin-rooms.html'">
+            <i class="fas fa-bed"></i>
+            <span data-i18n="sidebar_rooms">Rooms</span>
+          </button>
+          <button
+            class="nav-item"
+            onclick="location.href = 'admin-bookings.html'"
+          >
+            <i class="fas fa-calendar-check"></i>
+            <span data-i18n="sidebar_bookings">Bookings</span>
+          </button>
+          <button class="nav-item" onclick="location.href = 'admin-users.html'">
+            <i class="fas fa-users"></i>
+            <span data-i18n="sidebar_users">Users</span>
+          </button>
+
+          <div class="sidebar-divider"></div>
+          <div class="nav-group-label" data-i18n="sidebar_finances_feedback">
+            Finance & Feedback
+          </div>
+          <button
+            class="nav-item"
+            onclick="location.href = 'admin-payments.html'"
+          >
+            <i class="fas fa-credit-card"></i>
+            <span data-i18n="sidebar_payments">Payments</span>
+          </button>
+          <button
+            class="nav-item"
+            onclick="location.href = 'admin-refunds.html'"
+          >
+            <i class="fas fa-undo"></i>
+            <span data-i18n="sidebar_refundRequests">Refund Requests</span>
+          </button>
+          <button
+            class="nav-item"
+            onclick="location.href = 'admin-reviews.html'"
+          >
+            <i class="fas fa-star"></i>
+            <span data-i18n="sidebar_reviews">Room Reviews</span>
+          </button>
+          <button class="nav-item" onclick="location.href = 'admin-chat.html'">
+            <i class="fas fa-comments"></i>
+            <span data-i18n="sidebar_livechat">Live Chat</span>
+            <span id="sidebar-unread-badge" class="sidebar-unread-badge"></span>
+          </button>
+
+          <div class="sidebar-divider"></div>
+          <button
+            class="nav-item danger"
+            onclick="AdminDashboard.handleLogout()"
+          >
+            <i class="fas fa-sign-out-alt"></i>
+            <span data-i18n="sidebar_logout">Sign Out</span>
+          </button>
+        </nav>
+      </aside>
 
         <main class="main">
             <div class="page-header">
                 <div>
-                    <h1>Refund Management</h1>
-                    <p>Approve or reject guest refund requests</p>
+                    <h1 data-i18n="admin_refunds_title">Refund Management</h1>
+                    <p data-i18n="admin_refunds_sub">Handle cancellation refund applications</p>
                 </div>
             </div>
 
@@ -99,28 +158,28 @@
                     <div class="stat-mini-icon"><i class="fas fa-file-invoice"></i></div>
                     <div>
                         <div class="stat-mini-val" id="stat-total">0</div>
-                        <div class="stat-mini-lbl">Total Requests</div>
+                        <div class="stat-mini-lbl" data-i18n="admin_refunds_total_requests">Total Requests</div>
                     </div>
                 </div>
                 <div class="stat-mini">
                     <div class="stat-mini-icon"><i class="fas fa-clock"></i></div>
                     <div>
                         <div class="stat-mini-val" id="stat-pending">0</div>
-                        <div class="stat-mini-lbl">Pending</div>
+                        <div class="stat-mini-lbl" data-i18n="admin_refunds_pending">Pending</div>
                     </div>
                 </div>
                 <div class="stat-mini">
                     <div class="stat-mini-icon"><i class="fas fa-check-double"></i></div>
                     <div>
                         <div class="stat-mini-val" id="stat-approved">0</div>
-                        <div class="stat-mini-lbl">Approved</div>
+                        <div class="stat-mini-lbl" data-i18n="admin_refunds_approved">Approved</div>
                     </div>
                 </div>
                 <div class="stat-mini">
                     <div class="stat-mini-icon"><i class="fas fa-ban"></i></div>
                     <div>
                         <div class="stat-mini-val" id="stat-rejected">0</div>
-                        <div class="stat-mini-lbl">Rejected</div>
+                        <div class="stat-mini-lbl" data-i18n="admin_refunds_rejected">Rejected</div>
                     </div>
                 </div>
             </div>
@@ -128,37 +187,37 @@
             <!-- Filter Bar -->
             <div class="filter-bar">
                 <div class="filter-group">
-                    <label>Status</label>
+                    <label data-i18n="admin_refunds_status">Status</label>
                     <select class="form-input" id="filter-status" onchange="applyFilters()">
-                        <option value="">All</option>
-                        <option value="PENDING">Pending</option>
-                        <option value="APPROVED">Approved</option>
-                        <option value="REJECTED">Rejected</option>
+                        <option value="" data-i18n="admin_stat_all">All</option>
+                        <option value="PENDING" data-i18n="admin_stat_pending">Pending</option>
+                        <option value="APPROVED" data-i18n="admin_stat_approved">Approved</option>
+                        <option value="REJECTED" data-i18n="admin_stat_rejected">Rejected</option>
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>Search</label>
+                    <label data-i18n="admin_refunds_search">Search</label>
                     <input class="form-input" id="filter-search" type="text" placeholder="Booking ID or Guest…"
                         oninput="applyFilters()" />
                 </div>
                 <button class="btn-primary" onclick="resetFilters()" style="margin-left:auto;">
-                    <i class="fas fa-rotate-right"></i> Reset
+                    <i class="fas fa-rotate-right"></i> <span data-i18n="admin_refunds_resetBtn">Reset</span>
                 </button>
             </div>
 
             <!-- Table -->
             <div class="card">
-                <div class="card-title"><i class="fas fa-list"></i> All Refund Requests</div>
+                <div class="card-title"><i class="fas fa-list"></i><span data-i18n="admin_refunds_col_all"> All Refund Requests</span></div>
                 <div class="table-wrap">
                     <table>
                         <thead>
                             <tr>
-                                <th>Refund ID</th>
-                                <th>Guest</th>
-                                <th>Booking</th>
-                                <th>Reason</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <th data-i18n="admin_refunds_col_id">Refund ID</th>
+                                <th data-i18n="admin_refunds_col_guest">Guest</th>
+                                <th data-i18n="admin_refunds_col_booking">Booking</th>
+                                <th data-i18n="admin_refunds_col_reason">Reason</th>
+                                <th data-i18n="admin_refunds_col_status">Status</th>
+                                <th data-i18n="admin_refunds_col_action">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="refunds-body">
@@ -197,7 +256,9 @@
     <script src="script/api/refundApi.js"></script>
     <script src="script/authStore.js"></script>
     <script src="script/guard.js"></script>
+    <script src="script/app-shell.js"></script>
     <script src="script/admin-refunds.js"></script>
+    <script src="script/language.js"></script>
 
 </body>
 

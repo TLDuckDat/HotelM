@@ -34,8 +34,8 @@
                 + "<td>" + (user.fullName || "") + "</td>"
                 + "<td>" + (user.email || "") + "</td>"
                 + "<td>" + roleBadge(user.role) + "</td>"
-                + "<td><button class='btn-delete' data-delete-user='" + id + "'>"
-                + "<i class='fas fa-trash-alt'></i> Delete</button></td>"
+                + "<td><button class='btn-delete' data-i18n='admin_users_btn_delete' data-delete-user='" + id + "'>"
+                + "<i class='fas fa-trash-alt'></i> <span data-i18n='admin_users_btn_delete'>Delete</span></button></td>"
                 + "</tr>";
         }).join("");
 

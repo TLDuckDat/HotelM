@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - SOT Resort & Hotel</title>
+    <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/profile.css" />
+</head>
+
+<body>
+
+    <header class="topbar">
+        <a href="../../pages/index.html" class="topbar-logo">
+            <img src="assets/image/logo.svg" alt="SOT Logo">
+            <span>SOT</span>
+        </a>
+        <div class="topbar-right">
+            <a href="../../pages/index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            <div class="topbar-greeting">Welcome, <strong id="topbar-username">Guest</strong></div>
+            <a href="../account/account.html" class="topbar-avatar"><i class="fas fa-user"></i></a>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar-wrap"><i class="fas fa-user"></i></div>
+                <div class="sidebar-name" id="sidebar-username">Loading…</div>
+                <div class="sidebar-role" id="sidebar-role">—</div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item" onclick="location.href='account.html'"><i class="fas fa-user-circle"></i> My
+                    Account</button>
+                <button class="nav-item active"><i class="fas fa-chart-line"></i> Dashboard</button>
+                <button class="nav-item" onclick="location.href='bookings.html'"><i class="fas fa-calendar-check"></i>
+                    My Bookings</button>
+                <button class="nav-item" onclick="location.href='rooms.html'"><i class="fas fa-bed"></i> Browse
+                    Rooms</button>
+                <div class="sidebar-divider"></div>
+                <button class="nav-item danger" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Sign
+                    Out</button>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <div class="page-header">
+                <h1>Dashboard</h1>
+                <p>Overview of your hotel activity</p>
+            </div>
+
+            <div id="dashboard-message" class="message-box"></div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value" id="stat-users">—</div>
+                    <i class="fas fa-users stat-icon"></i>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Rooms</div>
+                    <div class="stat-value" id="stat-rooms">—</div>
+                    <i class="fas fa-bed stat-icon"></i>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Bookings</div>
+                    <div class="stat-value" id="stat-bookings">—</div>
+                    <i class="fas fa-calendar-check stat-icon"></i>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pending Bookings</div>
+                    <div class="stat-value" id="stat-pending">—</div>
+                    <i class="fas fa-clock stat-icon"></i>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-link"></i> Quick Links</div>
+                <div style="display:flex; flex-wrap:wrap; gap:12px;">
+                    <button class="btn-secondary" onclick="location.href='bookings.html'">My Bookings</button>
+                    <button class="btn-secondary" onclick="location.href='rooms.html'">Browse Rooms</button>
+                    <button class="btn-secondary" onclick="location.href='account.html'">My Profile</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+    <script src="script/api/baseApi.js"></script>
+    <script src="script/api/userApi.js"></script>
+    <script src="script/api/roomApi.js"></script>
+    <script src="script/api/bookingApi.js"></script>
+    <script src="script/authStore.js"></script>
+    <script src="script/guard.js"></script>
+    <script src="script/dashboard.js"></script>
+
+</body>
+
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - HotelM</title>
+    <link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body>
+<div id="app-topbar"></div>
+<div class="container">
+    <div id="dashboard-error" class="error" style="display:none;"></div>
+
+    <div class="page-links">
+        <a href="room-list.html">Room list</a>
+        <a href="booking.html">Booking list</a>
+        <a href="search.html">Room search</a>
+        <a href="contact.html">Contact</a>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Total users</h3>
+            <div id="stat-users">0</div>
+        </div>
+        <div class="card">
+            <h3>Total rooms</h3>
+            <div id="stat-rooms">0</div>
+        </div>
+        <div class="card">
+            <h3>Total bookings</h3>
+            <div id="stat-bookings">0</div>
+        </div>
+        <div class="card">
+            <h3>Pending bookings</h3>
+            <div id="stat-pending">0</div>
+        </div>
+    </div>
+</div>
+
+<script src="script/api/baseApi.js"></script>
+<script src="script/api/userApi.js"></script>
+<script src="script/api/roomApi.js"></script>
+<script src="script/api/bookingApi.js"></script>
+<script src="script/authStore.js"></script>
+<script src="script/guard.js"></script>
+<script src="script/app-shell.js"></script>
+<script src="script/dashboard.js"></script>
+</body>
+</html>
+ -->

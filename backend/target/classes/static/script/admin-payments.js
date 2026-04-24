@@ -54,8 +54,8 @@
                 + "<td>" + methodLabel(p) + "</td>"
                 + "<td>" + statusBadge(status) + "</td>"
                 + "<td><div class='actions-cell'>"
-                + (canAct ? "<button class='btn-approve' onclick='confirmAction(\"approve\",\"" + id + "\")'><i class='fas fa-check'></i> Approve</button>" : "")
-                + (canAct ? "<button class='btn-reject'  onclick='confirmAction(\"reject\",\""  + id + "\")'><i class='fas fa-times'></i> Reject</button>" : "")
+                + (canAct ? "<button class='btn-approve' onclick='confirmAction(\"approve\",\"" + id + "\")'><i class='fas fa-check'></i><span data-i18n='admin_approve'> Approve</button>" : "")
+                + (canAct ? "<button class='btn-reject'  onclick='confirmAction(\"reject\",\""  + id + "\")'><i class='fas fa-times'></i> <span data-i18n='admin_reject'>Reject</button>" : "")
                 + "<button class='btn-del' onclick='confirmAction(\"delete\",\"" + id + "\")'><i class='fas fa-trash'></i></button>"
                 + "</div></td>"
                 + "</tr>";

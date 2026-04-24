@@ -205,6 +205,65 @@
             font-size: 0.9rem;
         }
 
+        /* Language Toggle Button */
+
+        #lang-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: 1.5px solid rgba(201, 160, 80, 0.55);
+            border-radius: 20px;
+            padding: 5px 13px 5px 10px;
+            cursor: pointer;
+            font-family: 'Lato', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--white, #fff);
+            transition: background 0.25s, border-color 0.25s, color 0.25s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        #lang-toggle-btn:hover {
+            background: rgba(201, 160, 80, 0.18);
+            border-color: var(--primary, #C9A050);
+            color: var(--primary, #C9A050);
+        }
+
+        #lang-toggle-btn .lang-flag {
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        #lang-toggle-btn .lang-label {
+            line-height: 1;
+        }
+
+        /* Scrolled header — keep button readable against dark bg */
+        header.scrolled #lang-toggle-btn {
+            border-color: rgba(201, 160, 80, 0.7);
+        }
+
+        /* On non-scrolled transparent header (home page hero) */
+        #main-header:not(.scrolled) #lang-toggle-btn {
+            border-color: rgba(255, 255, 255, 0.45);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        #main-header:not(.scrolled) #lang-toggle-btn:hover {
+            border-color: var(--primary, #C9A050);
+            color: var(--primary, #C9A050);
+        }
+
+        /* Hide on very small screens — optional, remove if you want it always visible */
+        @media (max-width: 480px) {
+            #lang-toggle-btn .lang-label {
+                display: none;
+            }
+        }
+
         /* ── SIDEBAR ── */
         .sidebar {
             width: var(--sidebar-w);

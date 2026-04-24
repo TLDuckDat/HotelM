@@ -172,7 +172,7 @@
                 + "      <span><i class='fas fa-circle-dot'></i> Status: <strong>" + status + "</strong></span>"
                 + "      <span><i class='fas fa-users'></i> Capacity: <strong>" + capacity + "</strong></span>"
                 + "    </div>"
-                + "    <button class='btn-book' onclick=\"RoomsPage.bookRoom('" + roomId + "')\">"
+                + "    <button class='btn-book' onclick=\"window.location.href='room-detail.html?id=" + encodeURIComponent(roomId) + "'\">"
                 + "      <i class='fas fa-calendar-plus'></i> Book Now"
                 + "    </button>"
                 + "  </div>"
