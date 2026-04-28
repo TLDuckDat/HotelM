@@ -1,7 +1,4 @@
 # HotelM
-
-Monorepo tách rõ backend/frontend nhưng vẫn giữ backend Spring Boot chạy ổn định.
-
 ## Project Structure
 
 - `backend/`: Spring Boot API + static resources đang được serve bởi backend.
@@ -99,6 +96,5 @@ Hoặc chạy từ root bằng Maven module:
 ## Notes
 
 - Điểm vào ứng dụng vẫn là `backend/src/main/java/org/example/hotelm/HotelMApplication.java`.
-- Frontend runtime hiện tại vẫn nằm trong `backend/src/main/resources/static/` để tránh phá vỡ hành vi hiện có.
 - `frontend/` là không gian tổ chức lại code UI theo hướng chuyên nghiệp, có thể gắn pipeline build/copy sau.
 
