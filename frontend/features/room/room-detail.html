@@ -1,22 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Room Detail - HotelM</title>
-    <link rel="stylesheet" href="assets/css/app.css" />
+    <!-- Base Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- App Shell and Component CSS -->
+    <link rel="stylesheet" href="../../components/app-shell/app.css" />
+    
+    <!-- Page Specific CSS -->
+    <link rel="stylesheet" href="room-detail.css" />
 </head>
+
 <body>
-<div id="app-topbar"></div>
-<div class="container">
-    <div id="room-detail"></div>
-</div>
+    <div id="app-topbar"></div>
+    
+    <div class="container main-content">
+        <!-- Loading State -->
+        <div id="loading-indicator">
+            <i class="fas fa-spinner fa-spin"></i>
+            <h3>Loading Room Details...</h3>
+        </div>
 
-<script src="script/api/baseApi.js"></script>
-<script src="script/api/roomApi.js"></script>
-<script src="script/authStore.js"></script>
-<script src="script/app-shell.js"></script>
-<script src="script/room-detail.js"></script>
+        <!-- Not Found State -->
+        <div id="not-found-message" style="display: none;">
+            <i class="fas fa-door-closed"></i>
+            <h2>Room Not Found</h2>
+            <p>This room does not exist or may have been removed.</p>
+            <a href="room-list.html" class="btn-secondary"><i class="fas fa-arrow-left"></i> Browse All Rooms</a>
+        </div>
+
+        <!-- Main Content State -->
+        <div id="room-detail-content" style="display: none;">
+            <a href="room-list.html" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to All Rooms
+            </a>
+
+            <!-- HERO SECTION -->
+            <div class="room-hero">
+                <img id="el-hero-img" src="" alt="Room Hero Image" class="room-hero-img" onerror="this.src='../../images/home/villa/villa1.jpg'">
+                <div class="room-hero-overlay"></div>
+                <div id="el-hero-badge-container"></div>
+                <span class="room-hero-tag">
+                    <i class="fas fa-tag"></i> <span id="el-hero-type"></span>
+                </span>
+                <div class="room-hero-bottom">
+                    <div class="room-hero-name" id="el-hero-name"></div>
+                    <div class="room-hero-id">Room #<span id="el-hero-id"></span></div>
+                </div>
+            </div>
+
+            <!-- DETAIL GRID -->
+            <div class="detail-grid">
+                
+                <!-- LEFT COLUMN -->
+                <div>
+                    <!-- Specifications -->
+                    <div class="detail-section">
+                        <div class="section-heading"><i class="fas fa-circle-info"></i> Room Specifications</div>
+                        <div class="spec-grid">
+                            <div class="spec-item">
+                                <div class="spec-icon"><i class="fas fa-bed"></i></div>
+                                <div>
+                                    <div class="spec-label">Room Type</div>
+                                    <div class="spec-value" id="el-spec-type"></div>
+                                </div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-icon"><i class="fas fa-users"></i></div>
+                                <div>
+                                    <div class="spec-label">Max Capacity</div>
+                                    <div class="spec-value" id="el-spec-capacity"></div>
+                                </div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-icon"><i class="fas fa-circle-dot"></i></div>
+                                <div>
+                                    <div class="spec-label">Status</div>
+                                    <div class="spec-value" id="el-spec-status"></div>
+                                </div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-icon"><i class="fas fa-hashtag"></i></div>
+                                <div>
+                                    <div class="spec-label">Room ID</div>
+                                    <div class="spec-value" id="el-spec-id" style="font-size:0.85rem"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="detail-section">
+                        <div class="section-heading"><i class="fas fa-align-left"></i> About This Room</div>
+                        <div class="room-description" id="el-description"></div>
+                    </div>
+
+                    <!-- Amenities -->
+                    <div class="detail-section">
+                        <div class="section-heading"><i class="fas fa-star"></i> Amenities &amp; Features</div>
+                        <div class="amenities-list" id="el-amenities"></div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: BOOKING PANEL -->
+                <div>
+                    <div class="booking-panel">
+                        <div class="booking-panel-header">
+                            <div class="booking-panel-title">Reserve Your Stay</div>
+                            <div class="booking-panel-sub">Click below to lock in your room</div>
+                        </div>
+                        <div class="booking-panel-body">
+                            <div class="booking-panel-price" id="el-price-container">
+                                <!-- Price injected here -->
+                            </div>
+
+                            <div class="booking-panel-info">
+                                <div class="panel-info-row">
+                                    <span class="label"><i class="fas fa-bed"></i> Room</span>
+                                    <span class="value" id="el-panel-name"></span>
+                                </div>
+                                <div class="panel-info-row">
+                                    <span class="label"><i class="fas fa-tag"></i> Type</span>
+                                    <span class="value" id="el-panel-type"></span>
+                                </div>
+                                <div class="panel-info-row">
+                                    <span class="label"><i class="fas fa-users"></i> Capacity</span>
+                                    <span class="value" id="el-panel-capacity"></span>
+                                </div>
+                                <div class="panel-info-row">
+                                    <span class="label"><i class="fas fa-circle-dot"></i> Status</span>
+                                    <span class="value" id="el-panel-status"></span>
+                                </div>
+                            </div>
+
+                            <div id="el-book-button-container">
+                                <!-- Button injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../core/api/baseApi.js"></script>
+    <script src="../../core/api/roomApi.js"></script>
+    <script src="../../core/api/roomTypeApi.js"></script>
+    <script src="../../core/store/authStore.js"></script>
+    <script src="../../core/guards/guard.js"></script>
+    <script src="../../components/app-shell/app-shell.js"></script>
+    <script src="room-detail.js"></script>
 </body>
-</html>
 
+</html>

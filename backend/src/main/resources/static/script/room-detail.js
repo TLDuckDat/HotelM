@@ -78,7 +78,7 @@
                 '<div class="error-state fade-in">',
                 '  <i class="fas fa-door-closed"></i>',
                 '  <p>Room not found. It may have been removed or the link is invalid.</p>',
-                '  <a href="room-list.html" class="btn-back" style="margin:20px auto 0;display:inline-flex">',
+                '  <a href="rooms.html" class="btn-back" style="margin:20px auto 0;display:inline-flex">',
                 '    <i class="fas fa-arrow-left"></i> Back to Rooms',
                 '  </a>',
                 '</div>'
@@ -87,7 +87,7 @@
         }
 
         // ── Resolve fields ──
-        var roomId    = room.roomID || room.id || "";
+        var roomId    = room.roomId || room.roomID || room.id || "";
         var roomName  = room.roomName || room.name || "Unnamed Room";
         var status    = room.status || "";
         var capacity  = room.maxCapacity || room.capacity || 0;
@@ -127,13 +127,13 @@
 
             // Breadcrumb
             '<nav class="breadcrumb fade-in">',
-            '  <a href="room-list.html">Rooms</a>',
+            '  <a href="rooms.html">Rooms</a>',,
             '  <span class="sep">›</span>',
             '  <span class="current">' + roomName + '</span>',
             '</nav>',
 
             // Back button
-            '<a href="room-list.html" class="btn-back fade-in">',
+            '<a href="rooms.html" class="btn-back fade-in">',
             '  <i class="fas fa-arrow-left"></i> All Rooms',
             '</a>',
 
@@ -313,7 +313,7 @@
                 '<div class="error-state fade-in">',
                 '  <i class="fas fa-exclamation-triangle"></i>',
                 '  <p>No room ID provided. Please go back and select a room.</p>',
-                '  <a href="room-list.html" class="btn-back" style="margin:20px auto 0;display:inline-flex">',
+                '  <a href="rooms.html" class="btn-back" style="margin:20px auto 0;display:inline-flex">',
                 '    <i class="fas fa-arrow-left"></i> Browse Rooms',
                 '  </a>',
                 '</div>'
@@ -355,7 +355,7 @@
                     '<div class="error-state fade-in">',
                     '  <i class="fas fa-triangle-exclamation"></i>',
                     '  <p>Unable to load room details. Please try again later.</p>',
-                    '  <a href="room-list.html" class="btn-back" style="margin:20px auto 0;display:inline-flex">',
+                    '  <a href="rooms.html" class="btn-back" style="margin:20px auto 0;display:inline-flex">',
                     '    <i class="fas fa-arrow-left"></i> Back to Rooms',
                     '  </a>',
                     '</div>'

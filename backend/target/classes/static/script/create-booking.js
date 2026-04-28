@@ -141,18 +141,75 @@
             note: note
         };
 
-        setMessage("Creating booking...", "info");
+        // Disable submit button to prevent double-submit
+        var submitBtn = event.target.querySelector("[type=submit]");
+        if (submitBtn) submitBtn.disabled = true;
+
+        setMessage("Creating booking…", "info");
 
         global.BookingApi.createBooking(payload)
-            .then(function () {
-                setMessage("Booking created successfully! Redirecting...", "success");
-                setTimeout(function () {
-                    window.location.href = "booking.html";
-                }, 1000);
+            .then(function (res) {
+                // Backend returns 202 { requestId, message } — queue async
+                // Need to poll /bookings/queue/{requestId} to get the real bookingId
+                var requestId = res && (res.requestId || res.request_id);
+
+                if (!requestId) {
+                    // Fallback: if somehow a direct bookingId came back (non-queue mode)
+                    var direct = res && (res.payload || res.data || res) || {};
+                    var directId = direct.bookingId || direct.bookingID || direct.id;
+                    if (directId) {
+                        setMessage("Booking created! Redirecting to payment…", "success");
+                        setTimeout(function () {
+                            window.location.href = "payments.html?bookingId=" + encodeURIComponent(directId);
+                        }, 800);
+                        return;
+                    }
+                    // No ID at all — go to bookings list
+                    setMessage("Booking submitted. Redirecting…", "success");
+                    setTimeout(function () { window.location.href = "bookings.html"; }, 800);
+                    return;
+                }
+
+                setMessage("Booking queued — waiting for confirmation (this may take a few seconds)…", "info");
+
+                // Poll the queue until SUCCESS / FAILED
+                global.BookingApi.pollQueueResult(requestId, { maxAttempts: 20, intervalMs: 1500 })
+                    .then(function (result) {
+                        if (result.status === "SUCCESS") {
+                            // result.data holds the BookingResponse
+                            var booking = result.data || result.payload || result;
+                            var bookingId = booking.bookingId || booking.bookingID || booking.id || "";
+
+                            setMessage("Booking confirmed! Redirecting to payment…", "success");
+                            setTimeout(function () {
+                                if (bookingId) {
+                                    window.location.href = "payments.html?bookingId=" + encodeURIComponent(bookingId);
+                                } else {
+                                    window.location.href = "bookings.html";
+                                }
+                            }, 800);
+                        } else {
+                            // FAILED or NOT_FOUND
+                            var reason = (result.data && (result.data.message || result.data.error))
+                                || "Booking could not be confirmed. Please try again.";
+                            setMessage(reason, "error");
+                            if (submitBtn) submitBtn.disabled = false;
+                        }
+                    })
+                    .catch(function (pollErr) {
+                        setMessage(
+                            "Booking was submitted but we could not confirm it in time. " +
+                            "Please check My Bookings to verify.",
+                            "error"
+                        );
+                        if (submitBtn) submitBtn.disabled = false;
+                    });
             })
             .catch(function (err) {
-                var errMsg = err?.payload?.message || err?.payload?.error || "Cannot create booking.";
+                var errMsg = (err && err.payload && (err.payload.message || err.payload.error))
+                    || "Cannot create booking.";
                 setMessage(errMsg, "error");
+                if (submitBtn) submitBtn.disabled = false;
             });
     }
 

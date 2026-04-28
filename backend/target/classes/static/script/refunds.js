@@ -1,6 +1,8 @@
 (function (global) {
     "use strict";
 
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
     function setMessage(text, type) {
         var el = document.getElementById("refunds-message");
         if (!el) return;
@@ -9,28 +11,92 @@
         el.style.display = "block";
     }
 
-    function loadBookingOptions() {
+    /** Normalize user ID across different JWT/session token shapes */
+    function getCurrentUserId() {
         var user = global.AuthStore.getCurrentUser();
+        return user && (user.userId || user.userID || user.id || "");
+    }
 
-        return global.BookingApi.getBookings().then(function (bookings) {
-            var mine = (bookings || []).filter(function (b) {
-                return b.user && b.user.userID === user.userID;
+    function getCurrentUser() {
+        return global.AuthStore.getCurrentUser() || {};
+    }
+
+    // BookingResponse fields: bookingId, userId, roomId, checkIn, checkOut,
+    //                         totalPrice, status, createdAt, note
+    function getBookingId(b) {
+        return b.bookingId || b.bookingID || b.id || "";
+    }
+
+    function getRefundId(r) {
+        return r.refundId || r.refundID || r.id || "";
+    }
+
+    function getRefundBookingId(r) {
+        return r.bookingId || (r.booking && (r.booking.bookingId || r.booking.bookingID)) || "";
+    }
+
+    // ── Booking options for the "select booking" dropdown ────────────────────
+
+    function loadBookingOptions() {
+        var userId = getCurrentUserId();
+        if (!userId) {
+            setMessage("Cannot identify current user.", "error");
+            return Promise.resolve();
+        }
+
+        // Use user-specific endpoint (GET /bookings/user/{userId})
+        var loader = global.BookingApi.getBookingsByUser
+            ? global.BookingApi.getBookingsByUser(userId)
+            : global.BookingApi.getBookings().then(function (all) {
+                return (all || []).filter(function (b) {
+                    var bUid = b.userId
+                        || (b.user && (b.user.userId || b.user.userID || b.user.id))
+                        || "";
+                    return String(bUid) === String(userId);
+                });
             });
+
+        return loader.then(function (bookings) {
+            var raw = Array.isArray(bookings)
+                ? bookings
+                : (bookings && (bookings.payload || bookings.data) || []);
 
             var select = document.getElementById("refund-booking-id");
             if (!select) return;
 
-            if (!mine.length) {
-                select.innerHTML = "<option value=''>No booking found</option>";
+            // Only allow refunds on CONFIRMED or CHECKED_IN bookings
+            // (not CANCELLED or CHECKED_OUT — those are already finished)
+            var eligible = raw.filter(function (b) {
+                var s = (b.status || "").toUpperCase();
+                return s === "CONFIRMED" || s === "CHECKED_IN" || s === "PENDING";
+            });
+
+            if (!eligible.length) {
+                select.innerHTML = "<option value=''>No eligible booking for refund</option>";
                 return;
             }
 
-            select.innerHTML = mine.map(function (b) {
-                var roomName = b.room ? (b.room.roomName || "Room") : "Room";
-                return "<option value='" + b.bookingID + "'>" + b.bookingID + " - " + roomName + "</option>";
-            }).join("");
+            select.innerHTML = "<option value=''>Choose a booking…</option>"
+                + eligible.map(function (b) {
+                    var id = getBookingId(b);
+                    // BookingResponse has roomId (not roomName), so display roomId
+                    var roomLabel = b.roomName
+                        || (b.room && b.room.roomName)
+                        || (b.roomId ? "Room #" + b.roomId : "");
+                    var label = id + (roomLabel ? " — " + roomLabel : "")
+                        + " [" + (b.status || "?") + "]";
+                    return "<option value='" + id + "'>" + label + "</option>";
+                }).join("");
+        }).catch(function (err) {
+            var select = document.getElementById("refund-booking-id");
+            if (select) select.innerHTML = "<option value=''>Cannot load bookings</option>";
+            var msg = (err && err.payload && (err.payload.message || err.payload.error))
+                || "Cannot load your bookings.";
+            setMessage(msg, "error");
         });
     }
+
+    // ── Render refund list ────────────────────────────────────────────────────
 
     function renderRefunds(refunds) {
         var body = document.getElementById("refunds-body");
@@ -42,28 +108,47 @@
         }
 
         body.innerHTML = refunds.map(function (r) {
-            var bookingId = r.bookingId || (r.booking && r.booking.bookingID) || "";
+            var id        = getRefundId(r);
+            var bookingId = getRefundBookingId(r);
+            var status    = r.status || "PENDING";
+
+            // Status badge styling
+            var badgeStyle = status === "APPROVED"
+                ? "color:#1b4332;background:#d8f3dc;border:1px solid #95d5b2;"
+                : status === "REJECTED"
+                    ? "color:#7f0000;background:#ffe0e0;border:1px solid #f5c6cb;"
+                    : "color:#856404;background:#fff3cd;border:1px solid #ffecb5;";
+
             return "<tr>"
-                + "<td>" + (r.refundID || r.id || "") + "</td>"
+                + "<td><code style='font-size:.85rem;color:#555'>#" + id + "</code></td>"
                 + "<td>" + bookingId + "</td>"
-                + "<td>" + (r.status || "PENDING") + "</td>"
-                + "<td>" + (r.reason || "") + "</td>"
+                + "<td><span style='padding:3px 10px;border-radius:20px;font-size:.85rem;"
+                          + badgeStyle + "'>" + status + "</span></td>"
+                + "<td style='max-width:240px;word-break:break-word'>" + (r.reason || "—") + "</td>"
                 + "</tr>";
         }).join("");
     }
 
+    // ── Load & update stats ───────────────────────────────────────────────────
+
     function loadRefunds() {
-        var user = global.AuthStore.getCurrentUser();
+        var userId = getCurrentUserId();
 
         return global.RefundApi.getRefunds()
-            .then(function (refunds) {
-                var mine = (refunds || []).filter(function (r) {
-                    if (r.userId) return r.userId === user.userID;
-                    if (r.user && r.user.userID) return r.user.userID === user.userID;
-                    return true;
+            .then(function (data) {
+                var all = Array.isArray(data)
+                    ? data
+                    : (data && (data.payload || data.data) || []);
+
+                // Filter to this user's refunds only
+                var mine = all.filter(function (r) {
+                    var rUid = r.userId
+                        || (r.user && (r.user.userId || r.user.userID || r.user.id))
+                        || "";
+                    return !userId || String(rUid) === String(userId);
                 });
 
-                // Update stat cards
+                // Stats
                 var pending  = mine.filter(function (r) { return (r.status || "PENDING") === "PENDING"; }).length;
                 var approved = mine.filter(function (r) { return r.status === "APPROVED"; }).length;
                 var elTotal    = document.getElementById("stat-total");
@@ -77,41 +162,57 @@
             })
             .catch(function (err) {
                 renderRefunds([]);
-                var msg = err && err.status === 404
-                    ? "Refund API is not available yet. UI is ready."
-                    : "Cannot load refund requests.";
-                setMessage(msg, "notice");
+                // 404 = /refunds endpoint not yet implemented on backend
+                if (err && err.status === 404) {
+                    setMessage("Refund API is not available yet — feature coming soon.", "notice");
+                } else {
+                    var msg = (err && err.payload && (err.payload.message || err.payload.error))
+                        || "Cannot load refund requests.";
+                    setMessage(msg, "error");
+                }
             });
     }
 
+    // ── Submit new refund request ─────────────────────────────────────────────
+
     function submitRefund() {
-        var user      = global.AuthStore.getCurrentUser();
+        var userId    = getCurrentUserId();
         var bookingId = document.getElementById("refund-booking-id").value;
         var reason    = document.getElementById("refund-reason").value.trim();
 
-        if (!bookingId || !reason) {
-            setMessage("Please choose a booking and enter a reason.", "error");
+        if (!bookingId) {
+            setMessage("Please choose a booking.", "error");
+            return;
+        }
+        if (!reason) {
+            setMessage("Please enter a reason for the refund.", "error");
             return;
         }
 
-        setMessage("Submitting refund request...", "notice");
+        var btn = document.getElementById("refund-submit-btn");
+        if (btn) btn.disabled = true;
+
+        setMessage("Submitting refund request…", "notice");
 
         global.RefundApi.createRefund({
             bookingId: bookingId,
-            userId:    user.userID,
+            userId:    userId,
             reason:    reason
         }).then(function () {
-            setMessage("Refund request submitted.", "success");
+            setMessage("Refund request submitted successfully.", "success");
             document.getElementById("refund-booking-id").value = "";
             document.getElementById("refund-reason").value     = "";
+            if (btn) btn.disabled = false;
             loadRefunds();
         }).catch(function (err) {
-            var msg = err && err.payload
-                ? (err.payload.message || err.payload.error || "Submit refund failed")
-                : "Submit refund failed";
+            var msg = (err && err.payload && (err.payload.message || err.payload.error))
+                || "Cannot submit refund request.";
             setMessage(msg, "error");
+            if (btn) btn.disabled = false;
         });
     }
+
+    // ── Sidebar helpers ───────────────────────────────────────────────────────
 
     function handleLogout() {
         if (global.AuthStore) global.AuthStore.clearCurrentUser();
@@ -128,17 +229,22 @@
         document.getElementById("sidebar-overlay").classList.remove("active");
     };
 
+    // ── Init ─────────────────────────────────────────────────────────────────
+
     function init() {
         if (!global.Guard.requireLogin()) return;
 
-        var user = global.AuthStore.getCurrentUser();
-        if (user) {
-            var el;
-            el = document.getElementById("topbar-username"); if (el) el.textContent = user.fullName || "Guest";
-            el = document.getElementById("sidebar-username"); if (el) el.textContent = user.fullName || "Guest";
-            el = document.getElementById("sidebar-role");    if (el) el.textContent = user.role || "USER";
+        var user = getCurrentUser();
+        if (global.HotelMApiBase && (user.accessToken || user.token)) {
+            global.HotelMApiBase.setAuthToken(user.accessToken || user.token);
         }
 
+        var el;
+        el = document.getElementById("topbar-username");  if (el) el.textContent = user.fullName || "Guest";
+        el = document.getElementById("sidebar-username"); if (el) el.textContent = user.fullName || "Guest";
+        el = document.getElementById("sidebar-role");     if (el) el.textContent = user.role || "USER";
+
+        // Load bookings and refunds in parallel
         Promise.all([
             loadBookingOptions(),
             loadRefunds()
@@ -151,4 +257,5 @@
     }
 
     document.addEventListener("DOMContentLoaded", init);
-})(window); 
+
+})(window);

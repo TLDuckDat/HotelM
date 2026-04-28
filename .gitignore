@@ -1,12 +1,46 @@
-# Default ignored files
-/shelf/
-/workspace.xml
-# Ignored default folder with query files
-/queries/
-# Datasource local storage ignored files
-/dataSources/
-/dataSources.local.xml
-# Editor-based HTTP Client requests
-/httpRequests/
-/.idea
-/database
+# ======================
+# Java / Spring Boot
+# ======================
+*.class
+target/
+**/target/
+
+# Logs
+*.log
+
+# ======================
+# IntelliJ
+# ======================
+.idea/
+*.iml
+out/
+
+# ======================
+# VSCode
+# ======================
+.vscode/
+.history/
+
+# ======================
+# Node (nếu có frontend build sau này)
+# ======================
+node_modules/
+.env*
+
+# ======================
+# OS files
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# Temporary files
+# ======================
+temp/
+tmp/
+
+# ======================
+# Database
+# ======================
+# Chỉ ignore nếu là data tạm
+# database/

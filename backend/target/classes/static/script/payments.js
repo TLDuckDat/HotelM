@@ -22,12 +22,22 @@
         return "$" + (Number(amount) || 0).toFixed(2);
     }
 
+    // BookingResponse fields: bookingId, userId, roomId, checkIn, checkOut, totalPrice, status
     function getBookingId(booking) {
-        return booking.bookingID || booking.bookingId || booking.id || "";
+        return booking.bookingId || booking.bookingID || booking.id || "";
     }
 
     function getBookingRoomName(booking) {
-        return booking.roomName || (booking.room && booking.room.roomName) || "Room";
+        // BookingResponse only has roomId (no roomName) — show roomId with label
+        return booking.roomName
+            || (booking.room && booking.room.roomName)
+            || (booking.roomId ? "Room #" + booking.roomId : "Room");
+    }
+
+    // Normalize user ID across different auth token shapes
+    function getCurrentUserId() {
+        var user = global.AuthStore.getCurrentUser();
+        return user && (user.userId || user.userID || user.id || "");
     }
 
     function getPaymentId(payment) {
@@ -43,7 +53,8 @@
     }
 
     function getPaymentBookingId(payment) {
-        return payment.bookingId || (payment.booking && payment.booking.bookingID) || payment.booking_booking_id || "";
+        // InvoiceResponse fields: invoiceId, bookingId, userId, roomId, amount, discount, finalAmount, paymentMethod, status, paidAt
+        return payment.bookingId || (payment.booking && (payment.booking.bookingId || payment.booking.bookingID)) || "";
     }
 
     function getQrTransferNote(payment) {
@@ -75,41 +86,101 @@
         var select = document.getElementById("payment-booking-id");
         if (!select) return;
 
-        var usedBookingIds = paymentCache.map(function (payment) {
-            return getPaymentBookingId(payment);
-        });
+        // Bookings that already have a PENDING payment — can reopen QR but not create new
+        var pendingBookingIds = paymentCache
+            .filter(function (p) { return getPaymentStatus(p) === "PENDING"; })
+            .map(function (p) { return String(getPaymentBookingId(p)); });
 
-        var availableBookings = bookingCache.filter(function (booking) {
+        // Bookings that already have a COMPLETED payment — exclude entirely
+        var completedBookingIds = paymentCache
+            .filter(function (p) { return getPaymentStatus(p) === "COMPLETED"; })
+            .map(function (p) { return String(getPaymentBookingId(p)); });
+
+        var payableBookings = bookingCache.filter(function (booking) {
             var status = booking.status || "";
-            return usedBookingIds.indexOf(getBookingId(booking)) === -1
+            var bId = String(getBookingId(booking));
+            return completedBookingIds.indexOf(bId) === -1
                 && status !== "CANCELLED"
                 && status !== "CHECKED_OUT";
         });
 
-        if (!availableBookings.length) {
+        if (!payableBookings.length) {
             select.innerHTML = "<option value=''>No unpaid booking available</option>";
             updateAmountFromBooking();
             return;
         }
 
-        select.innerHTML = "<option value=''>Select a booking…</option>" + availableBookings.map(function (booking) {
-            return "<option value='" + getBookingId(booking) + "'>"
-                + getBookingId(booking) + " - " + getBookingRoomName(booking)
-                + " (" + formatMoney(booking.totalPrice) + ")"
-                + "</option>";
+        select.innerHTML = "<option value=''>Select a booking\u2026</option>" + payableBookings.map(function (booking) {
+            var bId = String(getBookingId(booking));
+            var label = bId + " - " + getBookingRoomName(booking)
+                + " (" + formatMoney(booking.totalPrice) + ")";
+            // Mark bookings that already have a PENDING payment
+            if (pendingBookingIds.indexOf(bId) !== -1) {
+                label += " [Payment pending]";
+            }
+            return "<option value='" + bId + "'>" + label + "</option>";
         }).join("");
-        updateAmountFromBooking();
+
+        // Auto-select if URL has ?bookingId= (e.g. redirected from create-booking)
+        var urlParams = new URLSearchParams(window.location.search);
+        var urlBookingId = urlParams.get("bookingId");
+        if (urlBookingId) {
+            // Try to find the booking in the select list
+            var found = Array.from(select.options).some(function (opt) {
+                return opt.value === String(urlBookingId);
+            });
+            if (found) {
+                select.value = String(urlBookingId);
+                updateAmountFromBooking();
+                // If it already has a PENDING payment, reopen the QR automatically
+                if (pendingBookingIds.indexOf(String(urlBookingId)) !== -1) {
+                    var existingPayment = paymentCache.filter(function (p) {
+                        return String(getPaymentBookingId(p)) === String(urlBookingId)
+                            && getPaymentStatus(p) === "PENDING";
+                    })[0];
+                    if (existingPayment) {
+                        renderQrPayment(existingPayment);
+                        setMessage('Payment already created. Scan the QR and confirm after transferring.', "notice");
+                    }
+                } else {
+                    setMessage('Booking pre-selected! Click "Create QR Payment" to proceed.', "notice");
+                }
+            } else {
+                setMessage('Booking #' + urlBookingId + ' not found in your payable bookings.', "error");
+            }
+        } else {
+            updateAmountFromBooking();
+        }
     }
 
     function loadBookings() {
-        var user = global.AuthStore.getCurrentUser();
-        return global.BookingApi.getBookings().then(function (bookings) {
-            bookingCache = (bookings || []).filter(function (booking) {
-                var bookingUserId = booking.userId || (booking.user && booking.user.userID);
-                return bookingUserId === user.userID;
-            });
+        var userId = getCurrentUserId();
+        // Use user-specific endpoint (GET /bookings/user/{userId}) — avoids loading all bookings
+        var loader = userId
+            ? global.BookingApi.getBookingsByUser(userId)
+            : global.BookingApi.getBookings();
+
+        return loader.then(function (bookings) {
+            var raw = Array.isArray(bookings)
+                ? bookings
+                : (bookings && (bookings.payload || bookings.data) || []);
+            // Extra client-side guard: only keep this user's bookings
+            bookingCache = userId
+                ? raw.filter(function (b) {
+                    var bUid = b.userId
+                        || (b.user && (b.user.userId || b.user.userID || b.user.id))
+                        || "";
+                    return String(bUid) === String(userId);
+                })
+                : raw;
             renderBookingOptions();
             return bookingCache;
+        }).catch(function (err) {
+            bookingCache = [];
+            renderBookingOptions();
+            var msg = (err && err.payload && (err.payload.message || err.payload.error))
+                || "Cannot load bookings.";
+            setMessage(msg, "error");
         });
     }
 
@@ -161,13 +232,17 @@
     }
 
     function loadPayments() {
-        var user = global.AuthStore.getCurrentUser();
-        var loader = global.PaymentApi.getPaymentsByUser
-            ? global.PaymentApi.getPaymentsByUser(user.userID)
+        var userId = getCurrentUserId();
+        // Use user-specific endpoint (GET /invoices/user/{userId})
+        var loader = userId
+            ? global.PaymentApi.getPaymentsByUser(userId)
             : global.PaymentApi.getPayments();
 
         return loader.then(function (payments) {
-            paymentCache = payments || [];
+            var raw = Array.isArray(payments)
+                ? payments
+                : (payments && (payments.payload || payments.data) || []);
+            paymentCache = raw;
 
             var completed = paymentCache.filter(function (payment) {
                 return getPaymentStatus(payment) === "COMPLETED";
@@ -177,20 +252,19 @@
             }, 0);
 
             var elTotal = document.getElementById("stat-total");
-            var elComp = document.getElementById("stat-completed");
-            var elAmt = document.getElementById("stat-amount");
+            var elComp  = document.getElementById("stat-completed");
+            var elAmt   = document.getElementById("stat-amount");
             if (elTotal) elTotal.textContent = paymentCache.length;
-            if (elComp) elComp.textContent = completed.length;
-            if (elAmt) elAmt.textContent = formatMoney(totalAmt);
+            if (elComp)  elComp.textContent  = completed.length;
+            if (elAmt)   elAmt.textContent   = formatMoney(totalAmt);
 
             renderBookingOptions();
             renderPayments(paymentCache);
             return paymentCache;
         }).catch(function (err) {
             renderPayments([]);
-            var msg = err && err.payload
-                ? (err.payload.message || err.payload.error || "Cannot load payments.")
-                : "Cannot load payments.";
+            var msg = (err && err.payload && (err.payload.message || err.payload.error))
+                || "Cannot load payments.";
             setMessage(msg, "error");
         });
     }

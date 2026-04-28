@@ -60,27 +60,48 @@
         }
 
         list.innerHTML = rooms.map(function (room) {
-            var roomId = getRoomId(room);
+            var roomId   = getRoomId(room);
             var roomName = getRoomName(room);
             var roomType = getRoomTypeName(room, types);
-            var status = room.status || "N/A";
+            var status   = room.status || "AVAILABLE";
             var capacity = room.maxCapacity || 0;
+
+            // Color-coded status badge
+            var statusClass = "";
+            var sl = status.toLowerCase();
+            if (sl === "available") statusClass = "badge-available";
+            else if (sl === "occupied" || sl === "booked") statusClass = "badge-occupied";
+            else if (sl === "maintenance") statusClass = "badge-maintenance";
+
+            var isMaintenance = sl === "maintenance";
 
             return ""
                 + "<div class='room-card'>"
                 + "  <div class='room-img-wrap'>"
-                + "    <img src='" + getRoomImage(room) + "' class='room-img' alt='" + roomName + "'>"
+                + "    <img src='" + getRoomImage(room) + "' class='room-img' alt='" + roomName + "'"
+                + "         onerror=\"this.src='assets/image/home/villa/villa1.jpg'\">"
                 + "  </div>"
                 + "  <div class='room-info'>"
                 + "    <p class='room-type'><i class='fas fa-tag'></i> " + roomType + "</p>"
                 + "    <h3>" + roomName + "</h3>"
                 + "    <div class='room-meta'>"
-                + "      <span><i class='fas fa-circle-dot'></i> Status: <strong>" + status + "</strong></span>"
+                + "      <span><i class='fas fa-circle-dot'></i> Status:&nbsp;"
+                + "        <span class='badge " + statusClass + "'>" + status + "</span></span>"
                 + "      <span><i class='fas fa-users'></i> Capacity: <strong>" + capacity + "</strong></span>"
                 + "    </div>"
-                + "    <button class='btn-book' onclick=\"RoomsPage.bookRoom('" + roomId + "')\">"
-                + "      <i class='fas fa-calendar-plus'></i> Book Now"
-                + "    </button>"
+                + "    <div style='display:flex;gap:10px;flex-wrap:wrap;margin-top:8px'>"
+                + "      <button class='btn-book' style='background:transparent;color:var(--primary);border:1.5px solid var(--primary)'"
+                + "              onclick=\"RoomsPage.viewDetail('" + roomId + "')\">"
+                + "        <i class='fas fa-eye'></i> View Details"
+                + "      </button>"
+                + (isMaintenance
+                    ? "      <button class='btn-book' disabled style='opacity:0.45;cursor:not-allowed'>"
+                      + "        <i class='fas fa-ban'></i> Unavailable"
+                      + "      </button>"
+                    : "      <button class='btn-book' onclick=\"RoomsPage.bookRoom('" + roomId + "')\">"
+                      + "        <i class='fas fa-calendar-plus'></i> Book Now"
+                      + "      </button>")
+                + "    </div>"
                 + "  </div>"
                 + "</div>";
         }).join("");
@@ -102,9 +123,14 @@
         });
     }
 
-    // ====================== BOOK ACTION ======================
+    // ====================== ROOM ACTIONS ======================
+    function viewDetail(id) {
+        window.location.href = "room-detail.html?id=" + encodeURIComponent(id);
+    }
+
     function bookRoom(id) {
-        window.location.href = "create-booking.html?roomId=" + encodeURIComponent(id);
+        // Navigate to create-booking with roomId pre-filled via URL param
+        window.location.href = "../booking/create-booking.html?roomId=" + encodeURIComponent(id);
     }
 
     // ====================== MOBILE SIDEBAR ======================
@@ -127,7 +153,8 @@
     // expose
     global.RoomsPage = {
         handleLogout,
-        bookRoom
+        bookRoom,
+        viewDetail
     };
 
 })(window);

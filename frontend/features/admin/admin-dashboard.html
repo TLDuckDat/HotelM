@@ -19,12 +19,39 @@
         <div class="card"><h3>Pending Bookings</h3><p id="admin-stat-pending">0</p></div>
     </div>
 
-    <div class="card">
+    <div class="card" style="margin-top:16px;">
+        <h3>Branch management</h3>
+        <form id="admin-create-branch-form" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:12px;">
+            <input id="admin-branch-name" placeholder="Branch name" required />
+            <input id="admin-branch-address" placeholder="Address" required />
+            <input id="admin-branch-city" placeholder="City" />
+            <input id="admin-branch-email" type="email" placeholder="Email" required />
+            <button class="primary" type="submit">Add branch</button>
+        </form>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+        <h3>Room Type management</h3>
+        <form id="admin-create-type-form" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:12px;">
+            <input id="admin-type-name" placeholder="Type name (e.g. Standard)" required />
+            <input id="admin-type-price" type="number" step="0.01" min="0" placeholder="Base Price" required />
+            <input id="admin-type-desc" placeholder="Description" />
+            <button class="primary" type="submit">Add room type</button>
+        </form>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
         <h3>Room management</h3>
         <form id="admin-create-room-form" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:12px;">
             <input id="admin-room-name" placeholder="Room name" required />
             <input id="admin-room-capacity" type="number" min="1" placeholder="Capacity" required />
             <input id="admin-room-desc" placeholder="Description" />
+            <select id="admin-room-type" required>
+                <option value="" disabled selected>Select Room Type</option>
+            </select>
+            <select id="admin-room-branch" required>
+                <option value="" disabled selected>Select Branch</option>
+            </select>
             <select id="admin-room-status" required>
                 <option value="AVAILABLE">AVAILABLE</option>
                 <option value="BOOKED">BOOKED</option>
@@ -93,6 +120,8 @@
 <script src="/script/api/baseApi.js"></script>
 <script src="/script/api/userApi.js"></script>
 <script src="/script/api/roomApi.js"></script>
+<script src="/script/api/roomTypeApi.js"></script>
+<script src="/script/api/branchApi.js"></script>
 <script src="/script/api/bookingApi.js"></script>
 <script src="/script/authStore.js"></script>
 <script src="/script/guard.js"></script>

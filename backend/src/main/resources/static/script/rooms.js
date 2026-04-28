@@ -115,7 +115,7 @@
 
     // ====================== RENDER ROOMS ======================
     function getRoomId(room) {
-        return room.roomID || room.id || "";
+        return room.roomId || room.roomID || room.id || "";
     }
 
     function getRoomName(room) {
