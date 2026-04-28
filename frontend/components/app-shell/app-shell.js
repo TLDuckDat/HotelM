@@ -19,7 +19,7 @@
             + "    <a href='index.html'>Home</a>"
             + "    <a href='dashboard.html'>Dashboard</a>"
             + "    <a href='room-list.html'>Rooms</a>"
-            + "    <a href='booking.html'>Bookings</a>"
+            + "    <a href='bookings.html'>Bookings</a>"
             + "    <a href='create-booking.html'>Create Booking</a>"
             + "    <a href='payment.html'>Payments</a>"
             + "    <a href='refund.html'>Refunds</a>"

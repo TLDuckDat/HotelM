@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offer - SOT Resort & Hotel</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/offer.css">
+</head>
+
+<body>
+
+    <header id="main-header">
+        <div class="container nav-container">
+            <div class="logo">
+                <a href="index.html" class="logo-link" aria-label="SOT Resort — trang chủ">
+                    <img src="assets/image/logo.svg" class="logo-img" width="48" height="48" alt="">
+                    <span class="logo-wordmark">SOT</span>
+                </a>
+            </div>
+            <nav class="desktop-nav">
+                <a href="index.html" data-i18n="nav-home">HOME</a>
+                <!-- <a href="/rosalia-villa.html">VILLA</a> -->
+                <a href="rosalia-service.html" data-i18n="nav-service">SERVICE</a>
+                <a href="rosalia-about.html" data-i18n="nav-about">ABOUT US</a>
+                <!-- <a href="restaurant.html">RESTAURANT</a> -->
+                <a href="offer.html" class="active" data-i18n="nav-offer">OFFER</a>
+                <!-- <a href="wedding.html">WEDDING</a> -->
+            </nav>
+            <div class="nav-actions" id="nav-actions">
+                <button class="btn-nav-outline" id="btn-login" onclick="openLoginModal()" data-i18n="nav_signin">SIGN
+                    IN</button>
+                <button class="btn-nav-primary" id="btn-register" onclick="openRegisterModal()"
+                    data-i18n="nav_book_now">BOOK NOW</button>
+            </div>
+            <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div id="auth-modals-placeholder"></div>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1 data-i18n="offer_hero_title">Offer</h1>
+        <div class="wavy-bottom">
+            <svg viewBox="0 0 1440 200" preserveAspectRatio="none">
+                <path d="M0,100 Q360,0 720,100 T1440,100 L1440,200 L0,200 Z" fill="#F5F1E8" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- Offers Data-->
+    <section class="offers-section">
+        <div class="container">
+            <div class="section-heading">
+                <h2 data-i18n="offer_section_title">OFFERS</h2>
+                <div class="filter-buttons" id="filter-buttons">
+                    <button class="filter-btn active" data-category="all" data-i18n="offer_filter_all">ALL</button>
+                    <button class="filter-btn" data-category="stay" data-i18n="offer_filter_stay">STAY</button>
+                    <button class="filter-btn" data-category="spa" data-i18n="offer_filter_spa">SPA</button>
+                    <button class="filter-btn" data-category="dine" data-i18n="offer_filter_dine">DINE</button>
+                </div>
+            </div>
+            <div id="offers-container"></div>
+        </div>
+    </section>
+
+    <div id="offer-data" style="display:none">
+
+        <div data-id="1" data-category="stay" data-image="assets/image/offer/clouds.jpg" data-title-key="offer1_title"
+            data-desc-key="offer1_desc" data-rate-key="offer1_rate"
+            data-inc-keys="offer1_inc0,offer1_inc1,offer1_inc2,offer1_inc3,offer1_inc4,offer1_inc5,offer1_inc6,offer1_inc7"
+            data-con-keys="offer1_con0,offer1_con1,offer1_con2,offer1_con3">
+        </div>
+
+        <div data-id="2" data-category="stay" data-image="assets/image/offer/summer.jpg" data-title-key="offer2_title"
+            data-desc-key="offer2_desc" data-rate-key="offer2_rate"
+            data-inc-keys="offer2_inc0,offer2_inc1,offer2_inc2,offer2_inc3,offer2_inc4,offer2_inc5"
+            data-con-keys="offer2_con0,offer2_con1">
+        </div>
+
+        <div data-id="3" data-category="spa" data-image="assets/image/offer/happy hour.jpg"
+            data-title-key="offer3_title" data-desc-key="offer3_desc" data-rate-key="offer3_rate"
+            data-inc-keys="offer3_inc0,offer3_inc1" data-con-keys="offer3_con0,offer3_con1,offer3_con2">
+        </div>
+
+        <div data-id="4" data-category="spa" data-image="assets/image/offer/relaxtion.jpg" data-title-key="offer4_title"
+            data-desc-key="offer4_desc" data-rate-key="offer4_rate" data-inc-keys="offer4_inc0,offer4_inc1"
+            data-con-keys="offer4_con0,offer4_con1">
+        </div>
+
+        <div data-id="5" data-category="dine" data-image="assets/image/offer/buffet.jpg" data-title-key="offer5_title"
+            data-desc-key="offer5_desc" data-rate-key="offer5_rate" data-inc-keys="offer5_inc0"
+            data-con-keys="offer5_con0,offer5_con1">
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="newsletter">
+                <h3 data-i18n="footer_newsletter">Subscribe to our e-newsletter:</h3>
+                <form id="newsletter-form">
+                    <input type="email" placeholder="Your email address" required data-i18n="footer_subscribe">
+                    <button type="submit" data-i18n="footer_subscribe">SUBSCRIBE</button>
+                </form>
+            </div>
+            <div class="contact-info">
+                <p data-i18n="footer_address">147 Mai Dich, Cau Giay, Ha Noi</p>
+                <p data-i18n="footer_phone">0242 242 0777 | info@webhotel.vn</p>
+            </div>
+            <div class="copyright">
+                <p>© 2026 SOT. All rights reserved</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script/api/baseApi.js"></script>
+    <script src="script/authStore.js"></script>
+    <script src="script/api/userApi.js"></script>
+
+    <script src="script/auth-modals.js"></script>
+    <script src="script/home.js"></script>
+    <script src="script/language.js"></script>
+    <script src="script/offer.js"></script>
+</body>
+
+</html>

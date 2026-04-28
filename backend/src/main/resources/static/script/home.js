@@ -95,8 +95,8 @@ function checkExistingUser() {
     const isAdmin = user.role === 'ADMIN';
     const profileHref = isAdmin ? 'admin-dashboard.html' : 'account.html';
     const profileLabel = isAdmin ? 'Admin Dashboard' : 'Profile';
-    const roomsHref = isAdmin ? 'admin-room-list.html' : 'room-list.html';
-    const bookingsHref = isAdmin ? 'admin-booking.html' : 'booking.html';
+    const roomsHref = isAdmin ? 'admin-rooms.html' : 'rooms.html';
+    const bookingsHref = isAdmin ? 'admin-bookings.html' : 'bookings.html';
 
     navActions.innerHTML = `
     <button id="lang-toggle-btn" onclick="toggleLanguage()" title="Switch language">

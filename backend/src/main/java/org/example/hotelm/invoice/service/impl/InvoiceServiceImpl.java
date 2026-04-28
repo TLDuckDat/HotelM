@@ -54,11 +54,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public InvoiceResponse createInvoice(InvoiceCreateRequest request) {
-        // Kiểm tra booking tồn tại
         Booking booking = bookingRepository.findById(request.bookingId())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy booking: " + request.bookingId()));
 
-        // Mỗi booking chỉ có 1 invoice
         invoiceRepository.findByBooking_BookingID(request.bookingId())
                 .ifPresent(i -> {
                     throw new ConflictException("Invoice đã tồn tại cho booking: " + request.bookingId());
@@ -69,9 +67,35 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setAmount(booking.getTotalPrice());
         invoice.setDiscount(request.discount());
         invoice.setPaymentMethod(request.paymentMethod());
-        invoice.setPaidAt(LocalDate.now());
+        invoice.setStatus(Invoice.PaymentStatus.PENDING);
+        invoice.setPaidAt(null);
 
         return invoiceMapper.toResponse(invoiceRepository.save(invoice));
+    }
+
+    @Override
+    public InvoiceResponse updateInvoiceStatus(String id, Invoice.PaymentStatus status) {
+        Invoice invoice = findOrThrow(id);
+        invoice.setStatus(status);
+
+        if (status == Invoice.PaymentStatus.COMPLETED) {
+            invoice.setPaidAt(LocalDate.now());
+            Booking booking = invoice.getBooking();
+            if (booking != null && booking.getStatus() == Booking.BookingStatus.PENDING) {
+                booking.setStatus(Booking.BookingStatus.CONFIRMED);
+                bookingRepository.save(booking);
+            }
+        } else {
+            invoice.setPaidAt(null);
+        }
+
+        return invoiceMapper.toResponse(invoiceRepository.save(invoice));
+    }
+
+    @Override
+    public void deleteInvoice(String id) {
+        Invoice invoice = findOrThrow(id);
+        invoiceRepository.delete(invoice);
     }
 
     private Invoice findOrThrow(String id) {

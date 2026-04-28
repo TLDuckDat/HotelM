@@ -14,6 +14,57 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
     <link rel="stylesheet" href="assets/css/profile.css" />
+    <style>
+      .qr-payment-box {
+        margin-top: 20px;
+        padding: 20px;
+        border: 1px solid rgba(25, 56, 45, 0.12);
+        border-radius: 16px;
+        background: #faf8f4;
+      }
+
+      .qr-payment-box[hidden] {
+        display: none !important;
+      }
+
+      .qr-image-wrap {
+        display: flex;
+        justify-content: center;
+        margin: 16px 0;
+      }
+
+      .qr-image-wrap img {
+        width: 220px;
+        height: 220px;
+        border-radius: 16px;
+        border: 1px solid rgba(25, 56, 45, 0.12);
+        background: #fff;
+        object-fit: cover;
+      }
+
+      .qr-payment-meta {
+        display: grid;
+        gap: 8px;
+        font-size: 0.95rem;
+        color: #4f5b55;
+      }
+
+      .qr-payment-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+        flex-wrap: wrap;
+      }
+
+      .btn-secondary {
+        border: 1px solid rgba(25, 56, 45, 0.18);
+        background: #fff;
+        color: #19382d;
+        border-radius: 999px;
+        padding: 12px 18px;
+        cursor: pointer;
+      }
+    </style>
   </head>
 
   <body>
@@ -162,9 +213,7 @@
             <div class="form-group">
               <label class="form-label" data-i18n="label_method">Payment Method</label>
               <select class="form-input" id="payment-method" required>
-                <option value="CARD">💳 Card</option>
-                <option value="BANK_TRANSFER">🏦 Bank Transfer</option>
-                <option value="CASH">💵 Cash</option>
+                <option value="TRANSFER">🏦 QR Bank Transfer</option>
               </select>
             </div>
             <div class="form-group">
@@ -176,12 +225,39 @@
                 min="0"
                 step="0.01"
                 placeholder="0.00"
+                readonly
                 required
               />
             </div>
             <button class="btn-primary" id="payment-submit-btn" type="button">
-              <i class="fas fa-paper-plane"></i> <span data-i18n="btn_submit_payment">Submit Payment</span>
+              <i class="fas fa-qrcode"></i> <span>Create QR Payment</span>
             </button>
+
+            <div id="qr-payment-box" class="qr-payment-box" hidden>
+              <div class="card-title" style="margin-bottom: 0">
+                <i class="fas fa-mobile-alt"></i> <span>Scan QR and confirm</span>
+              </div>
+              <p style="margin: 10px 0 0; color: #6b766f">
+                Scan the QR below with your banking app, transfer the exact amount, then press confirm.
+              </p>
+              <div class="qr-image-wrap">
+                <img id="payment-qr-image" alt="Payment QR code" />
+              </div>
+              <div class="qr-payment-meta">
+                <div><strong>Bank:</strong> <span id="payment-qr-bank">-</span></div>
+                <div><strong>Account:</strong> <span id="payment-qr-account">-</span></div>
+                <div><strong>Amount:</strong> <span id="payment-qr-amount">-</span></div>
+                <div><strong>Transfer note:</strong> <span id="payment-qr-note">-</span></div>
+              </div>
+              <div class="qr-payment-actions">
+                <button class="btn-primary" id="payment-confirm-btn" type="button">
+                  <i class="fas fa-check-circle"></i> <span>I have paid</span>
+                </button>
+                <button class="btn-secondary" id="payment-hide-qr-btn" type="button">
+                  Hide QR
+                </button>
+              </div>
+            </div>
           </div>
 
           <div class="card">
@@ -197,11 +273,12 @@
                     <th data-i18n="payments_col_amount">Amount</th>
                     <th data-i18n="payments_col_method">Method</th>
                     <th data-i18n="payments_col_status">Status</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody id="payments-body">
                   <tr>
-                    <td colspan="5">Loading…</td>
+                    <td colspan="6">Loading…</td>
                   </tr>
                 </tbody>
               </table>

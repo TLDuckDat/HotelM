@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.hotelm.invoice.dto.InvoiceCreateRequest;
 import org.example.hotelm.invoice.dto.InvoiceResponse;
+import org.example.hotelm.invoice.dto.InvoiceStatusUpdateRequest;
 import org.example.hotelm.invoice.service.InvoiceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,5 +42,18 @@ public class InvoiceController {
     @PostMapping
     public ResponseEntity<InvoiceResponse> createInvoice(@Valid @RequestBody InvoiceCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(invoiceService.createInvoice(request));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<InvoiceResponse> updateInvoiceStatus(
+            @PathVariable String id,
+            @Valid @RequestBody InvoiceStatusUpdateRequest request) {
+        return ResponseEntity.ok(invoiceService.updateInvoiceStatus(id, request.status()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteInvoice(@PathVariable String id) {
+        invoiceService.deleteInvoice(id);
+        return ResponseEntity.noContent().build();
     }
 }

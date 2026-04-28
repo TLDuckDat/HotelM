@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Room Management - SOT Resort & Hotel</title>
+    <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/admin.css" />
+</head>
+<body>
+
+    <header class="topbar">
+      <a href="index.html" class="topbar-logo">
+        <img src="assets/image/logo.svg" alt="SOT Logo" />
+        <span>SOT</span>
+      </a>
+      <div class="topbar-right">
+        <a href="index.html" class="back-home"
+          ><i class="fas fa-arrow-left"></i>
+          <span data-i18n="profile_back">Back to Home</span>
+        </a>
+        <div class="topbar-greeting">
+          <span data-i18n="profile_welcome">Welcome,</span>
+          <strong id="topbar-username"> Admin</strong>
+        </div>
+        <a href="admin-dashboard.html" class="topbar-avatar"
+          ><i class="fas fa-user-shield"></i
+        ></a>
+        <div class="notification-dropdown">
+          <button class="notification-btn" onclick="toggleNotification(event)">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge"></span>
+          </button>
+          <div class="notification-content" id="notificationMenu">
+            <div class="notification-header" data-i18n="notification_title">
+              Notifications
+            </div>
+            <div class="notification-list">
+              <div class="notification-empty" data-i18n="notification_empty">
+                No new notifications
+              </div>
+            </div>
+          </div>
+        </div>
+        <button
+          id="lang-toggle-btn"
+          onclick="toggleLanguage()"
+          title="Switch to Vietnamese"
+        >
+          <span class="lang-flag">🇻🇳</span>
+          <span class="lang-label">VI</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar-wrap">
+            <i class="fas fa-user-shield"></i>
+          </div>
+          <div class="sidebar-name" id="sidebar-username">Loading…</div>
+          <div class="sidebar-role" id="sidebar-role">ADMIN</div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-group-label" data-i18n="sidebar_overview">
+            Overview
+          </div>
+          <button
+            class="nav-item "
+            onclick="location.href = 'admin-dashboard.html'"
+          >
+            <i class="fas fa-chart-pie"></i>
+            <span data-i18n="sidebar_dashboard">Dashboard</span>
+          </button>
+
+          <div class="nav-group-label" data-i18n="sidebar_managements">
+            Management
+          </div>
+          <button class="nav-item" onclick="location.href = 'admin-rooms.html'">
+            <i class="fas fa-bed"></i>
+            <span data-i18n="sidebar_rooms">Rooms</span>
+          </button>
+          <button
+            class="nav-item"
+            onclick="location.href = 'admin-bookings.html'"
+          >
+            <i class="fas fa-calendar-check"></i>
+            <span data-i18n="sidebar_bookings">Bookings</span>
+          </button>
+          <button class="nav-item" onclick="location.href = 'admin-users.html'">
+            <i class="fas fa-users"></i>
+            <span data-i18n="sidebar_users">Users</span>
+          </button>
+
+          <div class="sidebar-divider"></div>
+          <div class="nav-group-label" data-i18n="sidebar_finances_feedback">
+            Finance & Feedback
+          </div>
+          <button
+            class="nav-item"
+            onclick="location.href = 'admin-payments.html'"
+          >
+            <i class="fas fa-credit-card"></i>
+            <span data-i18n="sidebar_payments">Payments</span>
+          </button>
+          <button
+            class="nav-item"
+            onclick="location.href = 'admin-refunds.html'"
+          >
+            <i class="fas fa-undo"></i>
+            <span data-i18n="sidebar_refundRequests">Refund Requests</span>
+          </button>
+          <button
+            class="nav-item"
+            onclick="location.href = 'admin-reviews.html'"
+          >
+            <i class="fas fa-star"></i>
+            <span data-i18n="sidebar_reviews">Room Reviews</span>
+          </button>
+          <button class="nav-item" onclick="location.href = 'admin-chat.html'">
+            <i class="fas fa-comments"></i>
+            <span data-i18n="sidebar_livechat">Live Chat</span>
+            <span id="sidebar-unread-badge" class="sidebar-unread-badge"></span>
+          </button>
+
+          <div class="sidebar-divider"></div>
+          <button
+            class="nav-item danger"
+            onclick="AdminDashboard.handleLogout()"
+          >
+            <i class="fas fa-sign-out-alt"></i>
+            <span data-i18n="sidebar_logout">Sign Out</span>
+          </button>
+        </nav>
+      </aside>
+
+        <main class="main">
+            <div id="admin-message" class="flash-message" style="display:none;"></div>
+
+            <div class="page-header">
+                <div>
+                    <h1 data-i18n="admin_rooms_title">Room Management</h1>
+                    <p data-i18n="admin_rooms_sub">Add, edit, or remove rooms</p>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 28px;">
+                <div class="card-title"><i class="fas fa-plus-circle"></i><span data-i18n="admin_rooms_add_title">Add New Room</span></div>
+                <form id="admin-create-room-form">
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label class="form-label" data-i18n="admin_rooms_label_name">Room Name</label>
+                            <input id="admin-room-name" class="form-input" placeholder="e.g. Deluxe Suite" required />
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" data-i18n="admin_rooms_label_capacity">Capacity</label>
+                            <input id="admin-room-capacity" class="form-input" type="number" min="1" placeholder="2" required />
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" data-i18n="admin_rooms_label_status">Status</label>
+                            <select id="admin-room-status" class="form-input">
+                                <option value="AVAILABLE" data-i18n="admin_rooms_status_available">AVAILABLE</option>
+                                <option value="BOOKED" data-i18n="admin_rooms_status_booked">BOOKED</option>
+                                <option value="MAINTENANCE" data-i18n="admin_rooms_status_maintenance">MAINTENANCE</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-field" style="margin-top: 14px;">
+                        <label class="form-label" data-i18n="admin_rooms_label_desc">Description</label>
+                        <input id="admin-room-desc" class="form-input" placeholder="Short description (optional)" />
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="submit" class="btn-primary"><i class="fas fa-plus" ></i> <span data-i18n="admin_rooms_btn_add">Add Room</span></button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-list"></i><span data-i18n="admin_rooms_list_title">All Rooms</span></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="admin_rooms_col_id">Room ID</th>
+                                <th data-i18n="admin_rooms_col_name">Name</th>
+                                <th data-i18n="admin_rooms_col_capacity">Capacity</th>
+                                <th data-i18n="admin_rooms_col_status">Status</th>
+                                <th data-i18n="admin_rooms_col_action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-rooms-body">
+                            <tr><td colspan="5" class="table-empty">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+    <script src="script/api/baseApi.js"></script>
+    <script src="script/authStore.js"></script>
+    <script src="script/api/roomApi.js"></script>
+    <script src="script/guard.js"></script>
+    <script src="script/app-shell.js"></script>
+    <script src="script/admin-rooms.js"></script>
+    <script src="script/language.js"></script>
+</body>
+</html>

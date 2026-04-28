@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - SOT Resort & Hotel</title>
+    <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="assets/css/admin.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a href="index.html" class="topbar-logo">
+        <img src="assets/image/logo.svg" alt="SOT Logo" />
+        <span>SOT</span>
+      </a>
+      <div class="topbar-right">
+        <a href="index.html" class="back-home"
+          ><i class="fas fa-arrow-left"></i>
+          <span data-i18n="profile_back">Back to Home</span>
+        </a>
+        <div class="topbar-greeting">
+          <span data-i18n="profile_welcome">Welcome,</span>
+          <strong id="topbar-username"> Admin</strong>
+        </div>
+        <a href="admin-dashboard.html" class="topbar-avatar"
+          ><i class="fas fa-user-shield"></i
+        ></a>
+        <div class="notification-dropdown">
+          <button class="notification-btn" onclick="toggleNotification(event)">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge"></span>
+          </button>
+          <div class="notification-content" id="notificationMenu">
+            <div class="notification-header" data-i18n="notification_title">
+              Notifications
+            </div>
+            <div class="notification-list">
+              <div class="notification-empty" data-i18n="notification_empty">
+                No new notifications
+              </div>
+            </div>
+          </div>
+        </div>
+        <button
+          id="lang-toggle-btn"
+          onclick="toggleLanguage()"
+          title="Switch to Vietnamese"
+        >
+          <span class="lang-flag">🇻🇳</span>
+          <span class="lang-label">VI</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar-wrap">
+            <i class="fas fa-user-shield"></i>
+          </div>
+          <div class="sidebar-name" id="sidebar-username">Loading…</div>
+          <div class="sidebar-role" id="sidebar-role">ADMIN</div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-group-label" data-i18n="sidebar_overview">
+            Overview
+          </div>
+          <button
+            class="nav-item active"
+            onclick="location.href = 'admin-dashboard.html'"
+          >
+            <i class="fas fa-chart-pie"></i>
+            <span data-i18n="sidebar_dashboard">Dashboard</span>
+          </button>
+
+          <div class="nav-group-label" data-i18n="sidebar_managements">
+            Management
+          </div>
+          <button class="nav-item" onclick="location.href = 'admin-rooms.html'">
+            <i class="fas fa-bed"></i>
+            <span data-i18n="sidebar_rooms">Rooms</span>
+          </button>
+          <button
+            class="nav-item"
+            onclick="location.href = 'admin-bookings.html'"
+          >
+            <i class="fas fa-calendar-check"></i>
+            <span data-i18n="sidebar_bookings">Bookings</span>
+          </button>
+          <button class="nav-item" onclick="location.href = 'admin-users.html'">
+            <i class="fas fa-users"></i>
+            <span data-i18n="sidebar_users">Users</span>
+          </button>
+
+          <div class="sidebar-divider"></div>
+          <div class="nav-group-label" data-i18n="sidebar_finances_feedback">
+            Finance & Feedback
+          </div>
+          <button
+            class="nav-item"
+            onclick="location.href = 'admin-payments.html'"
+          >
+            <i class="fas fa-credit-card"></i>
+            <span data-i18n="sidebar_payments">Payments</span>
+          </button>
+          <button
+            class="nav-item"
+            onclick="location.href = 'admin-refunds.html'"
+          >
+            <i class="fas fa-undo"></i>
+            <span data-i18n="sidebar_refundRequests">Refund Requests</span>
+          </button>
+          <button
+            class="nav-item"
+            onclick="location.href = 'admin-reviews.html'"
+          >
+            <i class="fas fa-star"></i>
+            <span data-i18n="sidebar_reviews">Room Reviews</span>
+          </button>
+          <button class="nav-item" onclick="location.href = 'admin-chat.html'">
+            <i class="fas fa-comments"></i>
+            <span data-i18n="sidebar_livechat">Live Chat</span>
+            <span id="sidebar-unread-badge" class="sidebar-unread-badge"></span>
+          </button>
+
+          <div class="sidebar-divider"></div>
+          <button
+            class="nav-item danger"
+            onclick="AdminDashboard.handleLogout()"
+          >
+            <i class="fas fa-sign-out-alt"></i>
+            <span data-i18n="sidebar_logout">Sign Out</span>
+          </button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div
+          id="admin-message"
+          class="flash-message"
+          style="display: none"
+        ></div>
+
+        <div class="page-header">
+          <div>
+            <h1 data-i18n="admin_dashboard_title">Admin Dashboard</h1>
+            <p data-i18n="admin_dashboard_sub">Manage your resort operations</p>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-body">
+              <div class="stat-value" id="admin-stat-users">0</div>
+              <div class="stat-label" data-i18n="admin_stat_users">
+                Total Users
+              </div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-bed"></i></div>
+            <div class="stat-body">
+              <div class="stat-value" id="admin-stat-rooms">0</div>
+              <div class="stat-label" data-i18n="admin_stat_rooms">
+                Total Rooms
+              </div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+            <div class="stat-body">
+              <div class="stat-value" id="admin-stat-bookings">0</div>
+              <div class="stat-label" data-i18n="admin_stat_bookings">
+                Total Bookings
+              </div>
+            </div>
+          </div>
+          <div class="stat-card accent">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="stat-body">
+              <div class="stat-value" id="admin-stat-pending">0</div>
+              <div class="stat-label" data-i18n="admin_stat_pending">
+                Pending Bookings
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-nav-grid">
+          <button
+            class="quick-nav-card"
+            onclick="location.href = 'admin-rooms.html'"
+          >
+            <i class="fas fa-bed"></i>
+            <span data-i18n="admin_manage_rooms">Manage Rooms</span>
+          </button>
+          <button
+            class="quick-nav-card"
+            onclick="location.href = 'admin-bookings.html'"
+          >
+            <i class="fas fa-calendar-check"></i>
+            <span data-i18n="admin_manage_bookings">Manage Bookings</span>
+          </button>
+          <button
+            class="quick-nav-card"
+            onclick="location.href = 'admin-users.html'"
+          >
+            <i class="fas fa-users"></i>
+            <span data-i18n="admin_manage_users">Manage Users</span>
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <div
+      class="sidebar-overlay"
+      id="sidebar-overlay"
+      onclick="closeSidebar()"
+    ></div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <script src="script/api/baseApi.js"></script>
+    <script src="script/authStore.js"></script>
+    <script src="script/api/userApi.js"></script>
+    <script src="script/api/roomApi.js"></script>
+    <script src="script/api/bookingApi.js"></script>
+    <script src="script/guard.js"></script>
+    <script src="script/app-shell.js"></script>
+    <script src="script/admin-dashboard.js"></script>
+    <script src="script/language.js"></script>
+  </body>
+</html>

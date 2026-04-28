@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Account - SOT Resort & Hotel</title>
+    <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="assets/css/profile.css" />
+  </head>
+
+  <body>
+    <header class="topbar">
+      <a href="index.html" class="topbar-logo">
+        <img src="assets/image/logo.svg" alt="SOT Logo" />
+        <span>SOT</span>
+      </a>
+      <div class="topbar-right">
+        <a href="index.html" class="back-home"
+          ><i class="fas fa-arrow-left"></i
+          ><span data-i18n="profile_back">Back to Home</span></a
+        >
+        <div class="topbar-greeting">
+          <span data-i18n="profile_welcome">Welcome,</span>
+          <strong id="topbar-username">Guest</strong>
+        </div>
+        <a href="account.html" class="topbar-avatar"
+          ><i class="fas fa-user"></i
+        ></a>
+
+        <div class="notification-dropdown">
+          <button class="notification-btn" onclick="toggleNotification(event)">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge"></span>
+          </button>
+          <div class="notification-content" id="notificationMenu">
+            <div class="notification-header" data-i18n="notification_header">
+              Notifications
+            </div>
+            <div class="notification-list">
+              <div class="notification-empty" data-i18n="notification_empty">
+                No new notifications
+              </div>
+            </div>
+          </div>
+        </div>
+        <button
+          id="lang-toggle-btn"
+          onclick="toggleLanguage()"
+          title="Switch to Vietnamese"
+        >
+          <span class="lang-flag">🇻🇳</span>
+          <span class="lang-label">VI</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar-wrap"><i class="fas fa-user"></i></div>
+          <div class="sidebar-name" id="sidebar-username">Loading…</div>
+          <div class="sidebar-role" id="sidebar-role">—</div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button class="nav-item" onclick="location.href = 'account.html'">
+            <i class="fas fa-user-circle"></i
+            ><span data-i18n="sidebar_account">My Account</span>
+          </button>
+          <!-- <button class="nav-item" onclick="location.href='dashboard.html'">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </button> -->
+          <button class="nav-item" onclick="location.href = 'bookings.html'">
+            <i class="fas fa-calendar-check"></i>
+            <span data-i18n="sidebar_bookings">My Bookings</span>
+          </button>
+          <button class="nav-item" onclick="location.href = 'rooms.html'">
+            <i class="fas fa-bed"></i>
+            <span data-i18n="sidebar_rooms">Browse Rooms</span>
+          </button>
+
+          <div class="sidebar-divider"></div>
+
+          <button class="nav-item" onclick="location.href = 'payments.html'">
+            <i class="fas fa-credit-card"></i>
+            <span data-i18n="sidebar_payments">Payments</span>
+          </button>
+          <button class="nav-item" onclick="location.href = 'refunds.html'">
+            <i class="fas fa-undo"></i>
+            <span data-i18n="sidebar_refunds">Refund Requests</span>
+          </button>
+          <button class="nav-item" onclick="location.href = 'reviews.html'">
+            <i class="fas fa-star"></i>
+            <span data-i18n="sidebar_reviews">Room Reviews</span>
+          </button>
+
+          <div class="sidebar-divider"></div>
+          <button class="nav-item danger" onclick="handleLogout()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span data-i18n="sidebar_signout">Sign Out</span>
+          </button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div id="panel-account" class="panel active">
+          <div class="page-header">
+            <h1 data-i18n="account_title">My Account</h1>
+            <p data-i18n="account_desc">Manage your personal information</p>
+          </div>
+
+          <div class="profile-grid">
+            <div class="card">
+              <div class="card-title">
+                <i class="fas fa-id-card"></i> <span data-i18n="personal_info">Personal Information</span>
+              </div>
+              <div class="info-field">
+                <div class="info-label" data-i18n="full_name">Full Name</div>
+                <div class="info-value" id="profile-name">—</div>
+              </div>
+              <div class="info-field">
+                <div class="info-label" data-i18n="email">Email</div>
+                <div class="info-value" id="profile-email">—</div>
+              </div>
+              <div class="info-field">
+                <div class="info-label" data-i18n="phone">Phone Number</div>
+                <div class="info-value" id="profile-phone">—</div>
+              </div>
+              <div class="info-field">
+                <div class="info-label" data-i18n="role">Role</div>
+                <div class="info-value" id="profile-role">—</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">
+                <i class="fas fa-concierge-bell"></i> <span data-i18n="quick_actions">Quick Actions</span>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  gap: 12px;
+                  margin-top: 16px;
+                "
+              >
+                <button
+                  class="btn-secondary"
+                  onclick="location.href = 'bookings.html'"
+                >
+                  <i class="fas fa-history"></i> <span data-i18n="quick_bookings">View My Bookings</span>
+                </button>
+                <button
+                  class="btn-secondary"
+                  onclick="location.href = 'create-booking.html'"
+                >
+                  <i class="fas fa-calendar-plus"></i> <span data-i18n="quick_create_booking">Create New Booking</span>
+                </button>
+                <button
+                  class="btn-secondary"
+                  onclick="location.href = 'payments.html'"
+                >
+                  <i class="fas fa-credit-card"></i> <span data-i18n="quick_payments">Payment History</span>
+                </button>
+                <button
+                  class="btn-secondary"
+                  onclick="location.href = 'refunds.html'"
+                >
+                  <i class="fas fa-undo"></i> <span data-i18n="quick_refunds">Refund Requests</span>
+                </button>
+                <button
+                  class="btn-secondary"
+                  onclick="location.href = 'reviews.html'"
+                >
+                  <i class="fas fa-star"></i> <span data-i18n="quick_reviews">Room Reviews</span>
+                </button>
+                <button
+                  class="btn-secondary"
+                  onclick="location.href = 'rooms.html'"
+                >
+                  <i class="fas fa-bed"></i> <span data-i18n="quick_rooms">Browse Rooms</span>
+                </button>
+                <button
+                  class="btn-primary"
+                  id="btn-edit-profile"
+                  onclick="enableEditMode()"
+                >
+                  <i class="fas fa-user-edit"></i> <span data-i18n="btn_edit_profile">Edit Profile Information</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Mobile -->
+    <div
+      class="sidebar-overlay"
+      id="sidebar-overlay"
+      onclick="closeSidebar()"
+    ></div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <script src="script/api/baseApi.js"></script>
+    <script src="script/api/userApi.js"></script>
+    <script src="script/authStore.js"></script>
+    <script src="script/guard.js"></script>
+    <script src="script/app-shell.js"></script>
+    <script src="script/account.js"></script>
+    <script src="script/language.js"></script>
+  </body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account - HotelM</title>
+    <link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body>
+<div id="app-topbar"></div>
+<div class="container">
+    <h2>Account</h2>
+    <div class="grid">
+        <div class="card">
+            <h3>Personal info</h3>
+            <p><strong>Name:</strong> <span id="profile-name"></span></p>
+            <p><strong>Email:</strong> <span id="profile-email"></span></p>
+            <p><strong>Phone:</strong> <span id="profile-phone"></span></p>
+            <p><strong>Role:</strong> <span id="profile-role"></span></p>
+        </div>
+        <div class="card">
+            <h3>Account actions</h3>
+            <ul>
+                <li><a href="booking.html">Booking history</a></li>
+                <li><a href="booking.html">Create booking</a></li>
+                <li><a href="booking.html">Cancel booking</a></li>
+                <li>Payment (frontend placeholder)</li>
+                <li>Refund request (frontend placeholder)</li>
+                <li>Room review (frontend placeholder)</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script src="script/authStore.js"></script>
+<script src="script/guard.js"></script>
+<script src="script/app-shell.js"></script>
+<script src="script/account.js"></script>
+</body>
+</html> -->

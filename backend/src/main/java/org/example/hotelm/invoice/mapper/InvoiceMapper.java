@@ -20,6 +20,7 @@ public class InvoiceMapper {
                 invoice.getDiscount(),
                 finalAmount,
                 invoice.getPaymentMethod(),
+                invoice.getStatus(),
                 invoice.getPaidAt()
         );
     }

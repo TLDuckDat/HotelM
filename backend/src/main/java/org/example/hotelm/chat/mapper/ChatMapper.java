@@ -32,7 +32,11 @@ public class ChatMapper {
         return new ChatThreadResponse(
                 thread.getId(),
                 thread.getGuest() == null ? null : thread.getGuest().getUserID(),
+                thread.getGuest() == null ? null : thread.getGuest().getFullName(),
+                thread.getGuest() == null ? null : thread.getGuest().getEmail(),
                 thread.getStaff() == null ? null : thread.getStaff().getUserID(),
+                thread.getStaff() == null ? null : thread.getStaff().getFullName(),
+                thread.getStaff() == null ? null : thread.getStaff().getEmail(),
                 thread.getCreatedAt(),
                 thread.getLastMessageAt(),
                 messages

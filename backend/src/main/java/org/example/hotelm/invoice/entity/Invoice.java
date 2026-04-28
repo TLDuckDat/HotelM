@@ -26,11 +26,21 @@ public class Invoice {
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
+
     private LocalDate paidAt;
     private Double discount;
+
     public enum PaymentMethod{
         CASH,
         CARD,
         TRANSFER
+    }
+
+    public enum PaymentStatus {
+        PENDING,
+        COMPLETED,
+        REJECTED
     }
 }

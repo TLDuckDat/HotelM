@@ -1,365 +1,346 @@
-/* ================================================================
-   ADMIN LIVE CHAT — admin-chat.js
-   Companion to admin-chat.html + admin-chat.css
+(function (global) {
+    "use strict";
 
-   All chat data lives in localStorage under keys:
-     sot_conv_{sessionId}  →  { id, guestName, messages[], unread, lastTime, online }
-   ================================================================ */
+    var activeConvId = null;
+    var threadsCache = [];
+    var activeThreadSignature = "";
+    var pollTimer = null;
+    var sending = false;
 
-const CONV_KEY_PREFIX = 'sot_conv_';
-let activeConvId = null;
+    function getCurrentUser() {
+        return global.AuthStore ? global.AuthStore.getCurrentUser() : null;
+    }
 
-/* ────────────────────────────────────────────
-   STORAGE HELPERS
-   ──────────────────────────────────────────── */
+    function getUserId(user) {
+        return user ? (user.userID || user.userId || user.id || null) : null;
+    }
 
-function getAllConversations() {
-    const convs = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith(CONV_KEY_PREFIX)) {
-            try { convs.push(JSON.parse(localStorage.getItem(k))); } catch (e) { }
+    function setAuthToken() {
+        var user = getCurrentUser();
+        if (user && global.HotelMApiBase) {
+            global.HotelMApiBase.setAuthToken(user.accessToken || user.token || null);
         }
     }
-    convs.sort((a, b) => (b.lastTime || 0) - (a.lastTime || 0));
-    return convs;
-}
 
-function getConversation(id) {
-    try { return JSON.parse(localStorage.getItem(CONV_KEY_PREFIX + id)); } catch (e) { return null; }
-}
-
-function saveConversation(conv) {
-    localStorage.setItem(CONV_KEY_PREFIX + conv.id, JSON.stringify(conv));
-}
-
-function deleteConvFromStorage(id) {
-    localStorage.removeItem(CONV_KEY_PREFIX + id);
-}
-
-
-/* ────────────────────────────────────────────
-   FORMAT HELPERS
-   ──────────────────────────────────────────── */
-
-function initials(name) {
-    if (!name) return '?';
-    return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-}
-
-function formatTime(ts) {
-    const d = new Date(ts);
-    const now = new Date();
-    const isToday = d.toDateString() === now.toDateString();
-    return isToday
-        ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : d.toLocaleDateString([], { day: '2-digit', month: 'short' });
-}
-
-function formatDateLabel(ts) {
-    const d = new Date(ts);
-    const now = new Date();
-    if (d.toDateString() === now.toDateString()) return 'Today';
-    const yesterday = new Date(now);
-    yesterday.setDate(now.getDate() - 1);
-    if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
-    return d.toLocaleDateString([], { weekday: 'long', day: '2-digit', month: 'short' });
-}
-
-function escHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
-
-/* ────────────────────────────────────────────
-   CONVERSATION LIST
-   ──────────────────────────────────────────── */
-
-function renderConvList(filter = '') {
-    const list = document.getElementById('conv-list');
-    const empty = document.getElementById('conv-empty');
-    let convs = getAllConversations();
-
-    if (filter) {
-        const q = filter.toLowerCase();
-        convs = convs.filter(c => (c.guestName || '').toLowerCase().includes(q));
+    function initials(name) {
+        if (!name) return "?";
+        return name.split(" ").map(function (word) { return word[0]; }).join("").toUpperCase().slice(0, 2);
     }
 
-    list.querySelectorAll('.conv-item').forEach(el => el.remove());
+    function formatTime(ts) {
+        var date = new Date(ts);
+        var now = new Date();
+        return date.toDateString() === now.toDateString()
+            ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+            : date.toLocaleDateString([], { day: "2-digit", month: "short" });
+    }
 
-    if (convs.length === 0) {
-        empty.style.display = 'flex';
+    function formatDateLabel(ts) {
+        var date = new Date(ts);
+        var now = new Date();
+        if (date.toDateString() === now.toDateString()) return "Today";
+        var yesterday = new Date(now);
+        yesterday.setDate(now.getDate() - 1);
+        if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
+        return date.toLocaleDateString([], { weekday: "long", day: "2-digit", month: "short" });
+    }
+
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    }
+
+    function sortMessages(messages) {
+        return (messages || []).slice().sort(function (a, b) {
+            return new Date(a.sentAt || 0) - new Date(b.sentAt || 0);
+        });
+    }
+
+    function getGuestName(thread) {
+        return thread.guestName || thread.guestUserName || thread.guestUserId || "Guest";
+    }
+
+    function getGuestAccount(thread) {
+        return thread.guestEmail || thread.guestUserId || "";
+    }
+
+    function getThreadSignature(thread) {
+        var messages = thread && thread.messages ? thread.messages : [];
+        return messages.map(function (message) {
+            return [message.id, message.senderUserId, message.sentAt].join("|");
+        }).join(",");
+    }
+
+    function sortThreads(threads) {
+        return (threads || []).slice().sort(function (a, b) {
+            return new Date(b.lastMessageAt || b.createdAt || 0) - new Date(a.lastMessageAt || a.createdAt || 0);
+        });
+    }
+
+    function updateSidebarBadge() {
+        var badge = document.getElementById("sidebar-unread-badge");
+        if (!badge) return;
+        badge.style.display = threadsCache.length ? "flex" : "none";
+        badge.textContent = threadsCache.length || "";
+    }
+
+    function renderConvList(filter) {
+        var list = document.getElementById("conv-list");
+        var empty = document.getElementById("conv-empty");
+        var query = (filter || "").trim().toLowerCase();
+        var threads = sortThreads(threadsCache).filter(function (thread) {
+            return !query || getGuestName(thread).toLowerCase().indexOf(query) !== -1;
+        });
+
+        list.querySelectorAll(".conv-item").forEach(function (item) { item.remove(); });
+
+        if (!threads.length) {
+            empty.style.display = "flex";
+            updateSidebarBadge();
+            return;
+        }
+
+        empty.style.display = "none";
+        threads.forEach(function (thread) {
+            var lastMessage = thread.messages && thread.messages.length
+                ? thread.messages[thread.messages.length - 1]
+                : null;
+            var preview = lastMessage ? lastMessage.content : "No messages yet";
+            var subtitle = getGuestAccount(thread) || (preview.slice(0, 50) + (preview.length > 50 ? "..." : ""));
+            var item = document.createElement("div");
+            item.className = "conv-item" + (activeConvId === thread.id ? " active" : "");
+            item.dataset.id = thread.id;
+            item.innerHTML = ""
+                + '<div class="conv-avatar">'
+                + initials(getGuestName(thread))
+                + '<span class="online-dot"></span>'
+                + "</div>"
+                + '<div class="conv-meta">'
+                + '  <div class="conv-name">' + escHtml(getGuestName(thread)) + "</div>"
+                + '  <div class="conv-preview">' + escHtml(subtitle) + "</div>"
+                + "</div>"
+                + '<div class="conv-time">' + (lastMessage ? formatTime(lastMessage.sentAt) : "") + "</div>";
+            item.addEventListener("click", function () {
+                openConversation(thread.id);
+            });
+            list.appendChild(item);
+        });
+
         updateSidebarBadge();
-        return;
     }
 
-    empty.style.display = 'none';
+    function renderMessages(thread) {
+        var container = document.getElementById("chat-messages");
+        var currentUser = getCurrentUser();
+        var currentUserId = getUserId(currentUser);
+        var messages = sortMessages(thread && thread.messages ? thread.messages : []);
+        var signature = getThreadSignature(thread);
 
-    convs.forEach(conv => {
-        const lastMsg = conv.messages && conv.messages.length ? conv.messages[conv.messages.length - 1] : null;
-        const preview = lastMsg ? lastMsg.text.slice(0, 50) + (lastMsg.text.length > 50 ? '…' : '') : 'No messages yet';
-        const timeStr = lastMsg ? formatTime(lastMsg.ts) : '';
+        if (signature === activeThreadSignature) return;
 
-        const item = document.createElement('div');
-        item.className = 'conv-item'
-            + (conv.unread ? ' unread' : '')
-            + (activeConvId === conv.id ? ' active' : '');
-        item.dataset.id = conv.id;
-        item.innerHTML = `
-            <div class="conv-avatar">
-                ${initials(conv.guestName)}
-                ${conv.online ? '<span class="online-dot"></span>' : ''}
-            </div>
-            <div class="conv-meta">
-                <div class="conv-name">${escHtml(conv.guestName || 'Guest')}</div>
-                <div class="conv-preview">${escHtml(preview)}</div>
-            </div>
-            <div class="conv-time">${timeStr}</div>
-            ${conv.unread ? `<span class="conv-badge">${conv.unread}</span>` : ''}
-        `;
-        item.addEventListener('click', () => openConversation(conv.id));
-        list.appendChild(item);
-    });
-
-    updateSidebarBadge();
-}
-
-function updateSidebarBadge() {
-    const total = getAllConversations().reduce((sum, c) => sum + (c.unread || 0), 0);
-    const badge = document.getElementById('sidebar-unread-badge');
-    if (!badge) return;
-    if (total > 0) {
-        badge.textContent = total;
-        badge.style.display = 'flex';
-    } else {
-        badge.style.display = 'none';
-    }
-}
-
-/* ────────────────────────────────────────────
-   OPEN / RENDER A CONVERSATION
-   ──────────────────────────────────────────── */
-
-function openConversation(id) {
-    const conv = getConversation(id);
-    if (!conv) return;
-
-    activeConvId = id;
-
-    conv.unread = 0;
-    saveConversation(conv);
-
-    document.getElementById('chat-header-avatar').textContent = initials(conv.guestName);
-    document.getElementById('chat-header-name').textContent = conv.guestName || 'Guest';
-    document.getElementById('chat-header-status').textContent = conv.online ? 'Online' : 'Offline';
-
-    document.getElementById('chat-empty-state').style.display = 'none';
-    const activeEl = document.getElementById('chat-active');
-    activeEl.style.display = 'flex';
-
-    renderMessages(conv);
-    renderConvList(document.getElementById('conv-search-input').value);
-
-    if (window.innerWidth <= 768) {
-        document.getElementById('conv-pane').classList.add('hidden');
-        document.getElementById('chat-pane').classList.remove('hidden');
-    }
-
-    document.getElementById('admin-reply-input').focus();
-}
-
-function renderMessages(conv) {
-    const container = document.getElementById('chat-messages');
-    container.innerHTML = '';
-
-    if (!conv.messages || conv.messages.length === 0) {
-        container.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:0.85rem;padding:40px 0;">No messages yet</div>';
-        return;
-    }
-
-    let lastDateLabel = '';
-
-    conv.messages.forEach(msg => {
-        const dateLabel = formatDateLabel(msg.ts);
-        if (dateLabel !== lastDateLabel) {
-            lastDateLabel = dateLabel;
-            const divider = document.createElement('div');
-            divider.className = 'date-divider';
-            divider.textContent = dateLabel;
-            container.appendChild(divider);
+        container.innerHTML = "";
+        if (!messages.length) {
+            container.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:0.85rem;padding:40px 0;">No messages yet</div>';
+            activeThreadSignature = signature;
+            return;
         }
 
-        const isAdmin = msg.from === 'admin';
-        const avatarInitials = isAdmin ? 'AD' : initials(conv.guestName);
+        var lastDateLabel = "";
+        messages.forEach(function (msg) {
+            var dateLabel = formatDateLabel(msg.sentAt);
+            if (dateLabel !== lastDateLabel) {
+                lastDateLabel = dateLabel;
+                var divider = document.createElement("div");
+                divider.className = "date-divider";
+                divider.textContent = dateLabel;
+                container.appendChild(divider);
+            }
 
-        const row = document.createElement('div');
-        row.className = 'msg-row' + (isAdmin ? ' from-admin' : '');
-        row.innerHTML = `
-            <div class="msg-avatar-sm">${avatarInitials}</div>
-            <div class="msg-group">
-                <div class="msg-bubble">${escHtml(msg.text)}</div>
-                <div class="msg-time">${formatTime(msg.ts)}</div>
-            </div>
-        `;
-        container.appendChild(row);
-    });
+            var isAdmin = msg.senderUserId === currentUserId;
+            var row = document.createElement("div");
+            row.className = "msg-row" + (isAdmin ? " from-admin" : "");
+            row.innerHTML = ""
+                + '<div class="msg-avatar-sm">' + (isAdmin ? "AD" : initials(getGuestName(thread))) + "</div>"
+                + '<div class="msg-group">'
+                + '  <div class="msg-sender">' + escHtml(isAdmin ? "Ban" : getGuestName(thread)) + "</div>"
+                + '  <div class="msg-bubble">' + escHtml(msg.content) + "</div>"
+                + '  <div class="msg-time">' + formatTime(msg.sentAt) + "</div>"
+                + "</div>";
+            container.appendChild(row);
+        });
 
-    container.scrollTop = container.scrollHeight;
-}
-
-/* ────────────────────────────────────────────
-   SEND ADMIN REPLY
-   ──────────────────────────────────────────── */
-
-function sendAdminReply() {
-    if (!activeConvId) return;
-    const input = document.getElementById('admin-reply-input');
-    const text = input.value.trim();
-    if (!text) return;
-
-    const conv = getConversation(activeConvId);
-    if (!conv) return;
-
-    const msg = { from: 'admin', text, ts: Date.now() };
-    conv.messages = conv.messages || [];
-    conv.messages.push(msg);
-    conv.lastTime = msg.ts;
-    saveConversation(conv);
-
-    input.value = '';
-    input.style.height = 'auto';
-
-    renderMessages(conv);
-    renderConvList(document.getElementById('conv-search-input').value);
-}
-
-function handleReplyKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendAdminReply();
+        container.scrollTop = container.scrollHeight;
+        activeThreadSignature = signature;
     }
-    const ta = document.getElementById('admin-reply-input');
-    ta.style.height = 'auto';
-    ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
-}
 
-/* ────────────────────────────────────────────
-   CONVERSATION ACTIONS
-   ──────────────────────────────────────────── */
+    function renderActiveThread(thread) {
+        if (!thread) return;
+        document.getElementById("chat-header-avatar").textContent = initials(getGuestName(thread));
+        document.getElementById("chat-header-name").textContent = getGuestName(thread);
+        document.getElementById("chat-header-status").textContent = getGuestAccount(thread) || "Online";
+        document.getElementById("chat-empty-state").style.display = "none";
+        document.getElementById("chat-active").style.display = "flex";
+        renderMessages(thread);
+    }
 
-function resolveConversation() {
-    if (!activeConvId) return;
-    if (!confirm('Mark this conversation as resolved and archive it?')) return;
-    deleteConvFromStorage(activeConvId);
-    activeConvId = null;
-    document.getElementById('chat-empty-state').style.display = 'flex';
-    document.getElementById('chat-active').style.display = 'none';
-    renderConvList();
-}
+    function loadThreads() {
+        var user = getCurrentUser();
+        var userId = getUserId(user);
+        if (!userId) return Promise.resolve();
 
-function deleteConversation() {
-    if (!activeConvId) return;
-    if (!confirm('Delete this conversation permanently?')) return;
-    deleteConvFromStorage(activeConvId);
-    activeConvId = null;
-    document.getElementById('chat-empty-state').style.display = 'flex';
-    document.getElementById('chat-active').style.display = 'none';
-    renderConvList();
-}
+        setAuthToken();
+        return global.ChatApi.getThreadsByUser(userId).then(function (threads) {
+            threadsCache = sortThreads(threads || []);
+            renderConvList(document.getElementById("conv-search-input").value);
+            if (activeConvId) {
+                return loadThread(activeConvId);
+            }
+        });
+    }
 
-/* ────────────────────────────────────────────
-   MOBILE — back button
-   ──────────────────────────────────────────── */
+    function loadThread(threadId) {
+        if (!threadId) return Promise.resolve();
+        return global.ChatApi.getThread(threadId).then(function (thread) {
+            var idx = threadsCache.findIndex(function (item) { return item.id === thread.id; });
+            if (idx >= 0) threadsCache[idx] = thread;
+            activeConvId = thread.id;
+            renderActiveThread(thread);
+            renderConvList(document.getElementById("conv-search-input").value);
+        });
+    }
 
-function showConvPane() {
-    document.getElementById('conv-pane').classList.remove('hidden');
-    document.getElementById('chat-pane').classList.add('hidden');
-}
-
-/* ────────────────────────────────────────────
-   SIDEBAR TOGGLE
-   ──────────────────────────────────────────── */
-
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('sidebar-overlay').classList.toggle('active');
-}
-
-function closeSidebar() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebar-overlay').classList.remove('active');
-}
-
-/* ────────────────────────────────────────────
-   POLL FOR NEW MESSAGES (every 3 s)
-   ──────────────────────────────────────────── */
-
-function pollMessages() {
-    renderConvList(document.getElementById('conv-search-input').value);
-
-    if (activeConvId) {
-        const conv = getConversation(activeConvId);
-        if (conv) {
-            const container = document.getElementById('chat-messages');
-            const msgCount = conv.messages ? conv.messages.length : 0;
-            const renderedCount = container.querySelectorAll('.msg-row').length;
-            if (msgCount !== renderedCount) renderMessages(conv);
+    function openConversation(id) {
+        activeThreadSignature = "";
+        loadThread(id);
+        if (window.innerWidth <= 768) {
+            document.getElementById("conv-pane").classList.add("hidden");
+            document.getElementById("chat-pane").classList.remove("hidden");
         }
+        document.getElementById("admin-reply-input").focus();
     }
-}
 
-/* ────────────────────────────────────────────
-   INIT
-   ──────────────────────────────────────────── */
+    function sendAdminReply() {
+        if (!activeConvId || sending) return;
 
-document.addEventListener('DOMContentLoaded', () => {
-    /* ---  Cập nhật thông tin User ở Sidebar --- */
-    if (window.AuthStore) {
-        const user = window.AuthStore.getCurrentUser();
+        var user = getCurrentUser();
+        var userId = getUserId(user);
+        var input = document.getElementById("admin-reply-input");
+        var text = input.value.trim();
+        if (!userId || !text) return;
+
+        sending = true;
+        document.getElementById("send-btn").disabled = true;
+
+        global.ChatApi.sendMessage({
+            threadId: activeConvId,
+            senderUserId: userId,
+            senderRole: user.role || "ADMIN",
+            content: text
+        }).then(function () {
+            input.value = "";
+            input.style.height = "auto";
+            activeThreadSignature = "";
+            return loadThread(activeConvId).then(loadThreads);
+        }).finally(function () {
+            sending = false;
+            document.getElementById("send-btn").disabled = false;
+        });
+    }
+
+    function handleReplyKey(event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            sendAdminReply();
+        }
+        var textarea = document.getElementById("admin-reply-input");
+        textarea.style.height = "auto";
+        textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px";
+    }
+
+    function resolveConversation() {
+        alert("Chat is now backed by database data. If you want, I can add a real resolved status next.");
+    }
+
+    function deleteConversation() {
+        alert("Delete conversation is not connected to backend yet.");
+    }
+
+    function showConvPane() {
+        document.getElementById("conv-pane").classList.remove("hidden");
+        document.getElementById("chat-pane").classList.add("hidden");
+    }
+
+    function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("open");
+        document.getElementById("sidebar-overlay").classList.toggle("active");
+    }
+
+    function closeSidebar() {
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("sidebar-overlay").classList.remove("active");
+    }
+
+    function toggleNotification(event) {
+        if (event) event.stopPropagation();
+        var menu = document.getElementById("notificationMenu");
+        if (menu) menu.classList.toggle("active");
+    }
+
+    function handleLogout() {
+        if (global.AuthStore) {
+            global.AuthStore.clearCurrentUser();
+        }
+        window.location.href = "index.html";
+    }
+
+    function startPolling() {
+        if (pollTimer) return;
+        pollTimer = window.setInterval(function () {
+            if (!document.hidden) {
+                loadThreads();
+            }
+        }, 1500);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (!global.Guard.requireAdmin()) return;
+
+        var user = getCurrentUser();
         if (user) {
-            const sideNameEl = document.getElementById("sidebar-username");
-            const sideRoleEl = document.getElementById("sidebar-role");
-            const sideAvatarEl = document.getElementById("sidebar-avatar");
-
+            var sideNameEl = document.getElementById("sidebar-username");
+            var sideRoleEl = document.getElementById("sidebar-role");
+            var topbarNameEl = document.getElementById("topbar-username");
             if (sideNameEl) sideNameEl.textContent = user.fullName || "Admin";
             if (sideRoleEl) sideRoleEl.textContent = user.role || "ADMIN";
-            
-            // Nếu bạn có lưu link ảnh trong user.avatarUrl
-            if (sideAvatarEl && user.avatarUrl) {
-                sideAvatarEl.src = user.avatarUrl;
-            }
+            if (topbarNameEl) topbarNameEl.textContent = user.fullName || "Admin";
         }
-    }
-    
 
-    /* Search */
-    document.getElementById('conv-search-input').addEventListener('input', e => {
-        renderConvList(e.target.value);
+        document.getElementById("conv-search-input").addEventListener("input", function (event) {
+            renderConvList(event.target.value);
+        });
+
+        document.addEventListener("click", function () {
+            var menu = document.getElementById("notificationMenu");
+            if (menu) menu.classList.remove("active");
+        });
+
+        loadThreads();
+        startPolling();
     });
 
-    renderConvList();
-    setInterval(pollMessages, 3000);
-
-    /* Seed a demo conversation when localStorage is empty */
-    if (getAllConversations().length === 0) {
-        const demoId = 'demo_' + Date.now();
-        const demoConv = {
-            id: demoId,
-            guestName: 'Nguyen Van A',
-            online: true,
-            unread: 2,
-            lastTime: Date.now() - 60000,
-            messages: [
-                { from: 'guest', text: 'Xin chào! Tôi muốn hỏi về giá phòng Deluxe Suite.', ts: Date.now() - 300000 },
-                { from: 'admin', text: 'Xin chào! Phòng Deluxe Suite hiện có giá 2,500,000 VND/đêm. Bạn cần thêm thông tin gì không?', ts: Date.now() - 250000 },
-                { from: 'guest', text: 'Phòng có bao gồm bữa sáng không ạ?', ts: Date.now() - 120000 },
-                { from: 'guest', text: 'Và có được đổi ngày đặt phòng không?', ts: Date.now() - 60000 },
-            ]
-        };
-        saveConversation(demoConv);
-        renderConvList();
-    }
-});
+    global.openConversation = openConversation;
+    global.sendAdminReply = sendAdminReply;
+    global.handleReplyKey = handleReplyKey;
+    global.resolveConversation = resolveConversation;
+    global.deleteConversation = deleteConversation;
+    global.showConvPane = showConvPane;
+    global.toggleSidebar = toggleSidebar;
+    global.closeSidebar = closeSidebar;
+    global.toggleNotification = toggleNotification;
+    global.AdminDashboard = {
+        handleLogout: handleLogout
+    };
+})(window);

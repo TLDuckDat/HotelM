@@ -32,5 +32,6 @@ public class ChatThread {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "thread", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("sentAt ASC")
     private List<ChatMessage> messages = new ArrayList<>();
 }

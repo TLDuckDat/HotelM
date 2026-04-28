@@ -13,5 +13,6 @@ public record InvoiceResponse(
         Double discount,
         double finalAmount,
         Invoice.PaymentMethod paymentMethod,
+        Invoice.PaymentStatus status,
         LocalDate paidAt
 ) {}

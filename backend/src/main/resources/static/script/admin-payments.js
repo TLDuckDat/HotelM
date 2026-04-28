@@ -18,14 +18,12 @@
     }
 
     function methodLabel(p) {
-        // DB: payment_method; backend may expose as method, paymentMethod, or payment_method
         var m = p.method || p.paymentMethod || p.payment_method || "";
-        var icons = { CARD: "💳", BANK_TRANSFER: "🏦", CASH: "💵" };
+        var icons = { CARD: "💳", TRANSFER: "🏦", CASH: "💵" };
         return (icons[m] || "💰") + " " + (m || "—");
     }
 
     function resolveStatus(p) {
-        // DB invoice table has no status column — derive from paidAt if backend doesn't add one
         if (p.status) return p.status;
         if (p.paidAt || p.paid_at) return "COMPLETED";
         return "PENDING";
@@ -39,7 +37,7 @@
             return;
         }
         body.innerHTML = list.map(function (p) {
-            var id      = p.paymentID || p.invoiceID || p.id || "—";
+            var id      = p.invoiceId || p.paymentID || p.invoiceID || p.id || "—";
             var guest   = p.user ? (p.user.fullName || p.user.email || p.user.userID) : (p.userId || "—");
             var booking = p.bookingId || (p.booking && p.booking.bookingID) || p.booking_booking_id || "—";
             var amount  = p.amount != null ? "$" + Number(p.amount).toFixed(2) : "—";

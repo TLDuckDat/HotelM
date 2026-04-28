@@ -26,14 +26,20 @@ public class ChatServiceImpl implements ChatService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<ChatThread> getThreadsByUserId(String userId) {
-        return chatThreadRepository.findByGuest_UserIDOrStaff_UserID(userId, userId);
+        return chatThreadRepository.findByGuest_UserIDOrStaff_UserID(userId, userId)
+                .stream()
+                .map(this::hydrateThread)
+                .toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ChatThread getThreadById(String threadId) {
-        return chatThreadRepository.findById(threadId)
+        ChatThread thread = chatThreadRepository.findById(threadId)
                 .orElseThrow(() -> new ResourceNotFoundException("Chat thread not found: " + threadId));
+        return hydrateThread(thread);
     }
 
     /**
@@ -56,15 +62,16 @@ public class ChatServiceImpl implements ChatService {
         }
 
         // Tránh tạo thread trùng giữa cùng một cặp (guest, staff)
-        return chatThreadRepository
+        ChatThread thread = chatThreadRepository
                 .findByGuest_UserIDAndStaff_UserID(request.guestUserId(), request.staffUserId())
                 .orElseGet(() -> {
-                    ChatThread thread = new ChatThread();
-                    thread.setGuest(guest);
-                    thread.setStaff(staff);
-                    thread.setCreatedAt(Instant.now());
-                    return chatThreadRepository.save(thread);
+                    ChatThread newThread = new ChatThread();
+                    newThread.setGuest(guest);
+                    newThread.setStaff(staff);
+                    newThread.setCreatedAt(Instant.now());
+                    return chatThreadRepository.save(newThread);
                 });
+        return hydrateThread(thread);
     }
 
     @Override
@@ -95,5 +102,20 @@ public class ChatServiceImpl implements ChatService {
                 List.of(User.Role.ADMIN, User.Role.RECEPTIONIST),
                 User.UserStatus.ACTIVE
         );
+    }
+
+    private ChatThread hydrateThread(ChatThread thread) {
+        if (thread.getGuest() != null) {
+            thread.getGuest().getUserID();
+            thread.getGuest().getFullName();
+        }
+        if (thread.getStaff() != null) {
+            thread.getStaff().getUserID();
+            thread.getStaff().getFullName();
+        }
+        if (thread.getMessages() != null) {
+            thread.getMessages().size();
+        }
+        return thread;
     }
 }

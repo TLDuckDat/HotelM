@@ -1,186 +1,262 @@
-// ===== CHAT UI SCRIPT =====
-// Messages are stored in localStorage so the admin Live Chat page can receive them.
-// Key format:  sot_conv_{sessionId}  →  { id, guestName, messages, unread, lastTime, online }
+(function (global) {
+    "use strict";
 
-(function () {
-    /* ── SESSION / IDENTITY ── */
-    let sessionId = localStorage.getItem('sot_chat_session');
-    if (!sessionId) {
-        sessionId = 'guest_' + Math.random().toString(36).slice(2, 10) + '_' + Date.now();
-        localStorage.setItem('sot_chat_session', sessionId);
-    }
+    var pollTimer = null;
+    var activeThreadId = null;
+    var renderedMessageSignature = "";
+    var sending = false;
 
-    const CONV_KEY = 'sot_conv_' + sessionId;
-    const GUEST_NAME_KEY = 'sot_chat_name';
-
-    function getConv() {
-        try { return JSON.parse(localStorage.getItem(CONV_KEY)); } catch (e) { return null; }
-    }
-
-    function saveConv(conv) {
-        localStorage.setItem(CONV_KEY, JSON.stringify(conv));
-    }
-
-    function ensureConv(guestName) {
-        let conv = getConv();
-        if (!conv) {
-            conv = {
-                id: sessionId,
-                guestName: guestName || localStorage.getItem(GUEST_NAME_KEY) || 'Guest',
-                online: true,
-                unread: 0,
-                lastTime: Date.now(),
-                messages: []
-            };
-        }
-        conv.online = true;
-        return conv;
-    }
-
-    /* ── UI HELPERS ── */
     function escHtml(str) {
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
     }
 
     function formatTime(ts) {
-        return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     }
 
-    function appendMessage(body, text, from, ts) {
-        const row = document.createElement('div');
-        row.className = 'chat-message ' + (from === 'admin' ? 'bot' : 'user');
-        row.innerHTML = `
-            <span class="chat-msg-text">${escHtml(text)}</span>
-            <span class="chat-msg-time">${formatTime(ts)}</span>
-        `;
+    function sortMessages(messages) {
+        return (messages || []).slice().sort(function (a, b) {
+            return new Date(a.sentAt || 0) - new Date(b.sentAt || 0);
+        });
+    }
+
+    function getCurrentUser() {
+        return global.AuthStore ? global.AuthStore.getCurrentUser() : null;
+    }
+
+    function getUserId(user) {
+        return user ? (user.userID || user.userId || user.id || null) : null;
+    }
+
+    function setAuthToken() {
+        var user = getCurrentUser();
+        if (user && global.HotelMApiBase) {
+            global.HotelMApiBase.setAuthToken(user.accessToken || user.token || null);
+        }
+    }
+
+    function getElements() {
+        var box = document.getElementById("chat-box");
+        return {
+            toggle: document.getElementById("chat-toggle"),
+            box: box,
+            closeBtn: document.getElementById("chat-close"),
+            body: box ? box.querySelector(".chat-body") : null,
+            input: box ? box.querySelector(".chat-footer input") : null,
+            sendBtn: box ? box.querySelector(".chat-footer button") : null
+        };
+    }
+
+    function setFooterDisabled(disabled) {
+        var elements = getElements();
+        if (elements.input) elements.input.disabled = disabled;
+        if (elements.sendBtn) elements.sendBtn.disabled = disabled;
+    }
+
+    function setInputPlaceholder(text) {
+        var elements = getElements();
+        if (elements.input && text) {
+            elements.input.placeholder = text;
+        }
+    }
+
+    function setSystemMessage(text) {
+        var elements = getElements();
+        if (!elements.body) return;
+        elements.body.innerHTML = ''
+            + '<div class="chat-message bot chat-message-system">'
+            + '  <span class="chat-msg-sender">He thong</span>'
+            + '  <span class="chat-msg-text">' + escHtml(text) + "</span>"
+            + "</div>";
+    }
+
+    function appendMessage(body, message, currentUserId) {
+        var isCurrentUser = message.senderUserId === currentUserId;
+        var row = document.createElement("div");
+        row.className = "chat-message " + (isCurrentUser ? "user" : "bot");
+        row.innerHTML = ""
+            + '<span class="chat-msg-sender">' + (isCurrentUser ? "Ban" : "Le tan") + "</span>"
+            + '<span class="chat-msg-text">' + escHtml(message.content) + "</span>"
+            + '<span class="chat-msg-time">' + formatTime(message.sentAt) + "</span>";
         body.appendChild(row);
-        body.scrollTop = body.scrollHeight;
     }
 
-    /* ── DOM READY ── */
-    document.addEventListener('DOMContentLoaded', () => {
-        const toggle   = document.getElementById('chat-toggle');
-        const box      = document.getElementById('chat-box');
-        const closeBtn = document.getElementById('chat-close');
-        const body     = box ? box.querySelector('.chat-body') : null;
-        const input    = box ? box.querySelector('.chat-footer input') : null;
-        const sendBtn  = box ? box.querySelector('.chat-footer button') : null;
+    function renderMessages(thread) {
+        var elements = getElements();
+        var user = getCurrentUser();
+        var currentUserId = getUserId(user);
+        var messages = sortMessages(thread && thread.messages ? thread.messages : []);
+        var signature = messages.map(function (message) {
+            return [message.id, message.senderUserId, message.sentAt].join("|");
+        }).join(",");
 
-        if (!toggle || !box) return;
+        if (!elements.body || signature === renderedMessageSignature) {
+            return;
+        }
 
-        /* Open / close */
-        toggle.addEventListener('click', () => {
-            box.style.display = 'flex';
-            toggle.style.display = 'none';
-            markOnline(true);
-            loadHistory();
-            if (input) input.focus();
+        elements.body.innerHTML = "";
+        if (!messages.length) {
+            setSystemMessage("Start the conversation with admin.");
+            renderedMessageSignature = signature;
+            return;
+        }
+
+        messages.forEach(function (message) {
+            appendMessage(elements.body, message, currentUserId);
         });
+        elements.body.scrollTop = elements.body.scrollHeight;
+        renderedMessageSignature = signature;
+    }
 
-        closeBtn.addEventListener('click', () => {
-            box.style.display = 'none';
-            toggle.style.display = 'flex';
-            markOnline(false);
+    function fetchThread() {
+        if (!activeThreadId) return Promise.resolve();
+        return global.ChatApi.getThread(activeThreadId).then(function (thread) {
+            renderMessages(thread);
         });
+    }
 
-        /* Ask guest name if not known */
-        function askName(cb) {
-            const stored = localStorage.getItem(GUEST_NAME_KEY);
-            if (stored) return cb(stored);
+    function ensureThread() {
+        var user = getCurrentUser();
+        var guestUserId = getUserId(user);
+        if (!user || !guestUserId) {
+            activeThreadId = null;
+            setFooterDisabled(false);
+            setInputPlaceholder("Vui long dang nhap de chat voi admin");
+            setSystemMessage("Please sign in to chat with admin.");
+            return Promise.resolve(null);
+        }
 
-            // Inject a tiny name-prompt inside the chat body
-            if (!body.querySelector('.chat-name-prompt')) {
-                const prompt = document.createElement('div');
-                prompt.className = 'chat-name-prompt';
-                prompt.style.cssText = 'background:rgba(201,160,80,0.08);border:1px solid rgba(201,160,80,0.25);border-radius:10px;padding:12px 14px;margin:8px 0;font-size:0.82rem;color:#3D2817;';
-                prompt.innerHTML = `
-                    <p style="margin-bottom:8px;font-weight:600;">Vui lòng nhập tên của bạn để bắt đầu:</p>
-                    <div style="display:flex;gap:6px;">
-                        <input id="chat-name-field" placeholder="Tên của bạn…" style="flex:1;padding:6px 10px;border:1px solid rgba(201,160,80,0.4);border-radius:6px;font-size:0.82rem;outline:none;" />
-                        <button id="chat-name-submit" style="padding:6px 12px;background:#C9A050;border:none;border-radius:6px;cursor:pointer;font-size:0.82rem;color:#3D2817;font-weight:700;">OK</button>
-                    </div>
-                `;
-                body.appendChild(prompt);
-                body.scrollTop = body.scrollHeight;
-
-                const nameInput = prompt.querySelector('#chat-name-field');
-                const nameBtn = prompt.querySelector('#chat-name-submit');
-
-                function submitName() {
-                    const name = nameInput.value.trim();
-                    if (!name) return nameInput.focus();
-                    localStorage.setItem(GUEST_NAME_KEY, name);
-                    prompt.remove();
-                    cb(name);
+        setAuthToken();
+        return global.ChatApi.getAvailableStaff()
+            .then(function (staffList) {
+                var staff = (staffList || [])[0];
+                if (!staff) {
+                    activeThreadId = null;
+                    setFooterDisabled(false);
+                    setInputPlaceholder("Tam thoi chua co admin online");
+                    setSystemMessage("No admin is available right now. Please try again later.");
+                    return null;
                 }
 
-                nameBtn.addEventListener('click', submitName);
-                nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitName(); });
-                nameInput.focus();
+                return global.ChatApi.createThread({
+                    guestUserId: guestUserId,
+                    staffUserId: staff.userId
+                });
+            })
+            .then(function (thread) {
+                if (!thread) return null;
+                activeThreadId = thread.id;
+                setFooterDisabled(false);
+                setInputPlaceholder("Nhap tin nhan...");
+                return fetchThread().then(function () { return thread; });
+            })
+            .catch(function (err) {
+                activeThreadId = null;
+                setFooterDisabled(false);
+                setInputPlaceholder("Khong ket noi duoc, bam gui de thu lai");
+                setSystemMessage(
+                    (err && err.payload && (err.payload.message || err.payload.error))
+                    || "Cannot connect to chat right now."
+                );
+                return null;
+            });
+    }
+
+    function startPolling() {
+        if (pollTimer) return;
+        pollTimer = window.setInterval(function () {
+            if (document.hidden) return;
+            if (!activeThreadId) return;
+            fetchThread();
+        }, 1500);
+    }
+
+    function stopPolling() {
+        if (pollTimer) {
+            window.clearInterval(pollTimer);
+            pollTimer = null;
+        }
+    }
+
+    function sendMessage() {
+        var elements = getElements();
+        var user = getCurrentUser();
+        var senderUserId = getUserId(user);
+        var text = elements.input ? elements.input.value.trim() : "";
+
+        if (!text || sending) return;
+        if (!user || !senderUserId) {
+            setSystemMessage("Please sign in to chat with admin.");
+            if (typeof global.openLoginModal === "function") {
+                global.openLoginModal();
             }
+            return;
+        }
+        if (!activeThreadId) {
+            ensureThread().then(function () {
+                if (activeThreadId) {
+                    sendMessage();
+                }
+            });
+            return;
         }
 
-        /* Send a guest message */
-        function sendMessage() {
-            const text = input ? input.value.trim() : '';
-            if (!text) return;
+        sending = true;
+        elements.sendBtn.disabled = true;
 
-            askName(guestName => {
-                const conv = ensureConv(guestName);
-                const msg = { from: 'guest', text, ts: Date.now() };
-                conv.messages.push(msg);
-                conv.unread = (conv.unread || 0) + 1;
-                conv.lastTime = msg.ts;
-                conv.guestName = guestName;
-                saveConv(conv);
+        global.ChatApi.sendMessage({
+            threadId: activeThreadId,
+            senderUserId: senderUserId,
+            senderRole: user.role || "USER",
+            content: text
+        }).then(function () {
+            if (elements.input) elements.input.value = "";
+            renderedMessageSignature = "";
+            return fetchThread();
+        }).catch(function () {
+            setSystemMessage("Cannot send message. Please try again.");
+        }).finally(function () {
+            sending = false;
+            elements.sendBtn.disabled = false;
+            if (elements.input) elements.input.focus();
+        });
+    }
 
-                if (input) input.value = '';
-                appendMessage(body, text, 'guest', msg.ts);
+    document.addEventListener("DOMContentLoaded", function () {
+        var elements = getElements();
+        if (!elements.toggle || !elements.box) return;
+
+        elements.toggle.addEventListener("click", function () {
+            elements.box.style.display = "flex";
+            elements.toggle.style.display = "none";
+            renderedMessageSignature = "";
+            setFooterDisabled(false);
+            ensureThread().then(startPolling);
+            if (elements.input) elements.input.focus();
+        });
+
+        if (elements.closeBtn) {
+            elements.closeBtn.addEventListener("click", function () {
+                elements.box.style.display = "none";
+                elements.toggle.style.display = "flex";
+                stopPolling();
             });
         }
 
-        if (sendBtn) sendBtn.addEventListener('click', sendMessage);
-        if (input) {
-            input.addEventListener('keydown', e => {
-                if (e.key === 'Enter') sendMessage();
+        if (elements.sendBtn) {
+            elements.sendBtn.addEventListener("click", sendMessage);
+        }
+
+        if (elements.input) {
+            elements.input.addEventListener("keydown", function (event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    sendMessage();
+                }
             });
         }
-
-        /* Load chat history on open */
-        function loadHistory() {
-            if (!body) return;
-            // Remove old rendered messages (keep the welcome bot bubble)
-            const existing = body.querySelectorAll('.user, .chat-message.bot:not(:first-child)');
-            existing.forEach(el => el.remove());
-
-            const conv = getConv();
-            if (!conv || !conv.messages) return;
-            conv.messages.forEach(msg => appendMessage(body, msg.text, msg.from, msg.ts));
-        }
-
-        /* Mark online/offline */
-        function markOnline(online) {
-            const conv = getConv();
-            if (!conv) return;
-            conv.online = online;
-            saveConv(conv);
-        }
-
-        /* Poll for admin replies every 3 seconds */
-        function pollAdminReplies() {
-            if (box.style.display === 'none') return;
-            const conv = getConv();
-            if (!conv || !conv.messages) return;
-
-            const rendered = body.querySelectorAll('.chat-message').length;
-            // +1 for the initial welcome bubble that is hardcoded in HTML
-            const storedCount = conv.messages.length + 1;
-
-            if (storedCount > rendered) {
-                loadHistory();
-            }
-        }
-
-        setInterval(pollAdminReplies, 3000);
     });
-})();
+})(window);
