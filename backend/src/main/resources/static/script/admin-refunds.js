@@ -2,6 +2,13 @@
     "use strict";
 
     var allRefunds = [];
+    function refundIdOf(r) {
+        return r.refundId || r.refundID || r.id || "—";
+    }
+
+    function bookingIdOf(r) {
+        return r.bookingId || (r.booking && (r.booking.bookingId || r.booking.bookingID)) || "—";
+    }
 
     /* ── helpers ── */
     function flash(msg, type) {
@@ -25,9 +32,9 @@
             return;
         }
         body.innerHTML = list.map(function (r) {
-            var id      = r.refundID || r.id || "—";
-            var guest   = r.user ? (r.user.fullName || r.user.email || r.user.userID) : (r.userId || "—");
-            var booking = r.bookingId || (r.booking && r.booking.bookingID) || "—";
+            var id      = refundIdOf(r);
+            var guest   = r.userName || (r.user ? (r.user.fullName || r.user.email || r.user.userID) : (r.userId || "—"));
+            var booking = bookingIdOf(r);
             var status  = r.status || "PENDING";
             var canAct  = status === "PENDING";
 
@@ -64,8 +71,8 @@
 
         var filtered = allRefunds.filter(function (r) {
             var s       = r.status || "PENDING";
-            var booking = String(r.bookingId || (r.booking && r.booking.bookingID) || "");
-            var guest   = r.user ? String(r.user.fullName || r.user.email || "") : "";
+            var booking = String(bookingIdOf(r));
+            var guest   = String(r.userName || (r.user ? (r.user.fullName || r.user.email || "") : ""));
             if (status && s !== status) return false;
             if (search && !booking.toLowerCase().includes(search) && !guest.toLowerCase().includes(search)) return false;
             return true;
@@ -133,7 +140,7 @@
     function loadRefunds() {
         window.RefundApi.getRefunds()
             .then(function (data) {
-                allRefunds = data || [];
+                allRefunds = Array.isArray(data) ? data : ((data && (data.payload || data.data)) || []);
                 updateStats(allRefunds);
                 renderRefunds(allRefunds);
             })

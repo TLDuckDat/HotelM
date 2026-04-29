@@ -104,7 +104,8 @@
             description: document.getElementById("admin-room-desc").value.trim(),
             status: document.getElementById("admin-room-status").value,
             roomTypeId: document.getElementById("admin-room-type").value,
-            branchId: document.getElementById("admin-room-branch").value
+            branchId: document.getElementById("admin-room-branch").value,
+            imageUrl: ""
         };
 
         if (!payload.roomName || !payload.maxCapacity || !payload.roomTypeId || !payload.branchId) {
@@ -112,13 +113,32 @@
             return;
         }
 
-        global.RoomApi.createRoom(payload).then(function () {
+        var fileInput = document.getElementById("admin-room-image");
+        var selectedFile = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+
+        var uploadPromise = selectedFile && global.UploadApi && typeof global.UploadApi.uploadRoomImage === "function"
+            ? global.UploadApi.uploadRoomImage(selectedFile)
+            : Promise.resolve(null);
+
+        uploadPromise.then(function (uploadResult) {
+            // uploadResult expected: { url: "/uploads/rooms/xxx.jpg", ... }
+            if (uploadResult && (uploadResult.url || uploadResult.imageUrl)) {
+                payload.imageUrl = uploadResult.url || uploadResult.imageUrl;
+            } else if (typeof uploadResult === "string") {
+                payload.imageUrl = uploadResult;
+            }
+
+            return global.RoomApi.createRoom(payload);
+        }).then(function () {
             setMessage("Room created", "success");
             document.getElementById("admin-create-room-form").reset();
+            var previewWrap = document.getElementById("admin-room-image-preview-wrap");
+            if (previewWrap) previewWrap.style.display = "none";
             loadRooms();
         }).catch(function (error) {
             var msg = error && error.payload && error.payload.message
-                ? error.payload.message : ("Create room failed. " + (error?.status === 400 ? "Bad Request - verify fields." : ""));
+                ? error.payload.message
+                : ("Create room failed. " + (error?.status === 400 ? "Bad Request - verify fields." : ""));
             setMessage(msg, "error");
         });
     }
@@ -234,6 +254,25 @@
 
         var roomForm = document.getElementById("admin-create-room-form");
         if (roomForm) roomForm.addEventListener("submit", createRoom);
+
+        var imageInput = document.getElementById("admin-room-image");
+        if (imageInput) {
+            imageInput.addEventListener("change", function () {
+                var file = imageInput.files && imageInput.files[0] ? imageInput.files[0] : null;
+                var wrap = document.getElementById("admin-room-image-preview-wrap");
+                var img = document.getElementById("admin-room-image-preview");
+                if (!wrap || !img) return;
+
+                if (!file) {
+                    wrap.style.display = "none";
+                    img.removeAttribute("src");
+                    return;
+                }
+
+                img.src = URL.createObjectURL(file);
+                wrap.style.display = "block";
+            });
+        }
 
         var branchForm = document.getElementById("admin-create-branch-form");
         if (branchForm) branchForm.addEventListener("submit", createBranch);

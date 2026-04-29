@@ -67,7 +67,7 @@ const TRANSLATIONS = {
         gallery_title: 'MEMORABLE MOMENT',
 
         // ── Chat ──────────────────────────────────────────────
-        chat_ai_receptionist: 'AI Receptionist',
+        chat_ai_receptionist: 'Online support',
         chat_welcome_message: 'Hello! How can I help you?',
         chat_placeholder: 'Type a message...',
 
@@ -228,7 +228,7 @@ const TRANSLATIONS = {
         // (Guest)
         sidebar_account: "My Account",
         sidebar_bookings: "My Bookings",
-        sidebar_rooms: "Browse Rooms",
+        sidebar_search_rooms: "Search Rooms",
         sidebar_create_booking: "Create Booking",
         sidebar_payments: "Payments",
         sidebar_refunds: "Refund Requests",
@@ -426,7 +426,7 @@ const TRANSLATIONS = {
         quick_payments: "Payments History",
         quick_refunds: "Refund Requests",
         quick_reviews: "Room Reviews",
-        quick_rooms: "Browse Rooms",
+        quick_search_rooms: "Search Rooms",
         btn_edit_profile: "Edit Profile Information",
 
         // ── Bookings Page ─────────────────────────────────────────────
@@ -455,8 +455,8 @@ const TRANSLATIONS = {
         placeholder_note: "Any special requests or notes (optional)",
 
         // ── Rooms Page ─────────────────────────────────────────────
-        rooms_title: "Browse Rooms",
-        rooms_desc: "Find the perfect room for your stay",
+        rooms_title: "Search Rooms",
+        rooms_desc: "Search and filter rooms for your stay",
         filter_title: "Filter",
         filter_type: "Room Type",
         filter_type_all: "All Types",
@@ -586,7 +586,7 @@ const TRANSLATIONS = {
         gallery_title: 'KHOẢNH KHẮC ĐÁNG NHỚ',
 
         // ── Chat ──────────────────────────────────────────────
-        chat_ai_receptionist: 'Lễ tân AI',
+        chat_ai_receptionist: 'Hỗ trợ trực tuyến',
         chat_welcome_message: 'Xin chào! Tôi có thể giúp gì cho bạn?',
         chat_placeholder: 'Nhập tin nhắn...',
 
@@ -749,7 +749,7 @@ const TRANSLATIONS = {
         // (Guest)
         sidebar_account: "Tài khoản của tôi",
         sidebar_bookings: "Đặt phòng của tôi",
-        sidebar_rooms: "Duyệt phòng",
+        sidebar_search_rooms: "Tìm phòng",
         sidebar_create_booking: "Tạo đặt phòng",
         sidebar_payments: "Thanh toán",
         sidebar_refunds: "Yêu cầu hoàn tiền",
@@ -950,7 +950,7 @@ const TRANSLATIONS = {
         quick_payments: "Lịch Sử Thanh Toán",
         quick_refunds: "Yêu Cầu Hoàn Tiền",
         quick_reviews: "Đánh Giá Phòng",
-        quick_rooms: "Xem Phòng",
+        quick_search_rooms: "Tìm phòng",
         btn_edit_profile: "Chỉnh sửa thông tin",
 
         // ── Bookings Page ─────────────────────────────────────────────
@@ -979,8 +979,8 @@ const TRANSLATIONS = {
         placeholder_note: "Yêu cầu đặc biệt hoặc ghi chú thêm (tùy chọn)",
 
         // ── Rooms Page ─────────────────────────────────────────────
-        rooms_title: "Danh sách phòng",
-        rooms_desc: "Tìm phòng hoàn hảo cho kỳ nghỉ của bạn",
+        rooms_title: "Tìm phòng",
+        rooms_desc: "Tìm kiếm và lọc phòng phù hợp cho kỳ nghỉ của bạn",
         filter_title: "Bộ lọc",
         filter_type: "Loại phòng",
         filter_type_all: "Tất cả loại",

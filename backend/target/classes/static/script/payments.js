@@ -19,7 +19,8 @@
     }
 
     function formatMoney(amount) {
-        return "$" + (Number(amount) || 0).toFixed(2);
+        var value = Math.round(Number(amount) || 0);
+        return value.toLocaleString("vi-VN") + " ₫";
     }
 
     // BookingResponse fields: bookingId, userId, roomId, checkIn, checkOut, totalPrice, status
@@ -79,7 +80,7 @@
         })[0];
 
         if (!amountInput) return;
-        amountInput.value = booking ? Number(booking.totalPrice || 0).toFixed(2) : "";
+        amountInput.value = booking ? String(Math.round(Number(booking.totalPrice || 0))) : "";
     }
 
     function renderBookingOptions() {

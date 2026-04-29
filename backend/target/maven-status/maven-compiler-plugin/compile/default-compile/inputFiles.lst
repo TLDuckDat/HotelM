@@ -48,6 +48,7 @@ C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\chat\webs
 C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\common\config\RateLimitConfig.java
 C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\common\config\RedisConfig.java
 C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\common\config\SecurityConfig.java
+C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\common\config\StaticResourceConfig.java
 C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\common\config\WebSocketConfig.java
 C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\common\exception\ApiError.java
 C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\common\exception\AppException.java
@@ -59,6 +60,8 @@ C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\common\se
 C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\common\security\JwtAuthenticationFilter.java
 C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\common\security\JwtService.java
 C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\common\security\JwtServiceImpl.java
+C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\common\upload\RoomImageUploadController.java
+C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\common\upload\UploadResponse.java
 C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\HotelMApplication.java
 C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\invoice\controller\InvoiceController.java
 C:\Users\Admin\Desktop\HotelM\backend\src\main\java\org\example\hotelm\invoice\dto\InvoiceCreateRequest.java

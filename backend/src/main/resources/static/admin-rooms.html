@@ -234,6 +234,15 @@
                             </select>
                         </div>
                     </div>
+                    <div class="form-row" style="margin-top: 14px;">
+                        <div class="form-field">
+                            <label class="form-label">Room Image</label>
+                            <input id="admin-room-image" class="form-input" type="file" accept="image/*" />
+                            <div style="margin-top: 10px; display: none;" id="admin-room-image-preview-wrap">
+                                <img id="admin-room-image-preview" alt="Room image preview" style="max-width: 240px; width: 100%; border-radius: 12px; border: 1px solid var(--border);" />
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-field" style="margin-top: 14px;">
                         <label class="form-label" data-i18n="admin_rooms_label_desc">Description</label>
                         <input id="admin-room-desc" class="form-input" placeholder="Short description (optional)" />
@@ -274,6 +283,7 @@
     <script src="script/api/roomApi.js"></script>
     <script src="script/api/branchApi.js"></script>
     <script src="script/api/roomTypeApi.js"></script>
+    <script src="script/api/uploadApi.js"></script>
     <script src="script/guard.js"></script>
     <script src="script/app-shell.js"></script>
     <script src="script/admin-rooms.js"></script>

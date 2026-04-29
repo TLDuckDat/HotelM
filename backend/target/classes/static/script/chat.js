@@ -78,7 +78,7 @@
         var row = document.createElement("div");
         row.className = "chat-message " + (isCurrentUser ? "user" : "bot");
         row.innerHTML = ""
-            + '<span class="chat-msg-sender">' + (isCurrentUser ? "Ban" : "Le tan") + "</span>"
+            + '<span class="chat-msg-sender">' + (isCurrentUser ? "Bạn" : "Admin") + "</span>"
             + '<span class="chat-msg-text">' + escHtml(message.content) + "</span>"
             + '<span class="chat-msg-time">' + formatTime(message.sentAt) + "</span>";
         body.appendChild(row);

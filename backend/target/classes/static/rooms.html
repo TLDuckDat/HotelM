@@ -86,7 +86,7 @@
           </button>
           <button class="nav-item" onclick="location.href = 'rooms.html'">
             <i class="fas fa-bed"></i>
-            <span data-i18n="sidebar_rooms">Browse Rooms</span>
+            <span data-i18n="sidebar_search_rooms">Search Rooms</span>
           </button>
 
           <div class="sidebar-divider"></div>
@@ -115,8 +115,8 @@
       <!-- MAIN -->
       <main class="main">
         <div class="page-header">
-          <h1 data-i18n="rooms_title">Browse Rooms</h1>
-          <p data-i18n="rooms_desc">Find the perfect room for your stay</p>
+          <h1 data-i18n="rooms_title">Search Rooms</h1>
+          <p data-i18n="rooms_desc">Search and filter rooms for your stay</p>
         </div>
 
         <div class="card filter-card" style="padding: 24px !important">
@@ -152,6 +152,21 @@
                 align-items: end;
               "
             >
+              <div class="form-field">
+                <label
+                  class="form-label"
+                  style="display: block; margin-bottom: 10px"
+                  data-i18n="filter_search"
+                  >Search</label
+                >
+                <input
+                  type="text"
+                  id="filter-keyword"
+                  class="form-input"
+                  placeholder="Search by room name..."
+                  data-i18n="filter_search_placeholder"
+                />
+              </div>
               <div class="form-field">
                 <label
                   class="form-label"

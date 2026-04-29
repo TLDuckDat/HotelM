@@ -2,6 +2,7 @@
     "use strict";
 
     var internalAuthToken = null;
+    var isFormDataSupported = typeof FormData !== "undefined";
 
     function resolveBaseUrl() {
         return global.__HOTELM_API_BASE_URL__ || "";
@@ -52,7 +53,9 @@
             config.headers || {}
         );
 
-        if (config.body !== undefined && config.body !== null) {
+        var isFormDataBody = isFormDataSupported && (config.body instanceof FormData);
+
+        if (config.body !== undefined && config.body !== null && !isFormDataBody) {
             headers["Content-Type"] = headers["Content-Type"] || "application/json";
         }
 

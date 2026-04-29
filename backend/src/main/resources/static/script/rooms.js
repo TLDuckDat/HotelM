@@ -25,11 +25,17 @@
 
     // --- LOGIC LỌC MỚI THÊM VÀO ---
     function applyFilters() {
+        const keywordVal = (document.getElementById('filter-keyword')?.value || "").trim().toLowerCase();
         const typeVal = document.getElementById('filter-type').value;
         const capVal = document.getElementById('filter-capacity').value;
         const priceVal = document.getElementById('filter-price').value;
 
         const filtered = rawRooms.filter(room => {
+            // Lọc theo keyword (tên phòng / loại phòng)
+            const name = (getRoomName(room) || "").toLowerCase();
+            const typeName = (getRoomTypeName(room, rawTypes) || "").toLowerCase();
+            const matchKeyword = !keywordVal || name.includes(keywordVal) || typeName.includes(keywordVal);
+
             // Lọc loại phòng
             const rTypeId = (room.roomTypeId || room.typeID || room.roomTypeID)?.toString();
             const matchType = !typeVal || rTypeId === typeVal;
@@ -45,7 +51,7 @@
                 matchPrice = rPrice >= min && rPrice <= max;
             }
 
-            return matchType && matchCap && matchPrice;
+            return matchKeyword && matchType && matchCap && matchPrice;
         });
 
         renderRooms(filtered, rawTypes);
@@ -82,7 +88,7 @@
         }
 
         // 3. Gắn sự kiện lọc cho các ô input
-        const controls = ['filter-type', 'filter-capacity', 'filter-price'];
+        const controls = ['filter-keyword', 'filter-type', 'filter-capacity', 'filter-price'];
         controls.forEach(id => {
             const el = document.getElementById(id);
             if (el) {

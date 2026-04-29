@@ -314,7 +314,7 @@
                 '  <i class="fas fa-exclamation-triangle"></i>',
                 '  <p>No room ID provided. Please go back and select a room.</p>',
                 '  <a href="rooms.html" class="btn-back" style="margin:20px auto 0;display:inline-flex">',
-                '    <i class="fas fa-arrow-left"></i> Browse Rooms',
+                '    <i class="fas fa-arrow-left"></i> Search Rooms',
                 '  </a>',
                 '</div>'
             ].join("\n");

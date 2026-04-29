@@ -2,6 +2,11 @@ spring:
   application:
     name: HotelM
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+
   datasource:
     url: jdbc:mysql://localhost:3306/HOTELM_DB?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true
     username: root
@@ -28,6 +33,9 @@ spring:
 
 server:
   port: 8080
+
+hotel:
+  upload-dir: uploads
 
 jwt:
   secret: your-256-bit-secret-key-change-this-in-production-minimum-32-chars

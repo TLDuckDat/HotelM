@@ -1,6 +1,9 @@
 (function (global) {
     "use strict";
 
+    var allRooms = [];
+    var selectedRoomFromUrl = "";
+
     function setMessage(text, type) {
         var el = document.getElementById("create-booking-message");
         if (!el) return;
@@ -37,6 +40,68 @@
         return user;
     }
 
+    function getRoomId(room) {
+        return String(room.roomId || room.roomID || room.id || "");
+    }
+
+    function getRoomBranchId(room) {
+        return String(room.branchId || room.branchID || (room.branch && room.branch.branchId) || "");
+    }
+
+    function getRoomDisplayName(room) {
+        var name = room.roomName || room.name || "Unnamed room";
+        var branchName = room.branchName || (room.branch && room.branch.branchName) || "";
+        return branchName ? (name + " - " + branchName) : name;
+    }
+
+    function setBranchOptionsFromRooms(rooms) {
+        var branchSelect = document.getElementById("branchId");
+        if (!branchSelect) return;
+
+        var branchMap = new Map();
+        (rooms || []).forEach(function (room) {
+            var id = getRoomBranchId(room);
+            if (!id) return;
+            var name = room.branchName || (room.branch && room.branch.branchName) || ("Branch " + id);
+            if (!branchMap.has(id)) {
+                branchMap.set(id, name);
+            }
+        });
+
+        var oldValue = branchSelect.value;
+        var optionsHtml = "<option value=''>-- All Branches --</option>";
+        branchMap.forEach(function (name, id) {
+            optionsHtml += "<option value='" + id + "'>" + name + "</option>";
+        });
+        branchSelect.innerHTML = optionsHtml;
+
+        if (oldValue && branchMap.has(oldValue)) {
+            branchSelect.value = oldValue;
+        }
+    }
+
+    function loadBranchesFallback() {
+        if (!global.BranchApi || typeof global.BranchApi.getBranches !== "function") {
+            return Promise.resolve();
+        }
+        var branchSelect = document.getElementById("branchId");
+        if (!branchSelect) return Promise.resolve();
+        if (branchSelect.options.length > 1) return Promise.resolve();
+
+        return global.BranchApi.getBranches().then(function (res) {
+            var list = Array.isArray(res) ? res : (res.payload || res.data || []);
+            var html = "<option value=''>-- All Branches --</option>";
+            list.forEach(function (b) {
+                var id = String(b.branchId || b.branchID || b.id || "");
+                var name = b.branchName || b.name || ("Branch " + id);
+                if (id) html += "<option value='" + id + "'>" + name + "</option>";
+            });
+            branchSelect.innerHTML = html;
+        }).catch(function () {
+            return Promise.resolve();
+        });
+    }
+
     // Fetch all rooms, then optionally fetch booked room IDs and disable them
     function loadRoomOptions(checkIn, checkOut) {
         var select = document.getElementById("roomId");
@@ -44,8 +109,17 @@
 
         return global.RoomApi.getRooms().then(function (data) {
             const rooms = Array.isArray(data) ? data : (data.payload || data.data || []);
+            allRooms = rooms;
+            setBranchOptionsFromRooms(rooms);
+            return loadBranchesFallback().then(function () { return rooms; });
+        }).then(function (rooms) {
 
-            if (!rooms.length) {
+            var branchId = document.getElementById("branchId").value;
+            var filteredRooms = !branchId
+                ? rooms
+                : rooms.filter(function (room) { return getRoomBranchId(room) === String(branchId); });
+
+            if (!filteredRooms.length) {
                 select.innerHTML = "<option value=''>No rooms available</option>";
                 return;
             }
@@ -65,9 +139,9 @@
 
             return bookedPromise.then(function(bookedIds) {
                 var html = '<option value="">-- Select a Room --</option>';
-                html += rooms.map(function (room) {
-                    const id = String(room.roomId || room.roomID || room.id || "");
-                    const name = room.roomName || room.name || "Unnamed room";
+                html += filteredRooms.map(function (room) {
+                    const id = getRoomId(room);
+                    const name = getRoomDisplayName(room);
                     const isBooked = bookedIds.has(id);
                     const isUnavailable = isBooked || room.status === 'MAINTENANCE';
 
@@ -87,10 +161,54 @@
                 }
 
                 // Pre-select from URL param
-                var params = new URLSearchParams(window.location.search);
-                var initialId = params.get("roomId");
-                if (initialId) select.value = initialId;
+                if (selectedRoomFromUrl) {
+                    var hasInitial = filteredRooms.some(function (room) { return getRoomId(room) === selectedRoomFromUrl; });
+                    if (hasInitial && !bookedIds.has(selectedRoomFromUrl)) {
+                        select.value = selectedRoomFromUrl;
+                    }
+                }
             });
+        });
+    }
+
+    function renderRoomsFromExisting(checkIn, checkOut) {
+        var select = document.getElementById("roomId");
+        if (!select) return Promise.resolve();
+        if (!allRooms || !allRooms.length) return loadRoomOptions(checkIn, checkOut);
+
+        var branchId = document.getElementById("branchId").value;
+        var filteredRooms = !branchId
+            ? allRooms
+            : allRooms.filter(function (room) { return getRoomBranchId(room) === String(branchId); });
+
+        if (!filteredRooms.length) {
+            select.innerHTML = "<option value=''>No rooms available in this branch</option>";
+            return Promise.resolve();
+        }
+
+        var bookedPromise = (checkIn && checkOut)
+            ? global.BookingApi.getBookedRooms(checkIn, checkOut)
+                .then(function (res) {
+                    var arr = Array.isArray(res) ? res : (res.payload || res.data || []);
+                    return new Set(arr.map(function (r) { return String(r.roomId || r.roomID || r.id || r); }));
+                })
+                .catch(function () { return new Set(); })
+            : Promise.resolve(new Set());
+
+        return bookedPromise.then(function (bookedIds) {
+            var html = '<option value="">-- Select a Room --</option>';
+            html += filteredRooms.map(function (room) {
+                var id = getRoomId(room);
+                var name = getRoomDisplayName(room);
+                var isBooked = bookedIds.has(id);
+                var isUnavailable = isBooked || room.status === "MAINTENANCE";
+                if (isUnavailable) {
+                    var reason = room.status === "MAINTENANCE" ? "Maintenance" : "Unavailable";
+                    return "<option value='" + id + "' disabled style='color:#aaa;'>" + name + " (" + reason + ")</option>";
+                }
+                return "<option value='" + id + "'>" + name + "</option>";
+            }).join("");
+            select.innerHTML = html;
         });
     }
 
@@ -218,10 +336,49 @@
         var checkIn = document.getElementById("checkIn").value;
         var checkOut = document.getElementById("checkOut").value;
         if (checkIn && checkOut && new Date(checkIn) < new Date(checkOut)) {
-            loadRoomOptions(checkIn, checkOut).catch(function() {
+            renderRoomsFromExisting(checkIn, checkOut).catch(function() {
                 setMessage("Cannot check room availability.", "error");
             });
         }
+    }
+
+    function toLocalDateTimeInputValue(date) {
+        var d = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+        return d.toISOString().slice(0, 16);
+    }
+
+    function addHours(value, hours) {
+        var d = new Date(value);
+        d.setHours(d.getHours() + hours);
+        return toLocalDateTimeInputValue(d);
+    }
+
+    function setupDateDefaults() {
+        var checkInEl = document.getElementById("checkIn");
+        var checkOutEl = document.getElementById("checkOut");
+        if (!checkInEl || !checkOutEl) return;
+
+        var now = new Date();
+        now.setMinutes(0, 0, 0);
+        now.setHours(now.getHours() + 1);
+
+        var defaultCheckIn = toLocalDateTimeInputValue(now);
+        var defaultCheckOut = addHours(defaultCheckIn, 24);
+
+        if (!checkInEl.value) checkInEl.value = defaultCheckIn;
+        if (!checkOutEl.value) checkOutEl.value = defaultCheckOut;
+
+        checkInEl.min = defaultCheckIn;
+        checkOutEl.min = addHours(checkInEl.value, 1);
+        checkInEl.step = 1800;
+        checkOutEl.step = 1800;
+
+        checkInEl.addEventListener("change", function () {
+            checkOutEl.min = addHours(checkInEl.value, 1);
+            if (!checkOutEl.value || new Date(checkOutEl.value) <= new Date(checkInEl.value)) {
+                checkOutEl.value = addHours(checkInEl.value, 24);
+            }
+        });
     }
 
     window.toggleSidebar = function () {
@@ -238,8 +395,13 @@
         var user = loadUser();
         if (!user) return;
 
+        var params = new URLSearchParams(window.location.search);
+        selectedRoomFromUrl = params.get("roomId") || "";
+
+        setupDateDefaults();
+
         // Load rooms initially (no date filter yet)
-        loadRoomOptions().catch(function (err) {
+        loadRoomOptions(document.getElementById("checkIn").value, document.getElementById("checkOut").value).catch(function (err) {
             var msg = "Cannot load room list.";
             if (err && err.payload && err.payload.message) {
                 msg = err.payload.message;
@@ -252,6 +414,13 @@
         var checkOutEl = document.getElementById("checkOut");
         if (checkInEl) checkInEl.addEventListener("change", onDateChange);
         if (checkOutEl) checkOutEl.addEventListener("change", onDateChange);
+
+        var branchEl = document.getElementById("branchId");
+        if (branchEl) {
+            branchEl.addEventListener("change", function () {
+                onDateChange();
+            });
+        }
 
         var form = document.getElementById("create-booking-form");
         if (form) form.addEventListener("submit", submitBooking);

@@ -17,6 +17,11 @@
         return "<span class='badge " + (map[s] || "badge-maintenance") + "'>" + (s || "PENDING") + "</span>";
     }
 
+    function formatMoney(amount) {
+        var value = Math.round(Number(amount) || 0);
+        return value.toLocaleString("vi-VN") + " ₫";
+    }
+
     function methodLabel(p) {
         var m = p.method || p.paymentMethod || p.payment_method || "";
         var icons = { CARD: "💳", TRANSFER: "🏦", CASH: "💵" };
@@ -40,7 +45,8 @@
             var id      = p.invoiceId || p.paymentID || p.invoiceID || p.id || "—";
             var guest   = p.user ? (p.user.fullName || p.user.email || p.user.userID) : (p.userId || "—");
             var booking = p.bookingId || (p.booking && p.booking.bookingID) || p.booking_booking_id || "—";
-            var amount  = p.amount != null ? "$" + Number(p.amount).toFixed(2) : "—";
+            var paymentAmount = p.finalAmount != null ? p.finalAmount : p.amount;
+            var amount  = paymentAmount != null ? formatMoney(paymentAmount) : "—";
             var status  = resolveStatus(p);
             var canAct  = status === "PENDING";
 
@@ -65,11 +71,11 @@
         var pending   = list.filter(function (p) { return resolveStatus(p) === "PENDING"; }).length;
         var completed = list.filter(function (p) { return resolveStatus(p) === "COMPLETED"; }).length;
         var revenue   = list.filter(function (p) { return resolveStatus(p) === "COMPLETED"; })
-                           .reduce(function (s, p) { return s + (Number(p.amount) || 0); }, 0);
+                           .reduce(function (s, p) { return s + (Number(p.finalAmount != null ? p.finalAmount : p.amount) || 0); }, 0);
         document.getElementById("stat-total").textContent     = list.length;
         document.getElementById("stat-pending").textContent   = pending;
         document.getElementById("stat-completed").textContent = completed;
-        document.getElementById("stat-revenue").textContent   = "$" + revenue.toFixed(2);
+        document.getElementById("stat-revenue").textContent   = formatMoney(revenue);
     }
 
     /* ── filters ── */
