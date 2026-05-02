@@ -11,6 +11,8 @@ import org.example.hotelm.invoice.entity.Invoice;
 import org.example.hotelm.invoice.mapper.InvoiceMapper;
 import org.example.hotelm.invoice.repository.InvoiceRepository;
 import org.example.hotelm.invoice.service.InvoiceService;
+import org.example.hotelm.room.entity.Room;
+import org.example.hotelm.room.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -23,6 +25,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final BookingRepository bookingRepository;
     private final InvoiceMapper invoiceMapper;
+    private final RoomRepository roomRepository;
 
     @Override
     public List<InvoiceResponse> getAllInvoices() {
@@ -81,9 +84,31 @@ public class InvoiceServiceImpl implements InvoiceService {
         if (status == Invoice.PaymentStatus.COMPLETED) {
             invoice.setPaidAt(LocalDate.now());
             Booking booking = invoice.getBooking();
-            if (booking != null && booking.getStatus() == Booking.BookingStatus.PENDING) {
-                booking.setStatus(Booking.BookingStatus.CONFIRMED);
+            if (booking != null) {
+                if (booking.getStatus() == Booking.BookingStatus.PENDING) {
+                    booking.setStatus(Booking.BookingStatus.CONFIRMED);
+                }
+                if (booking.getRoom() != null) {
+                    Room room = roomRepository.findById(booking.getRoom().getRoomID())
+                            .orElse(null);
+                    if (room != null) {
+                        room.setStatus(Room.RoomStatus.BOOKED);
+                        roomRepository.save(room);
+                    }
+                }
                 bookingRepository.save(booking);
+            }
+        } else if (status == Invoice.PaymentStatus.REJECTED) {
+
+            invoice.setPaidAt(null);
+            Booking booking = invoice.getBooking();
+            if (booking != null && booking.getRoom() != null) {
+                Room room = roomRepository.findById(booking.getRoom().getRoomID())
+                        .orElse(null);
+                if (room != null && room.getStatus() == Room.RoomStatus.BOOKED) {
+                    room.setStatus(Room.RoomStatus.AVAILABLE);
+                    roomRepository.save(room);
+                }
             }
         } else {
             invoice.setPaidAt(null);
@@ -102,4 +127,5 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoiceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy invoice với ID: " + id));
     }
+
 }

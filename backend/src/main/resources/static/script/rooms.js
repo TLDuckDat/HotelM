@@ -47,7 +47,7 @@
             let matchPrice = true;
             if (priceVal) {
                 const [min, max] = priceVal.split('-').map(Number);
-                const rPrice = room.price || room.roomType?.price || 0;
+                const rPrice = room.basePrice || 0;
                 matchPrice = rPrice >= min && rPrice <= max;
             }
 

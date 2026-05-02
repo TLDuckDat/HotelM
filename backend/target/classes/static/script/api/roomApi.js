@@ -10,7 +10,7 @@
     var ROOM_ENDPOINT = "/rooms";
 
     function getRooms(options) {
-        return baseApi.get(ROOM_ENDPOINT, options);
+        return baseApi.get(ROOM_ENDPOINT + "/available", options);
     }
 
     function getRoomById(id, options) {
