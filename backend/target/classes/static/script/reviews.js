@@ -11,10 +11,24 @@
 
     function loadBookingOptions() {
         var user = global.AuthStore.getCurrentUser();
+        var currentUserId = String(user.userId || user.userID || user.id || "");
 
-        return global.BookingApi.getBookings().then(function (bookings) {
-            var mine = (bookings || []).filter(function (b) {
-                return b.user && b.user.userID === user.userID;
+        // Fetch rooms and bookings to map room names correctly
+        return Promise.all([global.RoomApi.getRooms(), global.BookingApi.getBookings()]).then(function (results) {
+            var roomsData = results[0];
+            var bookingsData = results[1];
+            
+            var rooms = Array.isArray(roomsData) ? roomsData : (roomsData.payload || roomsData.data || []);
+            var roomMap = {};
+            rooms.forEach(function (room) {
+                var id = room.roomId || room.roomID || room.id;
+                var name = room.roomName || room.name || id;
+                if (id) roomMap[id] = name;
+            });
+
+            var bookings = Array.isArray(bookingsData) ? bookingsData : (bookingsData.payload || bookingsData.data || []);
+            var mine = bookings.filter(function (b) {
+                return String(b.userId || b.userID || "") === currentUserId;
             });
 
             var select = document.getElementById("review-booking-id");
@@ -26,8 +40,11 @@
             }
 
             select.innerHTML = mine.map(function (b) {
-                var roomName = b.room ? (b.room.roomName || "Room") : "Room";
-                return "<option value='" + b.bookingID + "'>" + b.bookingID + " - " + roomName + "</option>";
+                var rid = b.roomId || b.roomID || "";
+                var roomName = roomMap[rid] || rid || "Room";
+                var checkIn = b.checkIn ? String(b.checkIn).replace('T', ' ').substring(0, 16) : "";
+                var display = roomName + (checkIn ? " (Check-in: " + checkIn + ")" : "");
+                return "<option value='" + rid + "'>" + display + "</option>";
             }).join("");
         });
     }
@@ -65,8 +82,7 @@
             wrap.innerHTML = reviews.map(function (r) {
                 // DB field is "comment"; backend may also expose as "content"
                 var text = r.comment || r.content || "";
-                // DB links review to room; backend may also expose bookingId
-                var ref  = r.bookingId || (r.room && (r.room.roomName || r.room.roomID)) || "";
+                var roomDisp = r.roomName || r.roomId || "Unknown Room";
                 var stars = "";
                 for (var i = 1; i <= 5; i++) {
                     stars += "<span style='color:" + (i <= Number(r.rating) ? "#C9A050" : "#ddd") + "'>★</span>";
@@ -74,7 +90,7 @@
                 return "<div style='background:var(--light);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:12px;'>"
                     + "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;'>"
                     + "<span style='font-size:.85rem;color:var(--text-muted);'>"
-                    + (r.bookingId ? "Booking #" + r.bookingId : "Room: " + ref)
+                    + "Room: " + roomDisp
                     + "</span>"
                     + "<span>" + stars + "</span>"
                     + "</div>"
@@ -88,8 +104,7 @@
             body.innerHTML = reviews.map(function (r) {
                 var text = r.comment || r.content || "";
                 return "<tr>"
-                    + "<td>" + (r.reviewID || r.id || "") + "</td>"
-                    + "<td>" + (r.bookingId || "") + "</td>"
+                    + "<td>" + (r.roomName || r.roomId || "") + "</td>"
                     + "<td>" + (r.rating || "") + "</td>"
                     + "<td>" + text + "</td>"
                     + "</tr>";
@@ -99,14 +114,33 @@
 
     function loadReviews() {
         var user = global.AuthStore.getCurrentUser();
+        var currentUserId = String(user.userId || user.userID || user.id || "");
 
-        return global.ReviewApi.getReviews()
-            .then(function (reviews) {
-                var mine = (reviews || []).filter(function (r) {
-                    if (r.userId) return r.userId === user.userID;
-                    if (r.user && r.user.userID) return r.user.userID === user.userID;
+        return Promise.all([global.RoomApi.getRooms(), global.ReviewApi.getReviews()])
+            .then(function (results) {
+                var roomsData = results[0];
+                var reviewsData = results[1];
+
+                var rooms = Array.isArray(roomsData) ? roomsData : (roomsData.payload || roomsData.data || []);
+                var roomMap = {};
+                rooms.forEach(function(room) {
+                    var id = room.roomId || room.roomID || room.id;
+                    if (id) roomMap[id] = room.roomName || room.name || id;
+                });
+
+                var list = Array.isArray(reviewsData) ? reviewsData : (reviewsData.payload || reviewsData.data || []);
+                var mine = list.filter(function (r) {
+                    if (r.userId) return String(r.userId) === currentUserId;
+                    if (r.user && r.user.userID) return String(r.user.userID) === currentUserId;
                     return true;
                 });
+
+                // Attach roomName to each review for rendering
+                mine.forEach(function(r) {
+                    var rid = r.roomId || r.roomID;
+                    r.roomName = roomMap[rid] || rid || "Unknown Room";
+                });
+
                 renderReviews(mine);
             })
             .catch(function (err) {
@@ -131,12 +165,13 @@
 
     function submitReview() {
         var user      = global.AuthStore.getCurrentUser();
-        var bookingId = document.getElementById("review-booking-id").value;
+        var currentUserId = String(user.userId || user.userID || user.id || "");
+        var roomId    = document.getElementById("review-booking-id").value;
         var rating    = getSelectedRating();
-        // Use "content" as the payload field name — backend should map to DB "comment" column
-        var content   = document.getElementById("review-content").value.trim();
+        // Use "comment" as the payload field name to match backend
+        var comment   = document.getElementById("review-content").value.trim();
 
-        if (!bookingId || !rating || rating < 1 || rating > 5 || !content) {
+        if (!roomId || !rating || rating < 1 || rating > 5 || !comment) {
             setMessage("Please complete all review fields.", "error");
             return;
         }
@@ -144,10 +179,10 @@
         setMessage("Submitting review...", "notice");
 
         global.ReviewApi.createReview({
-            bookingId: bookingId,
-            userId:    user.userID,
+            roomId:    roomId,
+            userId:    currentUserId,
             rating:    rating,
-            content:   content   // backend maps this to the "comment" column
+            comment:   comment
         }).then(function () {
             setMessage("Review submitted.", "success");
             document.getElementById("review-booking-id").value = "";

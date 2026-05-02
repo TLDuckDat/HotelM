@@ -11,6 +11,9 @@
         el.style.display = "block";
     }
 
+    var sharedBookings = [];
+    var roomMap = {};
+
     /** Normalize user ID across different JWT/session token shapes */
     function getCurrentUserId() {
         var user = global.AuthStore.getCurrentUser();
@@ -61,6 +64,8 @@
                 ? bookings
                 : (bookings && (bookings.payload || bookings.data) || []);
 
+            sharedBookings = raw;
+
             var select = document.getElementById("refund-booking-id");
             if (!select) return;
 
@@ -79,12 +84,10 @@
             select.innerHTML = "<option value=''>Choose a booking…</option>"
                 + eligible.map(function (b) {
                     var id = getBookingId(b);
-                    // BookingResponse has roomId (not roomName), so display roomId
-                    var roomLabel = b.roomName
-                        || (b.room && b.room.roomName)
-                        || (b.roomId ? "Room #" + b.roomId : "");
-                    var label = id + (roomLabel ? " — " + roomLabel : "")
-                        + " [" + (b.status || "?") + "]";
+                    var rid = b.roomId || (b.room && (b.room.roomId || b.room.roomID));
+                    var roomLabel = (rid && roomMap[rid]) ? roomMap[rid] : (b.roomName || (b.room && b.room.roomName) || (b.roomId ? "Room #" + b.roomId.substring(0,8) : "Unknown Room"));
+                    var checkIn = b.checkIn ? String(b.checkIn).replace('T', ' ').substring(0, 16) : "";
+                    var label = roomLabel + (checkIn ? " (Check-in: " + checkIn + ")" : "") + " [" + (b.status || "?") + "]";
                     return "<option value='" + id + "'>" + label + "</option>";
                 }).join("");
         }).catch(function (err) {
@@ -112,6 +115,14 @@
             var bookingId = getRefundBookingId(r);
             var status    = r.status || "PENDING";
 
+            var bookingMatch = sharedBookings.filter(function(b) { return getBookingId(b) === bookingId; })[0];
+            var rName = "Booking #" + bookingId.substring(0,8);
+            if (bookingMatch) {
+                var rid = bookingMatch.roomId || (bookingMatch.room && (bookingMatch.room.roomId || bookingMatch.room.roomID));
+                rName = (rid && roomMap[rid]) ? roomMap[rid] : (bookingMatch.roomName || (bookingMatch.room && bookingMatch.room.roomName) || "Room #" + bookingMatch.roomId.substring(0,8));
+            }
+            var roomDisp = rName;
+
             // Status badge styling
             var badgeStyle = status === "APPROVED"
                 ? "color:#1b4332;background:#d8f3dc;border:1px solid #95d5b2;"
@@ -120,8 +131,8 @@
                     : "color:#856404;background:#fff3cd;border:1px solid #ffecb5;";
 
             return "<tr>"
-                + "<td><code style='font-size:.85rem;color:#555'>#" + id + "</code></td>"
-                + "<td>" + bookingId + "</td>"
+                + "<td><code style='font-size:.85rem;color:#555'>#" + id.substring(0,8).toUpperCase() + "</code></td>"
+                + "<td>" + roomDisp + "</td>"
                 + "<td><span style='padding:3px 10px;border-radius:20px;font-size:.85rem;"
                           + badgeStyle + "'>" + status + "</span></td>"
                 + "<td style='max-width:240px;word-break:break-word'>" + (r.reason || "—") + "</td>"
@@ -244,11 +255,19 @@
         el = document.getElementById("sidebar-username"); if (el) el.textContent = user.fullName || "Guest";
         el = document.getElementById("sidebar-role");     if (el) el.textContent = user.role || "USER";
 
-        // Load bookings and refunds in parallel
-        Promise.all([
-            loadBookingOptions(),
-            loadRefunds()
-        ]).catch(function () {
+        var pRooms = global.RoomApi ? global.RoomApi.getRooms().catch(function(){return [];}) : Promise.resolve([]);
+
+        pRooms.then(function(rooms) {
+            var rawRooms = Array.isArray(rooms) ? rooms : (rooms.payload || rooms.data || []);
+            rawRooms.forEach(function(r) {
+                var id = r.roomId || r.roomID || r.id;
+                if (id) roomMap[id] = r.roomName || r.name;
+            });
+            return Promise.all([
+                loadBookingOptions(),
+                loadRefunds()
+            ]);
+        }).catch(function () {
             setMessage("Cannot initialize refund page.", "error");
         });
 

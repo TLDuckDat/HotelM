@@ -9,6 +9,7 @@
     var bookingCache = [];
     var paymentCache = [];
     var activePayment = null;
+    var roomMap = {};
 
     function setMessage(text, type) {
         var el = document.getElementById("payments-message");
@@ -29,10 +30,11 @@
     }
 
     function getBookingRoomName(booking) {
-        // BookingResponse only has roomId (no roomName) — show roomId with label
+        var rid = booking.roomId || (booking.room && (booking.room.roomId || booking.room.roomID));
+        if (rid && roomMap[rid]) return roomMap[rid];
         return booking.roomName
             || (booking.room && booking.room.roomName)
-            || (booking.roomId ? "Room #" + booking.roomId : "Room");
+            || (booking.roomId ? "Room #" + booking.roomId.substring(0,8) : "Room");
     }
 
     // Normalize user ID across different auth token shapes
@@ -113,8 +115,9 @@
 
         select.innerHTML = "<option value=''>Select a booking\u2026</option>" + payableBookings.map(function (booking) {
             var bId = String(getBookingId(booking));
-            var label = bId + " - " + getBookingRoomName(booking)
-                + " (" + formatMoney(booking.totalPrice) + ")";
+            var roomName = getBookingRoomName(booking);
+            var checkIn = booking.checkIn ? String(booking.checkIn).replace('T', ' ').substring(0, 16) : "";
+            var label = roomName + (checkIn ? " (Check-in: " + checkIn + ")" : "") + " (" + formatMoney(booking.totalPrice) + ")";
             // Mark bookings that already have a PENDING payment
             if (pendingBookingIds.indexOf(bId) !== -1) {
                 label += " [Payment pending]";
@@ -175,6 +178,7 @@
                 })
                 : raw;
             renderBookingOptions();
+            if (paymentCache && paymentCache.length) renderPayments(paymentCache);
             return bookingCache;
         }).catch(function (err) {
             bookingCache = [];
@@ -220,10 +224,14 @@
             var actionHtml = status === "PENDING"
                 ? "<button class='btn-secondary' type='button' onclick='continuePayment(\"" + id + "\")'>Show QR</button>"
                 : "—";
+            
+            var bookingId = getPaymentBookingId(payment);
+            var bookingMatch = bookingCache.filter(function(b) { return getBookingId(b) === bookingId; })[0];
+            var roomDisp = bookingMatch ? getBookingRoomName(bookingMatch) : "Booking #" + bookingId.substring(0,8);
 
             return "<tr>"
-                + "<td>" + id + "</td>"
-                + "<td>" + getPaymentBookingId(payment) + "</td>"
+                + "<td><code style='font-size:0.85rem'>#" + id.substring(0,8).toUpperCase() + "</code></td>"
+                + "<td>" + roomDisp + "</td>"
                 + "<td>" + formatMoney(payment.finalAmount != null ? payment.finalAmount : payment.amount) + "</td>"
                 + "<td>" + getPaymentMethod(payment) + "</td>"
                 + "<td>" + status + "</td>"
@@ -363,10 +371,22 @@
             el = document.getElementById("sidebar-role"); if (el) el.textContent = user.role || "USER";
         }
 
+        var pRooms = global.RoomApi ? global.RoomApi.getRooms().catch(function(){return [];}) : Promise.resolve([]);
+
         Promise.all([
+            pRooms,
             loadBookings(),
             loadPayments()
-        ]).catch(function () {
+        ]).then(function(res) {
+            var rooms = res[0];
+            var rawRooms = Array.isArray(rooms) ? rooms : (rooms.payload || rooms.data || []);
+            rawRooms.forEach(function(r) {
+                var id = r.roomId || r.roomID || r.id;
+                if (id) roomMap[id] = r.roomName || r.name;
+            });
+            renderBookingOptions();
+            if (paymentCache && paymentCache.length) renderPayments(paymentCache);
+        }).catch(function () {
             setMessage("Cannot initialize payment page.", "error");
         });
 

@@ -287,9 +287,14 @@
         };
 
         console.log('Review data:', payload);
-        // Tại đây bạn gọi API: global.ReviewApi.create(payload)...
-        alert('Review submitted! (API placeholder)');
-        closeReviewModal();
+        global.ReviewApi.createReview(payload).then(function() {
+            msg('Review submitted successfully!', 'success');
+            closeReviewModal();
+        }).catch(function(err) {
+            console.error('Review submit error:', err);
+            var errMessage = err?.payload?.message || err?.payload?.error || 'Submit review failed';
+            alert('Error: ' + errMessage);
+        });
     };
 
     // 3. THÊM SỰ KIỆN CLICK RA NGOÀI ĐỂ ĐÓNG MODAL (Trong DOMContentLoaded)

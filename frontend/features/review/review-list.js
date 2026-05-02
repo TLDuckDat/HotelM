@@ -26,7 +26,8 @@
 
             select.innerHTML = mine.map(function (b) {
                 var roomName = b.room ? (b.room.roomName || "Room") : "Room";
-                return "<option value='" + b.bookingID + "'>" + b.bookingID + " - " + roomName + "</option>";
+                var roomId = b.room ? (b.room.roomID || b.room.id) : "";
+                return "<option value='" + roomId + "'>" + b.bookingID + " - " + roomName + "</option>";
             }).join("");
         });
     }
@@ -42,10 +43,10 @@
 
         body.innerHTML = reviews.map(function (r) {
             return "<tr>"
-                + "<td>" + (r.reviewID || r.id || "") + "</td>"
-                + "<td>" + (r.bookingId || "") + "</td>"
+                + "<td>" + (r.reviewId || r.reviewID || r.id || "") + "</td>"
+                + "<td>" + (r.roomId || "") + "</td>"
                 + "<td>" + (r.rating || "") + "</td>"
-                + "<td>" + (r.content || r.comment || "") + "</td>"
+                + "<td>" + (r.comment || "") + "</td>"
                 + "</tr>";
         }).join("");
     }
@@ -75,11 +76,11 @@
         event.preventDefault();
 
         var user = global.AuthStore.getCurrentUser();
-        var bookingId = document.getElementById("review-booking-id").value;
+        var roomId = document.getElementById("review-booking-id").value;
         var rating = Number(document.getElementById("review-rating").value);
-        var content = document.getElementById("review-content").value.trim();
+        var comment = document.getElementById("review-content").value.trim();
 
-        if (!bookingId || !rating || rating < 1 || rating > 5 || !content) {
+        if (!roomId || !rating || rating < 1 || rating > 5 || !comment) {
             setMessage("Please complete review information.", "error");
             return;
         }
@@ -87,10 +88,10 @@
         setMessage("Submitting review...", "notice");
 
         global.ReviewApi.createReview({
-            bookingId: bookingId,
+            roomId: roomId,
             userId: user.userID,
             rating: rating,
-            content: content
+            comment: comment
         }).then(function () {
             setMessage("Review submitted.", "success");
             document.getElementById("review-form").reset();

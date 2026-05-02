@@ -2,6 +2,8 @@
     "use strict";
 
     var allPayments = [];
+    var userMap = {};
+    var roomMap = {};
 
     /* ── helpers ── */
     function flash(msg, type) {
@@ -42,16 +44,18 @@
             return;
         }
         body.innerHTML = list.map(function (p) {
-            var id      = p.invoiceId || p.paymentID || p.invoiceID || p.id || "—";
-            var guest   = p.user ? (p.user.fullName || p.user.email || p.user.userID) : (p.userId || "—");
-            var booking = p.bookingId || (p.booking && p.booking.bookingID) || p.booking_booking_id || "—";
+            var id      = p.invoiceId || p.paymentID || p.invoiceID || p.id || "";
+            var rawUserId = p.user ? (p.user.userID || p.user.userId || p.user.id) : p.userId;
+            var guest   = p.user && p.user.fullName ? p.user.fullName : (userMap[rawUserId] || (rawUserId ? rawUserId.substring(0,8) : "—"));
+            var rawBookingId = p.bookingId || (p.booking && p.booking.bookingID) || p.booking_booking_id || "";
+            var booking = roomMap[rawBookingId] || (rawBookingId ? "Booking #" + rawBookingId.substring(0,8) : "—");
             var paymentAmount = p.finalAmount != null ? p.finalAmount : p.amount;
             var amount  = paymentAmount != null ? formatMoney(paymentAmount) : "—";
             var status  = resolveStatus(p);
             var canAct  = status === "PENDING";
 
             return "<tr>"
-                + "<td><code style='font-size:.8rem;color:var(--text-muted)'>#" + id + "</code></td>"
+                + "<td><code style='font-size:.8rem;color:var(--text-muted)'>#" + (id ? id.substring(0,8).toUpperCase() : "—") + "</code></td>"
                 + "<td>" + guest + "</td>"
                 + "<td>" + booking + "</td>"
                 + "<td class='amount-col'>" + amount + "</td>"
@@ -156,8 +160,41 @@
 
     /* ── load ── */
     function loadPayments() {
-        window.PaymentApi.getPayments()
-            .then(function (data) {
+        var pUsers = window.UserApi ? window.UserApi.getUsers().catch(function(){return [];}) : Promise.resolve([]);
+        var pRooms = window.RoomApi ? window.RoomApi.getRooms().catch(function(){return [];}) : Promise.resolve([]);
+        var pBookings = window.BookingApi ? window.BookingApi.getBookings().catch(function(){return [];}) : Promise.resolve([]);
+        var pPayments = window.PaymentApi.getPayments();
+
+        Promise.all([pUsers, pRooms, pBookings, pPayments])
+            .then(function (res) {
+                var users = res[0] || [];
+                var rooms = res[1] || [];
+                var bookings = res[2] || [];
+                var data = res[3];
+                
+                var rawUsers = Array.isArray(users) ? users : (users.payload || users.data || []);
+                rawUsers.forEach(function (u) {
+                    var id = u.userID || u.id || "";
+                    if (id) userMap[id] = u.fullName || u.name;
+                });
+
+                var rMap = {};
+                var rawRooms = Array.isArray(rooms) ? rooms : (rooms.payload || rooms.data || []);
+                rawRooms.forEach(function (r) {
+                    var id = r.roomID || r.roomId || r.id || "";
+                    if (id) rMap[id] = r.roomName || r.name;
+                });
+
+                var rawBookings = Array.isArray(bookings) ? bookings : (bookings.payload || bookings.data || []);
+                rawBookings.forEach(function(b) {
+                    var id = b.bookingId || b.bookingID || b.id || "";
+                    var rId = b.roomId || (b.room && (b.room.roomId || b.room.roomID));
+                    if (id) {
+                        var rName = (rId && rMap[rId]) ? rMap[rId] : (b.roomName || (b.room && b.room.roomName));
+                        if (rName) roomMap[id] = rName;
+                    }
+                });
+
                 allPayments = data || [];
                 updateStats(allPayments);
                 renderPayments(allPayments);

@@ -183,11 +183,7 @@
             '        <span class="spec-label">Max Guests</span>',
             '        <span class="spec-value">' + (capacity || "—") + '</span>',
             '      </div>',
-            '      <div class="spec-item">',
-            '        <i class="fas fa-door-open spec-icon"></i>',
-            '        <span class="spec-label">Room ID</span>',
-            '        <span class="spec-value" style="font-size:.85rem;font-family:monospace">' + roomId + '</span>',
-            '      </div>',
+
             '      <div class="spec-item">',
             '        <i class="fas fa-circle-dot spec-icon"></i>',
             '        <span class="spec-label">Status</span>',

@@ -41,8 +41,7 @@
 
             var guestName = (booking.user && booking.user.fullName)
                 || userMap[booking.userId || booking.userID]
-                || booking.userId
-                || "N/A";
+                || (booking.userId ? booking.userId.substring(0,8) : "N/A");
 
             var rName = (booking.room && booking.room.roomName)
                 || roomMap[booking.roomId || booking.roomID]
@@ -52,7 +51,7 @@
             var status = (booking.status || "PENDING").toUpperCase();
 
             return "<tr>"
-                + "<td>" + bId + "</td>"
+                + "<td><code style='font-size:.85rem;color:#555'>#" + bId.substring(0,8).toUpperCase() + "</code></td>"
                 + "<td>" + guestName + "</td>"
                 + "<td>" + rName + "</td>"
                 + "<td>" + statusBadge(status) + "</td>"
