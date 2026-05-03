@@ -31,6 +31,22 @@ spring:
   cache:
     type: redis
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: dinhgiang19092k6@gmail.com
+    password: fxfu herh ydbq eiup
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+otp:
+  expiry-seconds: 300
+
 server:
   port: 8080
 
@@ -47,3 +63,5 @@ rate-limit:
     capacity: 100
     refill-tokens: 100
     refill-duration-seconds: 60
+
+
