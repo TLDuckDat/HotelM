@@ -101,6 +101,13 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(existing);
     }
 
+    @Override
+    public User updateUserRole(String id, User.Role role) {
+        User existing = getUserById(id);
+        existing.setRole(role);
+        return userRepository.save(existing);
+    }
+    
     private String normalizeEmail(String email) {
         return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
     }
