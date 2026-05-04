@@ -109,11 +109,20 @@
     function submitBooking(event) {
         event.preventDefault();
 
+        var submitBtn = event.target.querySelector('button[type="submit"]');
+        var originalBtnHtml = "";
+        if (submitBtn) {
+            originalBtnHtml = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        }
+
         var user = global.AuthStore.getCurrentUser();
         var userId = getUserId(user);
 
         if (!userId) {
             setMessage("You must be logged in to create a booking.", "error");
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHtml; }
             return;
         }
 
@@ -124,12 +133,14 @@
 
         if (!roomId) {
             setMessage("Please select a room.", "error");
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHtml; }
             return;
         }
 
         var dateError = validateDates(checkIn, checkOut);
         if (dateError) {
             setMessage(dateError, "error");
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHtml; }
             return;
         }
 
@@ -151,6 +162,10 @@
                 }, 1000);
             })
             .catch(function (err) {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
+                }
                 var errMsg = err?.payload?.message || err?.payload?.error || "Cannot create booking.";
                 setMessage(errMsg, "error");
             });

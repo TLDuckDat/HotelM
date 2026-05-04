@@ -38,6 +38,12 @@ public class BookingServiceImpl implements BookingService {
     public Booking createBooking(Booking booking) {
         booking.setBookingID(null);
 
+        if (booking.getRoom() != null && booking.getRoom().getRoomID() != null) {
+            if (hasOverlappingBooking(booking.getRoom().getRoomID(), booking.getCheckIn(), booking.getCheckOut())) {
+                throw new org.example.hotelm.common.exception.ConflictException("Phòng đã được đặt trong khoảng thời gian này!");
+            }
+        }
+
         // Tự động tính totalPrice = basePrice * số đêm
         if (booking.getRoom() != null && booking.getRoom().getRoomID() != null) {
             roomRepository.findById(booking.getRoom().getRoomID()).ifPresent(room -> {

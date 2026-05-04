@@ -1,6 +1,8 @@
 package org.example.hotelm.common.upload;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,22 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/uploads")
+@RequiredArgsConstructor
 public class RoomImageUploadController {
 
     private static final Set<String> ALLOWED_EXT = Set.of("jpg", "jpeg", "png", "webp", "gif");
 
-    @Value("${hotel.upload-dir:uploads}")
-    private String uploadDir;
+    private final Cloudinary cloudinary;
 
     @PostMapping(value = "/rooms", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UploadResponse> uploadRoomImage(@RequestParam("file") MultipartFile file) throws IOException {
@@ -50,18 +47,9 @@ public class RoomImageUploadController {
             return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build();
         }
 
-        Path dir = Paths.get(uploadDir, "rooms").toAbsolutePath().normalize();
-        Files.createDirectories(dir);
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "hotelm/rooms"));
+        String url = uploadResult.get("secure_url").toString();
 
-        String filename = UUID.randomUUID() + "." + ext;
-        Path target = dir.resolve(filename).normalize();
-
-        try (InputStream in = file.getInputStream()) {
-            Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
-        }
-
-        String url = "/uploads/rooms/" + filename;
-        return ResponseEntity.status(HttpStatus.CREATED).body(new UploadResponse(url, filename, file.getSize()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new UploadResponse(url, original, file.getSize()));
     }
 }
-

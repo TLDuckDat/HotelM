@@ -1,6 +1,8 @@
 package org.example.hotelm.room.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import org.example.hotelm.branch.entity.Branch;
 import org.example.hotelm.branch.repository.BranchRepository;
 import org.example.hotelm.common.exception.ResourceNotFoundException;
@@ -27,6 +29,7 @@ public class RoomServiceImpl implements RoomService {
     private final RoomTypeRepository roomTypeRepository;
     private final RoomMapper roomMapper;
     private final BranchRepository branchRepository;
+    private final Cloudinary cloudinary;
 
     @Override
     @Cacheable(cacheNames = "rooms", key = "'all'")
@@ -65,7 +68,13 @@ public class RoomServiceImpl implements RoomService {
     @CacheEvict(cacheNames = "rooms", allEntries = true)
     public RoomResponse updateRoom(String id, RoomUpdateRequest request) {
         Room existing = findRoomOrThrow(id);
+        String oldImageUrl = existing.getImageUrl();
+        
         roomMapper.applyUpdate(request, existing);
+
+        if (request.getImageUrl() != null && !request.getImageUrl().equals(oldImageUrl)) {
+            deleteImageFromCloudinary(oldImageUrl);
+        }
 
         // Cập nhật roomType nếu có thay đổi
         if (request.getRoomTypeId() != null) {
@@ -79,10 +88,9 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @CacheEvict(cacheNames = "rooms", allEntries = true)
     public void deleteRoom(String id) {
-        if (!roomRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Không tìm thấy phòng với ID: " + id);
-        }
+        Room room = findRoomOrThrow(id);
         roomRepository.deleteById(id);
+        deleteImageFromCloudinary(room.getImageUrl());
     }
 
     @Override
@@ -111,6 +119,27 @@ public class RoomServiceImpl implements RoomService {
     private RoomType findRoomTypeOrThrow(String id) {
         return roomTypeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy loại phòng với ID: " + id));
+    }
+
+    private void deleteImageFromCloudinary(String imageUrl) {
+        if (imageUrl != null && imageUrl.contains("res.cloudinary.com")) {
+            try {
+                int uploadIdx = imageUrl.indexOf("/upload/");
+                if (uploadIdx != -1) {
+                    String afterUpload = imageUrl.substring(uploadIdx + 8);
+                    int firstSlash = afterUpload.indexOf('/');
+                    String path = afterUpload;
+                    if (afterUpload.matches("^v\\d+/.*")) {
+                        path = afterUpload.substring(firstSlash + 1);
+                    }
+                    int lastDot = path.lastIndexOf('.');
+                    String publicId = lastDot != -1 ? path.substring(0, lastDot) : path;
+                    cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to delete image from Cloudinary: " + e.getMessage());
+            }
+        }
     }
     @Override
     public List<RoomResponse> getRoomsByBranch(String branchId) {
