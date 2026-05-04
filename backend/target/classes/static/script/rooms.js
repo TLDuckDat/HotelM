@@ -81,7 +81,7 @@
         if (typeSelect && typeSelect.options.length <= 1) {
             types.forEach(t => {
                 const opt = document.createElement('option');
-                opt.value = t.typeID || t.id;
+                opt.value = t.typeId || t.typeID || t.id;
                 opt.textContent = t.typeName || t.name;
                 typeSelect.appendChild(opt);
             });
@@ -133,17 +133,22 @@
     }
 
     function getRoomTypeName(room, types) {
+        // 1. Check if backend provided roomTypeName directly (RoomResponse DTO)
+        if (room.roomTypeName) return room.roomTypeName;
+
+        // 2. Check for nested roomType object
         if (room.roomType && (room.roomType.typeName || room.roomType.name)) {
             return room.roomType.typeName || room.roomType.name;
         }
 
+        // 3. Fallback to searching in types array
         var roomTypeId = room.roomTypeId || room.typeID || room.roomTypeID;
         if (!roomTypeId) {
             return "Unknown Type";
         }
 
         var matched = (types || []).find(function (t) {
-            var id = t.typeID || t.id;
+            var id = t.typeId || t.typeID || t.id;
             return id === roomTypeId;
         });
 

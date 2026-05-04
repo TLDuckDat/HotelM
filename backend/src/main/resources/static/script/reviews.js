@@ -41,10 +41,16 @@
 
             select.innerHTML = mine.map(function (b) {
                 var rid = b.roomId || b.roomID || "";
-                var roomName = roomMap[rid] || rid || "Room";
-                var checkIn = b.checkIn ? String(b.checkIn).replace('T', ' ').substring(0, 16) : "";
-                var display = roomName + (checkIn ? " (Check-in: " + checkIn + ")" : "");
-                return "<option value='" + rid + "'>" + display + "</option>";
+                var bid = b.bookingId || b.bookingID || "";
+                var roomName = roomMap[rid] || "Room " + rid.substring(0, 8);
+                var checkIn = b.checkIn ? new Date(b.checkIn).toLocaleDateString("vi-VN") : "";
+                
+                // Show "Room Name (#ShortID) - Date"
+                var display = roomName + " (#" + bid.substring(0, 8) + ")" + (checkIn ? " - " + checkIn : "");
+                
+                // Store both roomId and bookingId in the value, or just use bookingId and find roomId later
+                // For simplicity, we can store a JSON string or just use data attributes
+                return "<option value='" + rid + "' data-booking-id='" + bid + "'>" + display + "</option>";
             }).join("");
         });
     }
@@ -166,7 +172,13 @@
     function submitReview() {
         var user      = global.AuthStore.getCurrentUser();
         var currentUserId = String(user.userId || user.userID || user.id || "");
-        var roomId    = document.getElementById("review-booking-id").value;
+        var select    = document.getElementById("review-booking-id");
+        var roomId    = select.value;
+        var bookingId = "";
+        if (select.selectedIndex >= 0) {
+            bookingId = select.options[select.selectedIndex].getAttribute("data-booking-id") || "";
+        }
+        
         var rating    = getSelectedRating();
         // Use "comment" as the payload field name to match backend
         var comment   = document.getElementById("review-content").value.trim();
@@ -181,6 +193,7 @@
         global.ReviewApi.createReview({
             roomId:    roomId,
             userId:    currentUserId,
+            bookingId: bookingId,
             rating:    rating,
             comment:   comment
         }).then(function () {

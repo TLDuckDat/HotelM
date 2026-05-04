@@ -17,6 +17,8 @@ public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final RoomRepository roomRepository;
+    private final org.example.hotelm.user.repository.UserRepository userRepository;
+    private final org.example.hotelm.notification.service.NotificationService notificationService;
 
     @Override
     public List<Booking> getAllBookings() {
@@ -56,14 +58,43 @@ public class BookingServiceImpl implements BookingService {
             });
         }
 
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+
+        // Notify admins/receptionists
+        userRepository.findByRoleInAndStatus(
+                List.of(org.example.hotelm.user.entity.User.Role.ADMIN, org.example.hotelm.user.entity.User.Role.RECEPTIONIST),
+                org.example.hotelm.user.entity.User.UserStatus.ACTIVE
+        ).forEach(staff -> {
+            notificationService.createAndPush(
+                    staff.getUserID(),
+                    "New Booking",
+                    "A new booking has been created for room " + (saved.getRoom() != null ? saved.getRoom().getRoomName() : "N/A"),
+                    org.example.hotelm.notification.entity.Notification.NotificationType.BOOKING_NEW,
+                    saved.getBookingID()
+            );
+        });
+
+        return saved;
     }
 
     @Override
     public Booking updateBookingStatus(String bookingId, Booking.BookingStatus status) {
         Booking booking = getBookingById(bookingId);
         booking.setStatus(status);
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+
+        // Notify user about status update
+        if (saved.getUser() != null) {
+            notificationService.createAndPush(
+                    saved.getUser().getUserID(),
+                    "Booking Updated",
+                    "Your booking for room " + (saved.getRoom() != null ? saved.getRoom().getRoomName() : "N/A") + " is now " + status,
+                    org.example.hotelm.notification.entity.Notification.NotificationType.BOOKING_STATUS,
+                    saved.getBookingID()
+            );
+        }
+
+        return saved;
     }
 
     @Override

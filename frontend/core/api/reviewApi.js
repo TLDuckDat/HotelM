@@ -21,10 +21,20 @@
         return baseApi.del(REVIEW_ENDPOINT + "/" + encodeURIComponent(id), options);
     }
 
+    function getReviewsByRoom(roomId, options) {
+        return baseApi.get(REVIEW_ENDPOINT + "/room/" + encodeURIComponent(roomId), options);
+    }
+
+    function updateReviewStatus(id, status, options) {
+        return baseApi.patch(REVIEW_ENDPOINT + "/" + encodeURIComponent(id) + "/status?status=" + encodeURIComponent(status), {}, options);
+    }
+
     global.ReviewApi = {
         getReviews: getReviews,
+        getReviewsByRoom: getReviewsByRoom,
         createReview: createReview,
-        deleteReview: deleteReview
+        deleteReview: deleteReview,
+        updateReviewStatus: updateReviewStatus
     };
 })(window);
 

@@ -16,19 +16,20 @@
     }
 
     function getRoomTypeName(room, types) {
+        if (room.roomTypeName) return room.roomTypeName;
         if (room.roomType && (room.roomType.typeName || room.roomType.name)) {
             return room.roomType.typeName || room.roomType.name;
         }
         var typeId = room.roomTypeId || room.typeID || room.roomTypeID;
         if (!typeId || !types) return "Standard Room";
         var matched = types.find(function (t) {
-            return (t.typeID || t.id) === typeId;
+            return (t.typeId || t.typeID || t.id) === typeId;
         });
         return matched ? (matched.typeName || matched.name || "Standard Room") : "Standard Room";
     }
 
     function getRoomPrice(room) {
-        return room.pricePerNight || room.price || room.pricePerDay || null;
+        return room.basePrice || room.pricePerNight || room.price || room.pricePerDay || null;
     }
 
     function getStatusClass(status) {
@@ -150,12 +151,12 @@
         // Price
         var priceContainer = document.getElementById("el-price-container");
         if (price) {
-            priceContainer.innerHTML = 
+            priceContainer.innerHTML =
                 '<div class="price-label">Starting from</div>' +
                 '<div class="price-value">' + formatPrice(price) + '</div>' +
                 '<div class="price-unit">per night · taxes included</div>';
         } else {
-            priceContainer.innerHTML = 
+            priceContainer.innerHTML =
                 '<div class="price-label">Starting from</div>' +
                 '<div class="price-value" style="font-size:1.2rem;color:var(--text-muted)">Contact for pricing</div>' +
                 '<div class="price-unit">Call our reservations desk</div>';
@@ -165,12 +166,12 @@
         var btnContainer = document.getElementById("el-book-button-container");
         var isUnavailable = status && (status.toLowerCase() === "maintenance");
         if (isUnavailable) {
-            btnContainer.innerHTML = 
+            btnContainer.innerHTML =
                 '<button class="btn-book-main" disabled>' +
                 '<i class="fas fa-ban"></i> Not Available</button>' +
                 '<p class="booking-note"><i class="fas fa-info-circle" style="color:var(--text-muted)"></i> This room is currently under maintenance</p>';
         } else {
-            btnContainer.innerHTML = 
+            btnContainer.innerHTML =
                 '<button class="btn-book-main" id="btn-book-now" onclick="RoomDetailPage.bookNow()">' +
                 '<i class="fas fa-calendar-plus"></i> Book This Room</button>' +
                 '<p class="booking-note"><i class="fas fa-shield-halved"></i> Free cancellation · No hidden fees</p>';

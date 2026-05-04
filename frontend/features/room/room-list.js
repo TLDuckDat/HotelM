@@ -33,17 +33,22 @@
     }
 
     function getRoomTypeName(room, types) {
+        // 1. Check if backend provided roomTypeName directly (RoomResponse DTO)
+        if (room.roomTypeName) return room.roomTypeName;
+
+        // 2. Check for nested roomType object
         if (room.roomType && (room.roomType.typeName || room.roomType.name)) {
             return room.roomType.typeName || room.roomType.name;
         }
 
+        // 3. Fallback to searching in types array
         var roomTypeId = room.roomTypeId || room.typeID || room.roomTypeID;
         if (!roomTypeId) {
             return "Unknown Type";
         }
 
         var matched = (types || []).find(function (t) {
-            var id = t.typeID || t.id;
+            var id = t.typeId || t.typeID || t.id;
             return id === roomTypeId;
         });
 

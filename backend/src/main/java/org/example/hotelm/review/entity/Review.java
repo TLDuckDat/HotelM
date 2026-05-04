@@ -27,5 +27,7 @@ public class Review {
 
     private int rating;
     private String comment;
+    private String bookingId;
+    private String status = "PUBLISHED";
     private LocalDateTime createdAt;
 }

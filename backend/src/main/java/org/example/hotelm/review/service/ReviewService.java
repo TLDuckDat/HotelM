@@ -11,5 +11,6 @@ public interface ReviewService {
     List<ReviewResponse> getReviewsByRoomId(String roomId);
     List<ReviewResponse> getReviewsByUserId(String userId);
     ReviewResponse createReview(ReviewCreateRequest request);
+    void updateReviewStatus(String id, String status);
     void deleteReview(String id);
 }

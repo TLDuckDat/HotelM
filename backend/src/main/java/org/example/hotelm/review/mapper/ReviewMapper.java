@@ -11,9 +11,14 @@ public class ReviewMapper {
         return new ReviewResponse(
                 review.getReviewID(),
                 review.getUser() == null ? null : review.getUser().getUserID(),
+                review.getUser() == null ? "Guest" : review.getUser().getFullName(),
+                review.getUser() == null ? null : review.getUser().getEmail(),
                 review.getRoom() == null ? null : review.getRoom().getRoomID(),
+                review.getRoom() == null ? "Unknown Room" : review.getRoom().getRoomName(),
+                review.getBookingId(),
                 review.getRating(),
                 review.getComment(),
+                review.getStatus(),
                 review.getCreatedAt()
         );
     }

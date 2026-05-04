@@ -96,22 +96,22 @@
         var rating    = room.rating || room.averageRating || null;
         var reviewCnt = room.reviewCount || 0;
 
-        // Price: room.price → roomType.price → types array lookup
-        var price = room.price || 0;
-        if (!price && room.roomType) price = room.roomType.price || 0;
+        // Price: room.basePrice → roomType.price → types array lookup
+        var price = room.basePrice || 0;
+        if (!price && room.roomType) price = room.roomType.basePrice || room.roomType.price || 0;
         if (!price && types && types.length) {
             var tid = room.roomTypeId || room.typeID || room.roomTypeID;
-            var matched = types.find(function (t) { return (t.typeID || t.id) === tid; });
-            if (matched) price = matched.price || 0;
+            var matched = types.find(function (t) { return (t.typeId || t.typeID || t.id) === tid; });
+            if (matched) price = matched.basePrice || matched.price || 0;
         }
 
         // Type name
-        var typeName = "Standard";
+        var typeName = room.roomTypeName || "Standard";
         if (room.roomType && (room.roomType.typeName || room.roomType.name)) {
             typeName = room.roomType.typeName || room.roomType.name;
         } else if (types && types.length) {
             var tid2 = room.roomTypeId || room.typeID || room.roomTypeID;
-            var m2 = types.find(function (t) { return (t.typeID || t.id) === tid2; });
+            var m2 = types.find(function (t) { return (t.typeId || t.typeID || t.id) === tid2; });
             if (m2) typeName = m2.typeName || m2.name || typeName;
         }
 
@@ -273,9 +273,64 @@
             '</div>',
             '</div><!-- /.detail-right -->',
 
-            '</div><!-- /.detail-body -->'
+            '</div><!-- /.detail-body -->',
+            
+            // ── REVIEWS SECTION ──
+            '<div class="reviews-section fade-in" id="reviews-container">',
+            '  <div class="reviews-header">',
+            '    <h3><i class="fas fa-star"></i> Guest Reviews</h3>',
+            '  </div>',
+            '  <div id="reviews-list" class="reviews-list">',
+            '    <div class="loading-reviews">Loading reviews...</div>',
+            '  </div>',
+            '</div>'
+
 
         ].join("\n");
+    }
+
+    function renderReviews(reviews) {
+        var list = document.getElementById("reviews-list");
+        if (!list) return;
+
+        if (!reviews || reviews.length === 0) {
+            list.innerHTML = '<div class="no-reviews">No reviews for this room yet. Be the first to stay and review!</div>';
+            return;
+        }
+
+        list.innerHTML = reviews.map(function (r) {
+            if (r.status === "HIDDEN") return "";
+            var date = new Date(r.createdAt).toLocaleDateString("vi-VN");
+            var name = r.userName || "Guest";
+            return [
+                '<div class="review-item">',
+                '  <div class="review-header">',
+                '    <div class="review-user">',
+                '      <div class="user-avatar-sm">' + name[0].toUpperCase() + '</div>',
+                '      <div>',
+                '        <div class="user-name">' + name + '</div>',
+                '        <div class="review-date">' + date + '</div>',
+                '      </div>',
+                '    </div>',
+                '    <div class="review-rating">' + renderStars(r.rating) + '</div>',
+                '  </div>',
+                '  <div class="review-comment">',
+                (r.comment ? '"' + r.comment + '"' : '<em>No comment provided.</em>'),
+                '  </div>',
+                '</div>'
+            ].join("");
+        }).join("");
+    }
+
+    function loadReviews(roomId) {
+        if (!global.ReviewApi || !global.ReviewApi.getReviewsByRoom) return;
+        global.ReviewApi.getReviewsByRoom(roomId).then(function (reviews) {
+            renderReviews(reviews);
+        }).catch(function (err) {
+            console.error("Failed to load reviews:", err);
+            var list = document.getElementById("reviews-list");
+            if (list) list.innerHTML = '<div class="error-reviews">Unable to load reviews.</div>';
+        });
     }
 
     // ─────────────────────────────────────────────
@@ -341,6 +396,7 @@
 
                 if (room) {
                     document.title = (room.roomName || room.name || "Room") + " – SOT Resort";
+                    loadReviews(roomId);
                 }
 
                 renderDetail(room, types);
