@@ -5,6 +5,7 @@
 target/
 **/target/
 
+*.env
 # Logs
 *.log
 

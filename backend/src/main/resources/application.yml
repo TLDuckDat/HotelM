@@ -2,15 +2,18 @@ spring:
   application:
     name: HotelM
 
+  config:
+    import: optional:file:.env[.properties]
+
   servlet:
     multipart:
       max-file-size: 5MB
       max-request-size: 6MB
 
   datasource:
-    url: jdbc:mysql://localhost:3306/HOTELM_DB?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true
-    username: root
-    password: root
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -34,8 +37,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: dinhgiang19092k6@gmail.com
-    password: fxfu herh ydbq eiup
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -54,7 +57,7 @@ hotel:
   upload-dir: uploads
 
 jwt:
-  secret: your-256-bit-secret-key-change-this-in-production-minimum-32-chars
+  secret: ${JWT_SECRET}
   expiration: 86400000
 
 rate-limit:
