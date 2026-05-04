@@ -2,10 +2,7 @@ package org.example.hotelm.user.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.hotelm.user.dto.UserCreateRequest;
-import org.example.hotelm.user.dto.UserResponse;
-import org.example.hotelm.user.dto.UserStatusUpdateRequest;
-import org.example.hotelm.user.dto.UserUpdateRequest;
+import org.example.hotelm.user.dto.*;
 import org.example.hotelm.user.entity.User;
 import org.example.hotelm.user.mapper.UserMapper;
 import org.example.hotelm.user.service.UserService;
@@ -64,6 +61,14 @@ public class UserController {
     public ResponseEntity<UserResponse> updateStatus(@PathVariable String id,
                                                      @Valid @RequestBody UserStatusUpdateRequest request) {
         User updated = userService.updateUserStatus(id, request.status());
+        return ResponseEntity.ok(userMapper.toResponse(updated));
+    }
+
+    @PatchMapping("/{id}/role")
+    public ResponseEntity<UserResponse> updateRole(
+            @PathVariable String id,
+            @Valid @RequestBody UserRoleUpdateRequest request) {
+        User updated = userService.updateUserRole(id, request.role());
         return ResponseEntity.ok(userMapper.toResponse(updated));
     }
 }

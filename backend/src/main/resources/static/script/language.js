@@ -75,8 +75,8 @@ const TRANSLATIONS = {
         footer_newsletter: 'Subscribe to our e-newsletter:',
         footer_email_ph: 'Your email address',
         footer_subscribe: 'SUBSCRIBE',
-        footer_address: '147 Mai Dich, Cau Giay, Ha Noi',
-        footer_phone: '0242 242 0777 | info@webhotel.vn',
+        footer_address: '448 Le Van Viet, Tang Nhon Phu A, TP Ho Chi Minh',
+        footer_phone: '0336374498 | dinhgiang19092k6gmail.com',
         footer_copyright: '© 2026 SOT. All rights reserved',
 
         // ── About ─────────────────────────────────────────────
@@ -594,8 +594,8 @@ const TRANSLATIONS = {
         footer_newsletter: 'Đăng ký nhận bản tin của chúng tôi:',
         footer_email_ph: 'Địa chỉ email của bạn',
         footer_subscribe: 'ĐĂNG KÝ',
-        footer_address: '147 Mai Dịch, Cầu Giấy, Hà Nội',
-        footer_phone: '0242 242 0777 | info@webhotel.vn',
+        footer_address: '448 Lê Văn Việt, Tăng Nhơn Phú A, TP Hồ Chí Minh',
+        footer_phone: '0336374498 | dinhgiang19092k6@gmail.com',
         footer_copyright: '© 2026 SOT. Bản quyền thuộc về SOT',
 
         // ── About ─────────────────────────────────────────────

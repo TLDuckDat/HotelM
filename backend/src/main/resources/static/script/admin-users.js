@@ -9,10 +9,12 @@
         box.className = "flash-message " + (type || "notice");
         box.textContent = text;
         box.style.display = "block";
+        setTimeout(function () { box.style.display = "none"; }, 3000);
     }
 
     function roleBadge(role) {
-        var cls = (role || "").toUpperCase() === "ADMIN" ? "badge-admin" : "badge-user";
+        var r = (role || "").toUpperCase();
+        var cls = r === "ADMIN" ? "badge-admin" : "badge-user";
         return "<span class='badge " + cls + "'>" + (role || "—") + "</span>";
     }
 
@@ -23,22 +25,55 @@
         if (!body) return;
 
         if (!users || users.length === 0) {
-            body.innerHTML = "<tr><td colspan='5' class='table-empty'>No users found</td></tr>";
+            body.innerHTML = "<tr><td colspan='6' class='table-empty'>No users found</td></tr>";
             return;
         }
 
         body.innerHTML = users.map(function (user) {
-            var id = user.userID || user.id || "";
+            var id = user.userId || user.userID || user.id || "";
+            var currentRole = (user.role || "USER").toUpperCase();
+
+            // Tạo dropdown đổi role
+            var roleOptions = ["USER", "ADMIN"].map(function (r) {
+                return "<option value='" + r + "'" + (currentRole === r ? " selected" : "") + ">" + r + "</option>";
+            }).join("");
+
             return "<tr>"
-                + "<td>" + id + "</td>"
+                + "<td style='max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap' title='" + id + "'>"
+                + id.substring(0, 8) + "…</td>"
                 + "<td>" + (user.fullName || "") + "</td>"
                 + "<td>" + (user.email || "") + "</td>"
                 + "<td>" + roleBadge(user.role) + "</td>"
-                + "<td><button class='btn-delete' data-i18n='admin_users_btn_delete' data-delete-user='" + id + "'>"
-                + "<i class='fas fa-trash-alt'></i> <span data-i18n='admin_users_btn_delete'>Delete</span></button></td>"
+                + "<td>"
+                +   "<div style='display:flex; gap:8px; align-items:center; flex-wrap:wrap'>"
+                +     "<select class='form-input role-select' data-user-id='" + id + "' style='width:140px; padding:6px 10px; font-size:0.82rem'>"
+                +       roleOptions
+                +     "</select>"
+                +     "<button class='btn-primary btn-role-save' data-user-id='" + id + "' data-user-name='" + (user.fullName || "") + "' style='padding:6px 12px; font-size:0.82rem'>"
+                +       "<i class='fas fa-check'></i> Save"
+                +     "</button>"
+                + "  </div>"
+                + "</td>"
+                + "<td>"
+                +   "<button class='btn-delete' data-delete-user='" + id + "' style='padding:6px 12px; font-size:0.82rem'>"
+                +     "<i class='fas fa-trash-alt'></i> Delete"
+                +   "</button>"
+                + "</td>"
                 + "</tr>";
         }).join("");
 
+        // Gắn event cho nút Save role
+        body.querySelectorAll(".btn-role-save").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                var userId   = btn.getAttribute("data-user-id");
+                var userName = btn.getAttribute("data-user-name");
+                var select   = body.querySelector(".role-select[data-user-id='" + userId + "']");
+                var newRole  = select ? select.value : null;
+                if (newRole) updateRole(userId, newRole, userName);
+            });
+        });
+
+        // Gắn event cho nút Delete
         body.querySelectorAll("button[data-delete-user]").forEach(function (btn) {
             btn.addEventListener("click", function () {
                 deleteUser(btn.getAttribute("data-delete-user"));
@@ -49,6 +84,9 @@
     // ── API calls ──
 
     function loadUsers() {
+        var body = document.getElementById("admin-users-body");
+        if (body) body.innerHTML = "<tr><td colspan='6' class='table-empty'><i class='fas fa-spinner fa-spin'></i> Loading…</td></tr>";
+
         global.UserApi.getUsers().then(function (users) {
             renderUsers(users);
         }).catch(function (error) {
@@ -58,16 +96,34 @@
         });
     }
 
+    function updateRole(userId, newRole, userName) {
+        if (!userId || !newRole) return;
+
+        // Gọi PATCH /users/{id}/role
+        global.HotelMApiBase.patch(
+            "/users/" + encodeURIComponent(userId) + "/role",
+            { role: newRole }
+        ).then(function () {
+            setMessage("✅ Updated " + (userName || userId) + " → " + newRole, "success");
+            loadUsers(); // Reload để cập nhật badge
+        }).catch(function (error) {
+            var msg = error && error.payload && error.payload.message
+                ? error.payload.message : "Update role failed";
+            setMessage("❌ " + msg, "error");
+        });
+    }
+
     function deleteUser(userId) {
         if (!userId) return;
+        if (!confirm("Are you sure you want to delete this user?")) return;
 
         global.UserApi.deleteUser(userId).then(function () {
-            setMessage("User deleted", "success");
+            setMessage("✅ User deleted", "success");
             loadUsers();
         }).catch(function (error) {
             var msg = error && error.payload && error.payload.message
                 ? error.payload.message : "Delete user failed";
-            setMessage(msg, "error");
+            setMessage("❌ " + msg, "error");
         });
     }
 
@@ -106,10 +162,10 @@
 
         var user = global.AuthStore.getCurrentUser();
         if (user) {
-            var topbarEl = document.getElementById("topbar-username");
+            var topbarEl  = document.getElementById("topbar-username");
             var sideNameEl = document.getElementById("sidebar-username");
             var sideRoleEl = document.getElementById("sidebar-role");
-            if (topbarEl) topbarEl.textContent = user.fullName || "Admin";
+            if (topbarEl)   topbarEl.textContent  = user.fullName || "Admin";
             if (sideNameEl) sideNameEl.textContent = user.fullName || "Admin";
             if (sideRoleEl) sideRoleEl.textContent = user.role || "ADMIN";
         }
@@ -118,8 +174,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", init);
-
-    // ── Public API ──
 
     global.AdminUsers = {
         handleLogout: function () {

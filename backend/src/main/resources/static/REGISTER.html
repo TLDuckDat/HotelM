@@ -6,21 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Đăng ký tài khoản</title>
     <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap"
-        rel="stylesheet" />
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap"
+            rel="stylesheet" />
     <link rel="stylesheet" href="/assets/register.css">
 </head>
 
 <body>
-    <div class="card">
-        <div class="logo">
-            <div class="logo-icon">✦</div>
-            <h1>Rosalia</h1>
-            <p>Tạo tài khoản mới</p>
-        </div>
+<div class="card">
+    <div class="logo">
+        <div class="logo-icon">✦</div>
+        <h1>Rosalia</h1>
+        <p>Tạo tài khoản mới</p>
+    </div>
 
-        <div class="divider"></div>
+    <div class="divider"></div>
 
+
+    <div id="step-info">
         <div class="form-group">
             <label for="fullName">Họ và tên</label>
             <input type="text" id="fullName" placeholder="Nguyễn Văn A" />
@@ -48,21 +50,47 @@
         <input type="hidden" id="role" value="USER" />
 
         <button class="btn" id="submitBtn" onclick="submitForm()">
-            <span class="btn-text">Đăng ký</span>
+            <span class="btn-text">Gửi mã OTP</span>
+            <div class="spinner"></div>
+        </button>
+    </div>
+
+
+    <div id="step-otp" style="display:none">
+        <p style="text-align:center; margin-bottom:16px; color:#888; font-size:0.9rem">
+            Mã OTP đã gửi đến <strong id="otp-email-display"></strong>
+        </p>
+
+        <div class="form-group">
+            <label for="otpInput">Mã OTP (6 chữ số)</label>
+            <input type="text" id="otpInput" placeholder="123456" maxlength="6"
+                   style="letter-spacing:8px; font-size:1.4rem; text-align:center" />
+            <div class="field-error" id="err-otp">OTP không hợp lệ hoặc đã hết hạn</div>
+        </div>
+
+        <button class="btn" id="btnVerify" onclick="verifyOtp()">
+            <span class="btn-text">Xác nhận & Đăng ký</span>
             <div class="spinner"></div>
         </button>
 
-        <div class="toast" id="toast"></div>
-
-        <p class="login-link">Da co tai khoan? <a href="/login.html">Dang nhap</a></p>
+        <p style="text-align:center; margin-top:12px; font-size:0.85rem">
+            Không nhận được?
+            <a href="#" onclick="resendOtp(event)" id="resend-link" style="display:none">Gửi lại</a>
+            <span id="resend-countdown"></span>
+        </p>
     </div>
 
-    <script src="/script/api/baseApi.js"></script>
-    <script src="/script/api/userApi.js"></script>
-    <script src="/script/api/roomApi.js"></script>
-    <script src="/script/api/bookingApi.js"></script>
-    <script src="/script/api/roomTypeApi.js"></script>
-    <script src="/script/register.js"></script>
+    <div class="toast" id="toast"></div>
+
+    <p class="login-link">Đã có tài khoản? <a href="/login.html">Đăng nhập</a></p>
+</div>
+
+<script src="/script/api/baseApi.js"></script>
+<script src="/script/api/userApi.js"></script>
+<script src="/script/api/roomApi.js"></script>
+<script src="/script/api/bookingApi.js"></script>
+<script src="/script/api/roomTypeApi.js"></script>
+<script src="/script/register.js"></script>
 </body>
 
 </html>
