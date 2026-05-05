@@ -36,4 +36,6 @@ public interface ChatService {
      * để guest lựa chọn người muốn liên hệ.
      */
     List<User> getAvailableStaff();
+    void markAsRead(String threadId, String userId);
+
 }

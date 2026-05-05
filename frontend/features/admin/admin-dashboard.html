@@ -113,11 +113,19 @@
 
     <div class="card" style="margin-top:16px;">
         <h3>Other admin modules</h3>
-        <p>Review, refund and contact management are prepared on frontend with API adapters. If endpoint is missing, UI will show a clear not-available message.</p>
+        <p>Review, refund and contact management are prepared on frontend with API adapters.</p>
+        <div class="page-links">
+            <a href="statistics.html">View Advanced Statistics & KPI Dashboard</a>
+        </div>
     </div>
+
+
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script src="/script/api/baseApi.js"></script>
+<script src="/core/api/notificationApi.js"></script>
 <script src="/script/api/userApi.js"></script>
 <script src="/script/api/roomApi.js"></script>
 <script src="/script/api/roomTypeApi.js"></script>
@@ -127,6 +135,7 @@
 <script src="/script/guard.js"></script>
 <script src="/script/app-shell.js"></script>
 <script src="/script/admin-dashboard.js"></script>
+
 </body>
 </html>
 

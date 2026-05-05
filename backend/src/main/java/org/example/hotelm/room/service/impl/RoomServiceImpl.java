@@ -30,9 +30,12 @@ public class RoomServiceImpl implements RoomService {
     private final RoomMapper roomMapper;
     private final BranchRepository branchRepository;
     private final Cloudinary cloudinary;
+    private final org.example.hotelm.booking.repository.BookingRepository bookingRepository;
+    private final org.example.hotelm.notification.service.NotificationService notificationService;
 
     @Override
     @Cacheable(cacheNames = "rooms", key = "'all'")
+
     public List<RoomResponse> getAllRooms() {
         return roomRepository.findAll()
                 .stream()
@@ -105,9 +108,35 @@ public class RoomServiceImpl implements RoomService {
     @CacheEvict(cacheNames = "rooms", allEntries = true)
     public RoomResponse updateRoomStatus(String id, Room.RoomStatus status) {
         Room room = findRoomOrThrow(id);
+        Room.RoomStatus oldStatus = room.getStatus();
         room.setStatus(status);
-        return roomMapper.toRoomResponse(roomRepository.save(room));
+        Room saved = roomRepository.save(room);
+
+        if (status == Room.RoomStatus.MAINTENANCE && oldStatus != Room.RoomStatus.MAINTENANCE) {
+            // Find active bookings for this room and notify users
+            List<org.example.hotelm.booking.entity.Booking> activeBookings = bookingRepository.findByRoom_RoomIDAndStatusIn(
+                    id, 
+                    List.of(org.example.hotelm.booking.entity.Booking.BookingStatus.PENDING, 
+                            org.example.hotelm.booking.entity.Booking.BookingStatus.CONFIRMED, 
+                            org.example.hotelm.booking.entity.Booking.BookingStatus.CHECKED_IN)
+            );
+
+            activeBookings.forEach(booking -> {
+                if (booking.getUser() != null) {
+                    notificationService.createAndPush(
+                            booking.getUser().getUserID(),
+                            "Room Maintenance Alert",
+                            "The room " + room.getRoomName() + " for your booking " + booking.getBookingID() + " is currently under maintenance. Please contact support.",
+                            org.example.hotelm.notification.entity.Notification.NotificationType.SYSTEM,
+                            booking.getBookingID()
+                    );
+                }
+            });
+        }
+
+        return roomMapper.toRoomResponse(saved);
     }
+
 
     // Helpers
 

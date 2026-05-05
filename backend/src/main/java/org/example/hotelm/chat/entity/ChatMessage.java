@@ -33,4 +33,6 @@ public class ChatMessage {
     private String content;
 
     private Instant sentAt;
+    private boolean isRead = false;
+
 }

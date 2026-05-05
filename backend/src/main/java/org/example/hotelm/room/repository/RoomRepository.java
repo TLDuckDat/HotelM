@@ -13,4 +13,5 @@ public interface RoomRepository extends JpaRepository<Room, String> {
     List<Room> findByBranch_BranchId(String branchId);
     List<Room> findByBranch_BranchIdAndStatus(String branchId, Room.RoomStatus status);
 
-}
+    long countByBranch_BranchId(String branchId);
+}

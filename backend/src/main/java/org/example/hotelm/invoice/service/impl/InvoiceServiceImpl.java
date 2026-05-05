@@ -26,8 +26,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final BookingRepository bookingRepository;
     private final InvoiceMapper invoiceMapper;
     private final RoomRepository roomRepository;
+    private final org.example.hotelm.notification.service.NotificationService notificationService;
 
     @Override
+
     public List<InvoiceResponse> getAllInvoices() {
         return invoiceRepository.findAll()
                 .stream()
@@ -79,6 +81,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceResponse updateInvoiceStatus(String id, Invoice.PaymentStatus status) {
         Invoice invoice = findOrThrow(id);
+        Invoice.PaymentStatus oldStatus = invoice.getStatus();
         invoice.setStatus(status);
 
         if (status == Invoice.PaymentStatus.COMPLETED) {
@@ -97,17 +100,47 @@ public class InvoiceServiceImpl implements InvoiceService {
                     }
                 }
                 bookingRepository.save(booking);
+
+                // Notify Admin about completed payment
+                notificationService.notifyAdmins(
+                        "Payment Completed",
+                        "Payment for booking " + booking.getBookingID() + " has been completed.",
+                        org.example.hotelm.notification.entity.Notification.NotificationType.SYSTEM,
+                        booking.getBookingID()
+                );
+
+                // Notify User
+                if (booking.getUser() != null) {
+                    notificationService.createAndPush(
+                            booking.getUser().getUserID(),
+                            "Payment Successful",
+                            "Your payment for booking " + booking.getBookingID() + " was successful. Your stay is confirmed!",
+                            org.example.hotelm.notification.entity.Notification.NotificationType.SYSTEM,
+                            booking.getBookingID()
+                    );
+                }
             }
         } else if (status == Invoice.PaymentStatus.REJECTED) {
-
             invoice.setPaidAt(null);
             Booking booking = invoice.getBooking();
-            if (booking != null && booking.getRoom() != null) {
-                Room room = roomRepository.findById(booking.getRoom().getRoomID())
-                        .orElse(null);
-                if (room != null && room.getStatus() == Room.RoomStatus.BOOKED) {
-                    room.setStatus(Room.RoomStatus.AVAILABLE);
-                    roomRepository.save(room);
+            if (booking != null) {
+                if (booking.getRoom() != null) {
+                    Room room = roomRepository.findById(booking.getRoom().getRoomID())
+                            .orElse(null);
+                    if (room != null && room.getStatus() == Room.RoomStatus.BOOKED) {
+                        room.setStatus(Room.RoomStatus.AVAILABLE);
+                        roomRepository.save(room);
+                    }
+                }
+                // Notify User about rejection
+                if (booking.getUser() != null) {
+                    notificationService.createAndPush(
+                            booking.getUser().getUserID(),
+                            "Payment Rejected",
+                            "Your payment for booking " + booking.getBookingID() + " was rejected. Please contact support.",
+                            org.example.hotelm.notification.entity.Notification.NotificationType.SYSTEM,
+                            booking.getBookingID()
+                    );
                 }
             }
         } else {
@@ -116,6 +149,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         return invoiceMapper.toResponse(invoiceRepository.save(invoice));
     }
+
 
     @Override
     public void deleteInvoice(String id) {

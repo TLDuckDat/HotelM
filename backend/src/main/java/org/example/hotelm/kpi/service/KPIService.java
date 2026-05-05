@@ -1,5 +1,6 @@
 package org.example.hotelm.kpi.service;
 
+import org.example.hotelm.kpi.dto.GlobalKPIResponse;
 import org.example.hotelm.kpi.dto.KPIResponse;
 import org.example.hotelm.kpi.dto.KPITargetRequest;
 
@@ -16,4 +17,6 @@ public interface KPIService {
     KPIResponse setRevenueTarget(KPITargetRequest request);
 
     KPIResponse recalculateKPI(String branchId, int year, int month);
-}
+
+    GlobalKPIResponse getGlobalSummary(int year, int month);
+}

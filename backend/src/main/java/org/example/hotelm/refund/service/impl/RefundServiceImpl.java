@@ -32,6 +32,7 @@ public class RefundServiceImpl implements RefundService {
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final RefundMapper refundMapper;
+    private final org.example.hotelm.notification.service.NotificationService notificationService;
 
     @Override
     public List<RefundResponse> getAllRefunds() {
@@ -74,7 +75,17 @@ public class RefundServiceImpl implements RefundService {
         refund.setCreatedAt(LocalDateTime.now());
         refund.setReviewedAt(null);
 
-        return refundMapper.toResponse(refundRepository.save(refund));
+        RefundRequest saved = refundRepository.save(refund);
+
+        // Notify Admins about new refund request
+        notificationService.notifyAdmins(
+                "New Refund Request",
+                "A new refund has been requested for booking " + booking.getBookingID(),
+                org.example.hotelm.notification.entity.Notification.NotificationType.REFUND_REQUEST,
+                saved.getRefundId()
+        );
+
+        return refundMapper.toResponse(saved);
     }
 
     @Override
@@ -102,8 +113,27 @@ public class RefundServiceImpl implements RefundService {
             }
         }
 
-        return refundMapper.toResponse(refundRepository.save(refund));
+        RefundRequest saved = refundRepository.save(refund);
+
+        // Notify User about refund status
+        if (saved.getUser() != null) {
+            String title = status == RefundRequest.RefundStatus.APPROVED ? "Refund Approved" : "Refund Rejected";
+            String msg = status == RefundRequest.RefundStatus.APPROVED 
+                    ? "Your refund request for booking " + (saved.getBooking() != null ? saved.getBooking().getBookingID() : "") + " has been approved."
+                    : "Your refund request for booking " + (saved.getBooking() != null ? saved.getBooking().getBookingID() : "") + " was rejected.";
+            
+            notificationService.createAndPush(
+                    saved.getUser().getUserID(),
+                    title,
+                    msg,
+                    org.example.hotelm.notification.entity.Notification.NotificationType.REFUND_STATUS,
+                    saved.getRefundId()
+            );
+        }
+
+        return refundMapper.toResponse(saved);
     }
+
 
     @Override
     @Transactional

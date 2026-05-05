@@ -39,19 +39,18 @@ public class ChatRestController {
     @PostMapping("/threads")
     public ResponseEntity<ChatThreadResponse> createThread(@Valid @RequestBody CreateThreadRequest request) {
         var thread = chatService.createThread(request);
-        ChatThreadResponse data = chatMapper.toThreadResponse(thread);
-        // Không có cách đơn giản để biết "mới tạo" hay "đã có" từ ngoài service,
-        // nên dùng 200 cho cả hai trường hợp để đơn giản.
+        ChatThreadResponse data = chatMapper.toThreadResponse(thread, request.guestUserId());
         return ResponseEntity.ok(data);
     }
+
 
     /**
      * GET /chat/threads/{threadId}
      * Lấy chi tiết một thread (kèm toàn bộ tin nhắn).
      */
     @GetMapping("/threads/{threadId}")
-    public ResponseEntity<ChatThreadResponse> getThread(@PathVariable String threadId) {
-        return ResponseEntity.ok(chatMapper.toThreadResponse(chatService.getThreadById(threadId)));
+    public ResponseEntity<ChatThreadResponse> getThread(@PathVariable String threadId, @RequestParam String viewerId) {
+        return ResponseEntity.ok(chatMapper.toThreadResponse(chatService.getThreadById(threadId), viewerId));
     }
 
     /**
@@ -61,10 +60,21 @@ public class ChatRestController {
     @GetMapping("/users/{userId}/threads")
     public ResponseEntity<List<ChatThreadResponse>> getThreadsByUser(@PathVariable String userId) {
         List<ChatThreadResponse> data = chatService.getThreadsByUserId(userId).stream()
-                .map(chatMapper::toThreadResponse)
+                .map(t -> chatMapper.toThreadResponse(t, userId))
                 .toList();
         return ResponseEntity.ok(data);
     }
+
+    /**
+     * PATCH /chat/threads/{threadId}/read
+     * Đánh dấu tất cả tin nhắn trong thread là đã đọc đối với viewer.
+     */
+    @PatchMapping("/threads/{threadId}/read")
+    public ResponseEntity<Void> markAsRead(@PathVariable String threadId, @RequestParam String userId) {
+        chatService.markAsRead(threadId, userId);
+        return ResponseEntity.ok().build();
+    }
+
     /**
      * POST /chat/messages
      * Gửi tin nhắn qua REST (dùng khi WebSocket không khả dụng).
@@ -74,4 +84,5 @@ public class ChatRestController {
         ChatMessageResponse data = chatMapper.toMessageResponse(chatService.sendMessage(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(data);
     }
+
 }

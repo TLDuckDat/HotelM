@@ -23,32 +23,39 @@
     --radius: 14px;
 }
 
-/* CHAT LAYOUT */
+/* CHAT LAYOUT - fixed height so messages area can scroll */
 .layout {
     padding-top: var(--topbar-h);
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     background: var(--light);
+    overflow: hidden;
 }
+
 
 .main {
     margin-left: var(--sidebar-w);
     flex: 1;
+    min-height: 0;
     padding: 0;
-    min-height: calc(100vh - var(--topbar-h));
+    height: calc(100vh - var(--topbar-h));
     background: var(--light);
     display: flex;
+    overflow: hidden;
 }
+
 
 /* CHAT LAYOUT */
 .chat-layout {
     display: flex;
     flex: 1;
+    min-height: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
     min-width: 0;
 }
+
 
 /* ── CONVERSATION LIST (left pane) ── */
 .conv-pane {
@@ -235,12 +242,15 @@
 /* ── CHAT VIEW (right pane) ── */
 .chat-pane {
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     background: var(--light);
     overflow: hidden;
     min-width: 0;
+    height: 100%;
 }
+
 
 .chat-pane-empty {
     flex: 1;
@@ -339,16 +349,16 @@
 /* Messages Area */
 .chat-messages {
     flex: 1;
+    min-height: 0;        /* CRITICAL: allows flex child to scroll */
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 28px 32px;
+    padding: 20px 24px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    background:
-        linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.35)),
-        var(--light);
+    gap: 4px;
+    background: #f5f3ee;
 }
+
 
 .chat-messages::-webkit-scrollbar {
     width: 4px;
@@ -448,6 +458,37 @@
 
 .msg-row.from-admin .msg-time {
     text-align: right;
+}
+
+/* Date separator — Messenger style */
+.date-divider {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    margin: 10px 0 6px;
+    position: relative;
+}
+
+.date-divider::before,
+.date-divider::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 30%;
+    height: 1px;
+    background: var(--border);
+}
+
+.date-divider::before { right: 54%; }
+.date-divider::after  { left: 54%; }
+
+/* Empty chat message */
+.chat-empty-msg {
+    margin: auto;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.88rem;
 }
 
 /* Input Bar */

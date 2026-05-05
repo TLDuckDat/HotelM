@@ -28,4 +28,19 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
             @Param("checkIn") LocalDateTime checkIn,
             @Param("checkOut") LocalDateTime checkOut
     );
+
+    @Query("SELECT COUNT(b) FROM Booking b " +
+           "WHERE b.room.branch.branchId = :branchId " +
+           "AND YEAR(b.createdAt) = :year " +
+           "AND MONTH(b.createdAt) = :month")
+    long countByBranchAndMonth(@Param("branchId") String branchId, @Param("year") int year, @Param("month") int month);
+
+    @Query("SELECT COUNT(b) FROM Booking b " +
+           "WHERE YEAR(b.createdAt) = :year " +
+           "AND MONTH(b.createdAt) = :month")
+    long countGlobalByMonth(@Param("year") int year, @Param("month") int month);
+
+    List<Booking> findByRoom_RoomIDAndStatusIn(String roomId, List<Booking.BookingStatus> statuses);
 }
+
+

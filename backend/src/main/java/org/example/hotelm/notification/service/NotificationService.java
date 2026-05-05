@@ -41,6 +41,17 @@ public class NotificationService {
         messagingTemplate.convertAndSend("/topic/notifications/" + userId, saved);
     }
 
+    private final org.example.hotelm.user.repository.UserRepository userRepository;
+
+    @Transactional
+    public void notifyAdmins(String title, String message, Notification.NotificationType type, String relatedId) {
+        userRepository.findByRoleInAndStatus(
+                List.of(org.example.hotelm.user.entity.User.Role.ADMIN, org.example.hotelm.user.entity.User.Role.RECEPTIONIST),
+                org.example.hotelm.user.entity.User.UserStatus.ACTIVE
+        ).forEach(staff -> createAndPush(staff.getUserID(), title, message, type, relatedId));
+    }
+
+
     @Transactional
     public void markAsRead(String notificationId) {
         notificationRepository.findById(notificationId).ifPresent(n -> {
@@ -56,4 +67,12 @@ public class NotificationService {
         unread.forEach(n -> n.setRead(true));
         notificationRepository.saveAll(unread);
     }
+
+    @Transactional
+    public void markAsReadByRelatedId(String userId, String relatedId) {
+        List<Notification> notifications = notificationRepository.findByUserIdAndRelatedId(userId, relatedId);
+        notifications.forEach(n -> n.setRead(true));
+        notificationRepository.saveAll(notifications);
+    }
 }
+

@@ -120,7 +120,22 @@ public class ChatServiceImpl implements ChatService {
         );
     }
 
+    @Override
+    @Transactional
+    public void markAsRead(String threadId, String userId) {
+        ChatThread thread = getThreadById(threadId);
+        thread.getMessages().forEach(msg -> {
+            if (!msg.getSenderUserId().equals(userId)) {
+                msg.setRead(true);
+            }
+        });
+        chatThreadRepository.save(thread);
+        notificationService.markAsReadByRelatedId(userId, threadId);
+    }
+
+
     private ChatThread hydrateThread(ChatThread thread) {
+
         if (thread.getGuest() != null) {
             thread.getGuest().getUserID();
             thread.getGuest().getFullName();

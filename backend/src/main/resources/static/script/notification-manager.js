@@ -97,8 +97,10 @@
                 return;
             }
 
-            list.innerHTML = notifications.map(n => `
-                <div class="notification-item ${n.read ? '' : 'unread'}" onclick="NotificationManager.handleNotificationClick('${n.id}', '${n.type}', '${n.relatedId}')">
+            list.innerHTML = notifications.map(n => {
+                const isRead = n.read === true || n.isRead === true;
+                return `
+                <div class="notification-item ${isRead ? '' : 'unread'}" onclick="NotificationManager.handleNotificationClick('${n.id}', '${n.type}', '${n.relatedId}')">
                     <div class="notification-icon">
                         <i class="${getIconForType(n.type)}"></i>
                     </div>
@@ -108,12 +110,16 @@
                         <div class="notification-time">${formatTime(n.createdAt)}</div>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
 
             // Mark all as read after opening
             global.NotificationApi.markAllAsRead(currentUser.userID).then(() => {
                 const badge = document.querySelector('.notification-badge');
-                if (badge) badge.style.display = 'none';
+                if (badge) {
+                    badge.textContent = "";
+                    badge.style.display = 'none';
+                }
             });
         });
     }
@@ -124,6 +130,7 @@
             case 'BOOKING_NEW': return 'fas fa-calendar-plus';
             case 'BOOKING_STATUS': return 'fas fa-info-circle';
             case 'REFUND_REQUEST': return 'fas fa-undo';
+            case 'REFUND_STATUS': return 'fas fa-check-circle';
             case 'SYSTEM': return 'fas fa-cog';
             default: return 'fas fa-bell';
         }
@@ -141,24 +148,30 @@
     }
 
     function handleNotificationClick(id, type, relatedId) {
-        // Mark this one as read (optional since we mark all as read when opening)
+        // Mark this one as read
+        global.NotificationApi.markAsRead(id);
         
         // Navigate based on type
         switch(type) {
             case 'CHAT_MESSAGE':
-                window.location.href = currentUser.role === 'ADMIN' ? 'admin-chat.html?threadId=' + relatedId : 'account.html#chat';
+                window.location.href = (currentUser.role === 'ADMIN' || currentUser.role === 'RECEPTIONIST') 
+                    ? 'admin-chat.html?threadId=' + relatedId : 'account.html#chat';
                 break;
             case 'BOOKING_NEW':
             case 'BOOKING_STATUS':
-                window.location.href = currentUser.role === 'ADMIN' ? 'admin-bookings.html?id=' + relatedId : 'bookings.html?id=' + relatedId;
+                window.location.href = (currentUser.role === 'ADMIN' || currentUser.role === 'RECEPTIONIST')
+                    ? 'admin-bookings.html?id=' + relatedId : 'bookings.html?id=' + relatedId;
                 break;
             case 'REFUND_REQUEST':
-                window.location.href = 'admin-refunds.html?id=' + relatedId;
+            case 'REFUND_STATUS':
+                window.location.href = (currentUser.role === 'ADMIN' || currentUser.role === 'RECEPTIONIST')
+                    ? 'admin-refunds.html?id=' + relatedId : 'refunds.html?id=' + relatedId;
                 break;
             default:
-                // Just stay here
+                // Do nothing
         }
     }
+
 
     // Expose
     global.NotificationManager = {

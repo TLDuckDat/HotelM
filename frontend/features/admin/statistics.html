@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics & KPI - HotelM</title>
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="stylesheet" href="statistics.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="app-topbar"></div>
+    <div class="container dashboard-container">
+        <div class="dashboard-header">
+            <h2>Statistics & KPI</h2>
+            <div class="dashboard-controls">
+                <select id="stat-year"></select>
+                <select id="stat-month">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <button id="refresh-stats" class="primary">Refresh</button>
+            </div>
+        </div>
+
+        <!-- Global Summary -->
+        <div class="summary-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-value" id="global-revenue">$0</div>
+                <div class="stat-desc">Across all branches</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Bookings</div>
+                <div class="stat-value" id="global-bookings">0</div>
+                <div class="stat-desc">Monthly total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg Occupancy</div>
+                <div class="stat-value" id="global-occupancy">0%</div>
+                <div class="stat-desc">System average</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg Rating</div>
+                <div class="stat-value" id="global-rating">0.0</div>
+                <div class="stat-desc">Customer satisfaction</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-grid">
+            <div class="chart-container card">
+                <h3>Revenue by Branch</h3>
+                <canvas id="revenueBranchChart"></canvas>
+            </div>
+            <div class="chart-container card">
+                <h3>Branch Performance Comparison</h3>
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Branch Detailed View -->
+        <div class="branch-details-section card">
+            <div class="section-header">
+                <h3>Branch Details</h3>
+                <select id="branch-selector">
+                    <option value="" disabled selected>Select Branch</option>
+                </select>
+            </div>
+            
+            <div id="branch-kpi-content" style="display: none;">
+                <div class="branch-stats-grid">
+                    <div class="mini-stat">
+                        <span class="label">Actual Revenue</span>
+                        <span class="value" id="branch-revenue">$0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="label">Revenue Target</span>
+                        <span class="value" id="branch-target">$0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="label">Achievement Rate</span>
+                        <div class="progress-bar">
+                            <div id="branch-achievement-bar" class="progress-fill"></div>
+                        </div>
+                        <span class="value" id="branch-achievement">0%</span>
+                    </div>
+                </div>
+                
+                <div class="branch-actions">
+                    <button id="recalculate-branch" class="secondary">Recalculate KPI</button>
+                    <button id="set-target-btn" class="secondary">Set New Target</button>
+                </div>
+            </div>
+            
+            <div id="no-branch-selected" class="empty-state">
+                <p>Please select a branch to view detailed performance data.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Target Modal -->
+    <div id="targetModal" class="modal" style="display: none;">
+        <div class="modal-content card">
+            <h3>Set Revenue Target</h3>
+            <p id="target-branch-name"></p>
+            <input type="number" id="target-amount" placeholder="Target Amount ($)" step="1000">
+            <div class="modal-actions">
+                <button id="save-target" class="primary">Save</button>
+                <button id="close-target" class="secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/script/api/baseApi.js"></script>
+    <script src="/script/api/branchApi.js"></script>
+    <script src="/script/api/kpiApi.js"></script>
+    <script src="/script/authStore.js"></script>
+    <script src="/script/guard.js"></script>
+    <script src="/script/app-shell.js"></script>
+    <script src="statistics.js"></script>
+</body>
+</html>
