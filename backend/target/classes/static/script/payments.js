@@ -21,7 +21,7 @@
 
     function formatMoney(amount) {
         var value = Math.round(Number(amount) || 0);
-        return value.toLocaleString("vi-VN") + " ₫";
+        return window.formatCurrency(value);
     }
 
     // BookingResponse fields: bookingId, userId, roomId, checkIn, checkOut, totalPrice, status
@@ -215,6 +215,7 @@
 
         if (!payments || !payments.length) {
             body.innerHTML = "<tr><td colspan='6'>No payments found</td></tr>";
+        if (typeof applyTranslations === 'function') applyTranslations(global.localStorage.getItem('sot_lang') || 'en');
             return;
         }
 
@@ -233,8 +234,8 @@
                 + "<td><code style='font-size:0.85rem'>#" + id.substring(0,8).toUpperCase() + "</code></td>"
                 + "<td>" + roomDisp + "</td>"
                 + "<td>" + formatMoney(payment.finalAmount != null ? payment.finalAmount : payment.amount) + "</td>"
-                + "<td>" + getPaymentMethod(payment) + "</td>"
-                + "<td>" + status + "</td>"
+                + "<td data-i18n='method_" + getPaymentMethod(payment) + "'>" + getPaymentMethod(payment) + "</td>"
+                + "<td data-i18n='status_" + status + "'>" + status + "</td>"
                 + "<td>" + actionHtml + "</td>"
                 + "</tr>";
         }).join("");

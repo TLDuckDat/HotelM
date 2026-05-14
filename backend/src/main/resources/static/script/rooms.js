@@ -5,22 +5,166 @@
     let rawRooms = [];
     let rawTypes = [];
 
-    // ====================== LOAD USER ======================
-    function loadUser() {
-        if (!global.Guard.requireLogin()) return;
+    var ROOMS_PER_PAGE = 20;
+    var currentRoomsPage = 1;
+    var lastRenderedRooms = [];
+    var lastRenderedTypes = [];
 
-        const user = global.AuthStore.getCurrentUser();
-        if (!user) return;
+    var ROOMS_PAGINATION_I18N = {
+        en: {
+            prev: "Previous",
+            next: "Next",
+            pageOf: function (c, t) { return "Page " + c + " of " + t; },
+            range: function (lo, hi, total) { return "Showing " + lo + "–" + hi + " of " + total; },
+            pageLabel: "Page",
+            ofLabel: "of"
+        },
+        vi: {
+            prev: "Trước",
+            next: "Tiếp",
+            pageOf: function (c, t) { return "Trang " + c + " / " + t; },
+            range: function (lo, hi, total) { return "Hiển thị " + lo + "–" + hi + " / " + total; },
+            pageLabel: "Trang",
+            ofLabel: "/"
+        }
+    };
 
-        document.getElementById('topbar-username').textContent = user.fullName || "Guest";
-        document.getElementById('sidebar-username').textContent = user.fullName || "Guest";
-        document.getElementById('sidebar-role').textContent = user.role || "USER";
+    function getRoomsPaginationStrings() {
+        var lang = (global.localStorage.getItem("sot_lang") || "en") === "vi" ? "vi" : "en";
+        return ROOMS_PAGINATION_I18N[lang];
     }
 
-    // ====================== LOGOUT ======================
-    function handleLogout() {
-        global.AuthStore.clearCurrentUser();
-        window.location.href = "index.html";
+    function scrollRoomsListIntoView() {
+        var list = document.getElementById("rooms-list");
+        if (list && typeof list.scrollIntoView === "function") {
+            list.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    }
+
+    function goRoomsPage(page) {
+        var total = lastRenderedRooms.length;
+        var totalPages = Math.max(1, Math.ceil(total / ROOMS_PER_PAGE));
+        var next = Math.min(Math.max(1, page), totalPages);
+        if (next === currentRoomsPage) return;
+        currentRoomsPage = next;
+        renderRooms(lastRenderedRooms, lastRenderedTypes, false);
+        scrollRoomsListIntoView();
+    }
+
+    // ====================== AUTH & UI ======================
+    function checkExistingUser() {
+        const user = global.AuthStore ? global.AuthStore.getCurrentUser() : JSON.parse(localStorage.getItem('sotCurrentUser'));
+        const navActions = document.getElementById('nav-actions');
+        if (!navActions || !user) return;
+
+        const isAdmin = user.role === 'ADMIN';
+        const profileHref = isAdmin ? 'admin-dashboard.html' : 'account.html';
+        const profileLabel = isAdmin ? 'Admin Dashboard' : 'Profile';
+        const roomsHref = isAdmin ? 'admin-rooms.html' : 'rooms.html';
+        const bookingsHref = isAdmin ? 'admin-bookings.html' : 'bookings.html';
+
+        navActions.innerHTML = `
+        <button id="lang-toggle-btn" onclick="toggleLanguage()" title="Switch language">
+            <span class="lang-flag">🇻🇳</span>
+            <span class="lang-label">VI</span>
+        </button>
+
+        <div class="notification-dropdown">
+            <button class="notification-btn" onclick="toggleNotification(event)">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge"></span>
+            </button>
+            <div class="notification-content" id="notificationMenu">
+                <div class="notification-header" data-i18n="notification_title">Notifications</div>
+                <div class="notification-list">
+                    <div class="notification-empty" data-i18n="notification_empty">No new notifications</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="user-dropdown">
+            <div class="user-avatar" onclick="toggleUserMenu()">
+                <img src="assets/image/logo.svg" alt="avatar">
+            </div>
+            <div class="user-menu" id="userMenu">
+                <div class="menu-header">
+                    <img src="assets/image/logo.svg" class="menu-logo">
+                    <div class="menu-brand">SOT</div>
+                    <div class="menu-avatar"><i class="fas fa-user"></i></div>
+                    <div class="menu-username">${user.fullName || user.name || 'User'}</div>
+                </div>
+                <a href="${profileHref}" class="menu-item" data-i18n="${isAdmin ? 'menu_dashboard' : 'menu_profile'}">
+                ${profileLabel}
+            </a>
+            <a href="${roomsHref}" class="menu-item" data-i18n="menu_rooms">
+                Rooms
+            </a>
+            <a href="${bookingsHref}" class="menu-item" data-i18n="menu_bookings">
+                Bookings
+            </a>
+            <button class="menu-item logout" onclick="logoutUser()" data-i18n="menu_logout">
+                Logout
+            </button>
+            </div>
+        </div>`;
+
+        if (typeof applyTranslations === 'function') {
+            applyTranslations(global.localStorage.getItem('sot_lang') || 'en');
+        }
+    }
+
+    function toggleUserMenu() {
+        const menu = document.getElementById('userMenu');
+        if (menu) menu.classList.toggle('active');
+    }
+
+    global.toggleUserMenu = toggleUserMenu;
+
+    document.addEventListener('click', function (e) {
+        const dropdown = document.querySelector('.user-dropdown');
+        if (!dropdown) return;
+        if (!dropdown.contains(e.target)) {
+            const menu = document.getElementById('userMenu');
+            if (menu) menu.classList.remove('active');
+        }
+    });
+
+    function logoutUser() {
+        if (global.AuthStore) global.AuthStore.clearCurrentUser();
+        else localStorage.removeItem('sotCurrentUser');
+        location.reload();
+    }
+    global.logoutUser = logoutUser;
+
+    async function loadAuthModals() {
+        try {
+            const response = await fetch('auth-modals.html');
+            const html = await response.text();
+            const placeholder = document.getElementById('auth-modals-placeholder');
+            if (placeholder) {
+                placeholder.innerHTML = html;
+                if (typeof initModals === 'function') initModals();
+                if (typeof initForgotPasswordModal === 'function') initForgotPasswordModal();
+
+                const lForm = document.getElementById('loginForm');
+                const rForm = document.getElementById('registerForm');
+                const fForm = document.getElementById('forgotPasswordForm');
+
+                if (lForm) lForm.addEventListener('submit', handleLogin);
+                if (rForm) rForm.addEventListener('submit', handleRegister);
+                if (fForm) fForm.addEventListener('submit', handleForgotPassword);
+
+                document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                    backdrop.addEventListener('click', () => {
+                        if (typeof closeLoginModal === 'function') closeLoginModal();
+                        if (typeof closeRegisterModal === 'function') closeRegisterModal();
+                        if (typeof closeForgotPasswordModal === 'function') closeForgotPasswordModal();
+                    });
+                });
+            }
+        } catch (error) {
+            console.error('Error loading auth modals:', error);
+        }
     }
 
     // --- LOGIC LỌC MỚI THÊM VÀO ---
@@ -54,7 +198,7 @@
             return matchKeyword && matchType && matchCap && matchPrice;
         });
 
-        renderRooms(filtered, rawTypes);
+        renderRooms(filtered, rawTypes, true);
     }
 
     function initFilterEvents(types) {
@@ -102,7 +246,7 @@
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
                 document.getElementById('filter-form').reset();
-                renderRooms(rawRooms, rawTypes);
+                renderRooms(rawRooms, rawTypes, true);
             });
         }
 
@@ -155,65 +299,197 @@
         return matched ? (matched.typeName || matched.name || "Unknown Type") : "Unknown Type";
     }
 
-    function renderRooms(rooms, types) {
-        var list = document.getElementById("rooms-list");
-        if (!list) return;
+    function updateRoomsPaginationNav(total, totalPages, startIndex, pageCount) {
+        var nav = document.getElementById("rooms-pagination");
+        if (!nav) return;
 
-        if (!rooms || !rooms.length) {
-            list.innerHTML = "<p>No rooms found.</p>";
+        if (!total) {
+            nav.classList.remove("is-visible");
+            nav.innerHTML = "";
             return;
         }
 
-        list.innerHTML = rooms.map(function (room) {
-            var roomId = getRoomId(room);
+        if (totalPages <= 1) {
+            nav.classList.remove("is-visible");
+            nav.innerHTML = "";
+            return;
+        }
+
+        var pg = getRoomsPaginationStrings();
+        var lo = startIndex + 1;
+        var hi = startIndex + pageCount;
+        var prevDisabled = currentRoomsPage <= 1;
+        var nextDisabled = currentRoomsPage >= totalPages;
+
+        nav.innerHTML = ""
+            + "<button type='button' id='rooms-pg-prev'" + (prevDisabled ? " disabled" : "") + ">" + pg.prev + "</button>"
+            + "<div class='rooms-pagination-controls'>"
+            + "<span>" + pg.pageLabel + "</span>"
+            + "<input type='number' id='rooms-pg-input' class='rooms-pagination-input' value='" + currentRoomsPage + "' min='1' max='" + totalPages + "'>"
+            + "<span class='rooms-pagination-total'>" + pg.ofLabel + " " + totalPages + "</span>"
+            + "</div>"
+            + "<button type='button' id='rooms-pg-next'" + (nextDisabled ? " disabled" : "") + ">" + pg.next + "</button>";
+
+        nav.classList.add("is-visible");
+
+        var prevBtn = document.getElementById("rooms-pg-prev");
+        var nextBtn = document.getElementById("rooms-pg-next");
+        var pgInput = document.getElementById("rooms-pg-input");
+
+        if (prevBtn && !prevDisabled) {
+            prevBtn.addEventListener("click", function () { goRoomsPage(currentRoomsPage - 1); });
+        }
+        if (nextBtn && !nextDisabled) {
+            nextBtn.addEventListener("click", function () { goRoomsPage(currentRoomsPage + 1); });
+        }
+        if (pgInput) {
+            pgInput.addEventListener("change", function () {
+                var p = parseInt(this.value);
+                if (!isNaN(p)) goRoomsPage(p);
+            });
+            pgInput.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    var p = parseInt(this.value);
+                    if (!isNaN(p)) goRoomsPage(p);
+                }
+            });
+        }
+    }
+
+    function renderRooms(rooms, types, resetPage) {
+        var list = document.getElementById("rooms-list");
+        if (!list) return;
+
+        lastRenderedRooms = rooms || [];
+        lastRenderedTypes = types || [];
+
+        if (resetPage) {
+            currentRoomsPage = 1;
+        }
+
+        var total = lastRenderedRooms.length;
+        var totalPages = Math.max(1, Math.ceil(total / ROOMS_PER_PAGE));
+
+        if (currentRoomsPage > totalPages) {
+            currentRoomsPage = totalPages;
+        }
+        if (currentRoomsPage < 1) {
+            currentRoomsPage = 1;
+        }
+
+        var nav = document.getElementById("rooms-pagination");
+
+        if (!total) {
+            list.innerHTML = "<p>No rooms found.</p>";
+            if (nav) {
+                nav.classList.remove("is-visible");
+                nav.innerHTML = "";
+            }
+            return;
+        }
+
+        var start = (currentRoomsPage - 1) * ROOMS_PER_PAGE;
+        var pageRooms = lastRenderedRooms.slice(start, start + ROOMS_PER_PAGE);
+
+        var lang = (global.localStorage.getItem("sot_lang") || "en");
+        var isVi = lang === "vi";
+
+        var i18n = {
+            status:     isVi ? "Trạng thái"   : "Status",
+            capacity:   isVi ? "Sức chứa"     : "Capacity",
+            from:       isVi ? "Từ"            : "From",
+            perNight:   isVi ? "/ đêm"         : "/ night",
+            bookNow:    isVi ? "Xem chi tiết"  : "View Details",
+            available:  isVi ? "Còn trống"     : "Available",
+            occupied:   isVi ? "Đã có khách"   : "Occupied",
+            noPrice:    isVi ? "Liên hệ"       : "Contact us",
+        };
+
+        function translateStatus(s) {
+            var up = (s || "").toUpperCase();
+            if (up === "AVAILABLE") return isVi ? "Còn trống" : "Available";
+            if (up === "OCCUPIED" || up === "BOOKED") return isVi ? "Đã có khách" : "Occupied";
+            if (up === "MAINTENANCE") return isVi ? "Bảo trì" : "Maintenance";
+            return s || "—";
+        }
+
+        function formatRoomPrice(price) {
+            if (!price) return i18n.noPrice;
+            if (typeof window.formatCurrency === "function") return window.formatCurrency(price);
+            return isVi
+                ? Number(price).toLocaleString("vi-VN") + " ₫"
+                : "$" + Math.round(Number(price) / 25000);
+        }
+
+        list.innerHTML = pageRooms.map(function (room) {
+            var roomId   = getRoomId(room);
             var roomName = getRoomName(room);
             var roomType = getRoomTypeName(room, types);
-            var status = room.status || "N/A";
+            var status   = room.status || "N/A";
             var capacity = room.maxCapacity || 0;
+            var price    = room.basePrice
+                || (room.roomType && (room.roomType.basePrice || room.roomType.price))
+                || 0;
+            var isAvailable = status.toUpperCase() === "AVAILABLE";
+            var statusClass = isAvailable ? "status-available" : "status-occupied";
 
             return ""
                 + "<div class='room-card'>"
                 + "  <div class='room-img-wrap'>"
                 + "    <img src='" + getRoomImage(room) + "' class='room-img' alt='" + roomName + "'>"
+                + "    <span class='room-status-badge " + statusClass + "'>" + translateStatus(status) + "</span>"
                 + "  </div>"
                 + "  <div class='room-info'>"
                 + "    <p class='room-type'><i class='fas fa-tag'></i> " + roomType + "</p>"
                 + "    <h3>" + roomName + "</h3>"
                 + "    <div class='room-meta'>"
-                + "      <span><i class='fas fa-circle-dot'></i> Status: <strong>" + status + "</strong></span>"
-                + "      <span><i class='fas fa-users'></i> Capacity: <strong>" + capacity + "</strong></span>"
+                + "      <span><i class='fas fa-users'></i> " + i18n.capacity + ": <strong>" + capacity + "</strong></span>"
+                + (price ? "      <span><i class='fas fa-tag'></i> " + i18n.from + " <strong>" + formatRoomPrice(price) + "</strong> " + i18n.perNight + "</span>" : "")
                 + "    </div>"
                 + "    <button class='btn-book' onclick=\"window.location.href='room-detail.html?id=" + encodeURIComponent(roomId) + "'\">"
-                + "      <i class='fas fa-calendar-plus'></i> Book Now"
+                + "      <i class='fas fa-eye'></i> " + i18n.bookNow
                 + "    </button>"
                 + "  </div>"
                 + "</div>";
         }).join("");
+
+        updateRoomsPaginationNav(total, totalPages, start, pageRooms.length);
     }
 
-    function loadRooms() {
+    async function loadRooms() {
         var list = document.getElementById("rooms-list");
         if (!list) return;
-        list.innerHTML = "<div class='loading'>Loading rooms...</div>";
+        list.innerHTML = "<div class='loading' data-i18n='loading_rooms'>Loading rooms...</div>";
+        if (typeof applyTranslations === 'function') applyTranslations(global.localStorage.getItem('sot_lang') || 'en');
 
-        Promise.all([
-            global.RoomApi.getRooms(),
-            global.RoomTypeApi.getRoomTypes().catch(function () { return []; })
-        ]).then(function (result) {
-            // QUAN TRỌNG: Phải gán dữ liệu vào biến raw trước khi render
-            rawRooms = result[0] || [];
-            rawTypes = result[1] || [];
+        try {
+            const [rooms, types] = await Promise.all([
+                global.RoomApi.getRooms(),
+                global.RoomTypeApi.getRoomTypes().catch(() => [])
+            ]);
 
-            initFilterEvents(rawTypes); // Khởi tạo sự kiện ẩn/hiện và lọc
-            renderRooms(rawRooms, rawTypes); // Hiển thị danh sách ban đầu
-        }).catch(function (err) {
+            rawRooms = rooms || [];
+            rawTypes = types || [];
+
+            initFilterEvents(rawTypes);
+            renderRooms(rawRooms, rawTypes, true);
+        } catch (err) {
             list.innerHTML = "<p class='error'>Failed to load rooms.</p>";
             console.error(err);
-        });
+        }
     }
 
     // ====================== BOOK ACTION ======================
     function bookRoom(id) {
+        const user = global.AuthStore ? global.AuthStore.getCurrentUser() : JSON.parse(localStorage.getItem('sotCurrentUser'));
+        if (!user) {
+            if (typeof openLoginModal === 'function') {
+                openLoginModal();
+            } else {
+                window.location.href = "index.html"; // fallback if modal not loaded
+            }
+            return;
+        }
         window.location.href = "create-booking.html?roomId=" + encodeURIComponent(id);
     }
 
@@ -230,83 +506,27 @@
 
     // ====================== INIT ======================
     document.addEventListener("DOMContentLoaded", () => {
-        loadUser();
+        loadAuthModals();
+        checkExistingUser();
         loadRooms();
+
+        // Listen for language change to re-render dynamic content
+        window.addEventListener('languageChanged', () => {
+            renderRooms(lastRenderedRooms, lastRenderedTypes, false);
+        });
+
+        // Scroll header effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('main-header');
+            if (header) header.classList.toggle('scrolled', window.scrollY > 50);
+        });
     });
 
     // expose
     global.RoomsPage = {
-        handleLogout,
-        bookRoom
+        logoutUser,
+        bookRoom,
+        goRoomsPage
     };
 
 })(window);
-
-
-// (function (global) {
-//     "use strict";
-
-//     var allRooms = [];
-
-//     function roomTypeName(room) {
-//         if (!room || !room.roomType) {
-//             return "N/A";
-//         }
-
-//         return room.roomType.typeName || room.roomType.roomTypeName || room.roomType.name || "N/A";
-//     }
-
-//     function renderRooms(rooms) {
-//         var body = document.getElementById("rooms-body");
-//         if (!body) {
-//             return;
-//         }
-
-//         if (!rooms || rooms.length === 0) {
-//             body.innerHTML = "<tr><td colspan='6'>No rooms found</td></tr>";
-//             return;
-//         }
-
-//         body.innerHTML = rooms.map(function (room) {
-//             return "<tr>"
-//                 + "<td>" + (room.roomID || "") + "</td>"
-//                 + "<td>" + (room.roomName || "") + "</td>"
-//                 + "<td>" + roomTypeName(room) + "</td>"
-//                 + "<td>" + (room.maxCapacity || 0) + "</td>"
-//                 + "<td><span class='badge'>" + (room.status || "") + "</span></td>"
-//                 + "<td><a href='/room-detail.html?id=" + encodeURIComponent(room.roomID || "") + "'>Detail</a></td>"
-//                 + "</tr>";
-//         }).join("");
-//     }
-
-//     function applyFilter() {
-//         var keyword = document.getElementById("room-keyword").value.trim().toLowerCase();
-//         var filtered = allRooms.filter(function (room) {
-//             var name = (room.roomName || "").toLowerCase();
-//             var status = (room.status || "").toLowerCase();
-//             return name.indexOf(keyword) !== -1 || status.indexOf(keyword) !== -1;
-//         });
-
-//         renderRooms(filtered);
-//     }
-
-//     function loadRooms() {
-//         global.AppShell.renderTopbar("Room List");
-
-//         global.RoomApi.getRooms().then(function (rooms) {
-//             allRooms = rooms || [];
-//             renderRooms(allRooms);
-//         }).catch(function (error) {
-//             var box = document.getElementById("rooms-error");
-//             var msg = error && error.payload && error.payload.message
-//                 ? error.payload.message
-//                 : "Cannot load rooms";
-//             box.textContent = msg;
-//             box.style.display = "block";
-//         });
-
-//         document.getElementById("room-search-btn").addEventListener("click", applyFilter);
-//     }
-
-//     document.addEventListener("DOMContentLoaded", loadRooms);
-// })(window);

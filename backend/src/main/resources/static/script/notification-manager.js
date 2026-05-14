@@ -89,7 +89,7 @@
         const list = document.querySelector('.notification-list');
         if (!list) return;
 
-        list.innerHTML = '<div class="notification-loading">Loading...</div>';
+        list.innerHTML = '<div class="notification-loading" data-i18n="loading_text">Loading...</div>';
 
         global.NotificationApi.getNotificationsForUser(currentUser.userID).then(notifications => {
             if (!notifications || notifications.length === 0) {

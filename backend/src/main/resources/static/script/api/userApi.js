@@ -30,11 +30,11 @@
     }
 
     function updateUserStatus(id, status, options) {
-        var requestOptions = Object.assign({}, options, {
-            query: Object.assign({}, options && options.query, { status: status })
-        });
-
-        return baseApi.patch(USER_ENDPOINT + "/" + encodeURIComponent(id) + "/status", null, requestOptions);
+        return baseApi.patch(
+            USER_ENDPOINT + "/" + encodeURIComponent(id) + "/status",
+            { status: status },
+            options
+        );
     }
 
     global.UserApi = {

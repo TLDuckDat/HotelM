@@ -1,0 +1,289 @@
+/* Rooms Page Styles */
+
+.layout {
+  display: block;
+  padding-top: 80px;
+  background: var(--light);
+  min-height: 100vh;
+}
+
+.main {
+  margin-left: 0 !important;
+  max-width: 95%;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+#main-header.scrolled {
+  background: var(--dark);
+}
+
+body {
+  padding-top: 0;
+}
+
+/* Rooms Layout */
+.rooms-layout {
+  display: flex;
+  flex-direction: row-reverse;
+  /* Filter on right */
+  gap: 30px;
+  align-items: flex-start;
+}
+
+.rooms-content {
+  flex: 1;
+}
+
+.rooms-sidebar {
+  width: 320px;
+  position: sticky;
+  top: 100px;
+  /* Below the fixed header */
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding-bottom: 20px;
+}
+
+.rooms-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.rooms-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(201, 160, 80, 0.4);
+  border-radius: 4px;
+}
+
+.rooms-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (max-width: 900px) {
+  .rooms-layout {
+    flex-direction: column;
+  }
+
+  .rooms-sidebar {
+    width: 100%;
+    position: static;
+  }
+}
+
+/* Pagination */
+.rooms-pagination {
+  margin-top: 28px;
+  padding: 16px 20px;
+  display: none;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: rgba(61, 40, 23, 0.045);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.rooms-pagination.is-visible {
+  display: flex;
+}
+
+.rooms-pagination-info {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  flex: 1;
+  text-align: center;
+  min-width: 160px;
+  order: 0;
+  display: none; /* Omitted per user request */
+}
+
+.rooms-pagination > button {
+  min-width: 100px;
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--dark);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.rooms-pagination > button:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.rooms-pagination > button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .rooms-pagination {
+    flex-direction: column;
+  }
+
+  .rooms-pagination-info {
+    order: -1;
+    width: 100%;
+  }
+
+  .rooms-pagination > button {
+    flex: 1;
+  }
+}
+
+/* New Pagination Controls */
+.rooms-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--dark);
+  font-weight: 500;
+}
+
+.rooms-pagination-input {
+  width: 50px;
+  height: 34px;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -moz-appearance: textfield;
+}
+
+.rooms-pagination-input::-webkit-outer-spin-button,
+.rooms-pagination-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.rooms-pagination-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(201, 160, 80, 0.1);
+}
+
+.rooms-pagination-total {
+  color: var(--text-muted);
+}
+
+/* Filter Card & Sidebar Elements */
+.filter-card {
+  padding: 20px !important;
+  margin-bottom: 0;
+}
+
+.toggle-filter {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+
+.filter-card-title {
+  margin-bottom: 0;
+  font-size: 1.1rem;
+}
+
+.filter-card-title i {
+  margin-right: 8px;
+}
+
+.filter-chevron {
+  transition: 0.3s;
+  color: var(--primary);
+}
+
+.filter-container {
+  transition: all 0.3s ease;
+}
+
+.filter-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 15px;
+}
+
+.filter-form .form-field {
+  margin-bottom: 0;
+}
+
+.filter-form .form-field.full-width {
+  grid-column: span 2;
+}
+
+.filter-form .form-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.75rem;
+}
+
+.filter-form .form-input,
+.filter-form .form-select {
+  padding: 9px 12px;
+}
+
+.btn-reset-wrapper {
+  grid-column: span 2;
+  margin-top: 5px;
+}
+
+.btn-reset {
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-reset i {
+  font-size: 0.8rem;
+}
+
+/* -- Room Status Badge (on card image) -- */
+.room-img-wrap {
+  position: relative;
+}
+
+.room-status-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  backdrop-filter: blur(4px);
+}
+
+.room-status-badge.status-available {
+  background: rgba(34, 197, 94, 0.2);
+  color: #15803d;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.room-status-badge.status-occupied {
+  background: rgba(239, 68, 68, 0.2);
+  color: #b91c1c;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}

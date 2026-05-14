@@ -9,7 +9,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', sans-serif;
     color: var(--dark);
     line-height: 1.6;
     overflow-x: hidden;
@@ -312,7 +312,7 @@ footer { background: var(--light); padding: 80px 0 30px; text-align: center; }
     padding: 12px;
     border: 2px solid var(--dark);
     outline: none;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
 .newsletter button {
@@ -341,3 +341,28 @@ footer { background: var(--light); padding: 80px 0 30px; text-align: center; }
     .info-layout { grid-template-columns: 1fr; }
     .info-image img { height: 250px; }
 }
+
+
+
+
+/* GLOBAL PREMIUM TYPOGRAPHY OVERRIDE */
+body, p, a, button, input, select, textarea, label, span, div, td, th {
+    font-family: 'Outfit', sans-serif !important;
+}
+h1, h2, h3, h4, h5, h6, .logo-wordmark, .hero-title, .section-title, .card-title, .section-heading h2 {
+    font-family: 'Playfair Display', serif !important;
+    letter-spacing: 0.5px;
+}
+/* Ensure icons keep their font family */
+i.fas, i.far, i.fab, i.fa {
+    font-family: "Font Awesome 6 Free" !important;
+}
+
+button, .btn, .btn-primary, .btn-secondary, .btn-danger, .btn-nav-primary, .btn-nav-outline, .btn-book, .btn-explore,
+input, select, textarea, .form-input, .form-select, .form-textarea,
+.card, .filter-card, .promo-card, .offer-card, .villa-card, .service-card, .stat-card, .room-card,
+.modal-content, .auth-container, .table-wrap, .notification-content, .user-menu, .nav-item {
+    border-radius: 0 !important;
+}
+
+#lang-toggle-btn { border-radius: 20px !important; }

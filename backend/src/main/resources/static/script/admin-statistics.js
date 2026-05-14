@@ -14,8 +14,7 @@
         setTimeout(function() { box.style.display = "none"; }, 5000);
     }
 
-    function formatCurrency(val) {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val || 0);
+    ).format(val || 0);
     }
 
     function formatPercent(val) {
@@ -35,8 +34,8 @@
 
         var avgAchiev = totalTarget > 0 ? (totalRev / totalTarget) * 100 : 0;
 
-        document.getElementById("kpi-total-revenue").textContent = formatCurrency(totalRev);
-        document.getElementById("kpi-total-target").textContent = formatCurrency(totalTarget);
+        document.getElementById("kpi-total-revenue").textContent = window.formatCurrency(totalRev);
+        document.getElementById("kpi-total-target").textContent = window.formatCurrency(totalTarget);
         
         var achievEl = document.getElementById("kpi-avg-achievement");
         achievEl.textContent = formatPercent(avgAchiev);
@@ -60,8 +59,8 @@
             var achievClass = kpi.revenueAchievementRate >= 100 ? "style='color:#28a745;font-weight:bold;'" : "";
             return "<tr>" +
                 "<td><strong>" + (kpi.branchName || kpi.branchId) + "</strong></td>" +
-                "<td>" + formatCurrency(kpi.totalRevenue) + "</td>" +
-                "<td>" + formatCurrency(kpi.revenueTarget) + "</td>" +
+                "<td>" + window.formatCurrency(kpi.totalRevenue) + "</td>" +
+                "<td>" + window.formatCurrency(kpi.revenueTarget) + "</td>" +
                 "<td " + achievClass + ">" + formatPercent(kpi.revenueAchievementRate) + "</td>" +
                 "<td>" + formatPercent(kpi.occupancyRate) + "</td>" +
                 "<td>" + (kpi.averageRating ? kpi.averageRating.toFixed(1) + " <i class='fas fa-star' style='color:#f39c12'></i>" : "N/A") + "</td>" +
@@ -124,7 +123,7 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return context.dataset.label + ': ' + formatCurrency(context.raw);
+                                return context.dataset.label + ': ' + window.formatCurrency(context.raw);
                             }
                         }
                     }

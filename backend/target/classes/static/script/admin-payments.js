@@ -16,18 +16,18 @@
 
     function statusBadge(s) {
         var map = { PENDING: "badge-pending", COMPLETED: "badge-confirmed", FAILED: "badge-cancelled", REJECTED: "badge-cancelled" };
-        return "<span class='badge " + (map[s] || "badge-maintenance") + "'>" + (s || "PENDING") + "</span>";
+        return "<span class='badge " + (map[s] || "badge-maintenance") + "' data-i18n='status_" + s + "'>" + (s || "PENDING") + "</span>";
     }
 
     function formatMoney(amount) {
         var value = Math.round(Number(amount) || 0);
-        return value.toLocaleString("vi-VN") + " ₫";
+        return window.formatCurrency(value);
     }
 
     function methodLabel(p) {
         var m = p.method || p.paymentMethod || p.payment_method || "";
         var icons = { CARD: "💳", TRANSFER: "🏦", CASH: "💵" };
-        return (icons[m] || "💰") + " " + (m || "—");
+        return "<span>" + (icons[m] || "💰") + " <span data-i18n='method_" + m + "'>" + (m || "—") + "</span></span>";
     }
 
     function resolveStatus(p) {
@@ -41,6 +41,7 @@
         var body = document.getElementById("payments-body");
         if (!list || !list.length) {
             body.innerHTML = "<tr><td colspan='7' class='table-empty'>No payments found.</td></tr>";
+        if (typeof applyTranslations === 'function') applyTranslations(global.localStorage.getItem('sot_lang') || 'en');
             return;
         }
         body.innerHTML = list.map(function (p) {

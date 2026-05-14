@@ -22,6 +22,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final org.example.hotelm.booking.repository.BookingRepository bookingRepository;
+    private final org.example.hotelm.review.repository.ReviewRepository reviewRepository;
 
     @Override
     public List<User> getAllUsers() {
@@ -91,6 +93,15 @@ public class UserServiceImpl implements UserService {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("Không tìm thấy user với ID: " + id);
         }
+
+        // Kiểm tra ràng buộc dữ liệu
+        if (!bookingRepository.findByUser_UserID(id).isEmpty()) {
+            throw new ConflictException("Cannot delete user with booking history. Please set status to BANNED instead. \nKhông thể xóa người dùng này vì họ đã có lịch sử đặt phòng. Vui lòng chuyển sang trạng thái BỊ KHÓA thay vì xóa.");
+        }
+        if (!reviewRepository.findByUser_UserID(id).isEmpty()) {
+            throw new ConflictException("Cannot delete user with existing reviews. Please set status to BANNED instead. \nKhông thể xóa người dùng này vì họ đã gửi đánh giá. Vui lòng chuyển sang trạng thái BỊ KHÓA thay vì xóa.");
+        }
+
         userRepository.deleteById(id);
     }
 

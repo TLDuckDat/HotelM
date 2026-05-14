@@ -165,3 +165,28 @@ button.secondary {
     border-radius: 8px;
 }
 
+
+
+
+
+/* GLOBAL PREMIUM TYPOGRAPHY OVERRIDE */
+body, p, a, button, input, select, textarea, label, span, div, td, th {
+    font-family: 'Outfit', sans-serif !important;
+}
+h1, h2, h3, h4, h5, h6, .logo-wordmark, .hero-title, .section-title h2, .card-title {
+    font-family: 'Playfair Display', serif !important;
+    letter-spacing: 0.5px;
+}
+/* Ensure icons keep their font family */
+i.fas, i.far, i.fab, i.fa {
+    font-family: "Font Awesome 6 Free" !important;
+}
+
+button, .btn, .btn-primary, .btn-secondary, .btn-danger, .btn-nav-primary, .btn-nav-outline, .btn-book, .btn-explore,
+input, select, textarea, .form-input, .form-select, .form-textarea,
+.card, .filter-card, .promo-card, .offer-card, .villa-card, .service-card, .stat-card, .room-card,
+.modal-content, .auth-container, .table-wrap, .notification-content, .user-menu, .nav-item {
+    border-radius: 0 !important;
+}
+
+#lang-toggle-btn { border-radius: 20px !important; }

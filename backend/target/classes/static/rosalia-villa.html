@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Villa — SOT Resort & Hotel</title>
     <meta name="description" content="Explore luxurious villas at SOT Resort, blending Vietnamese tradition with Western modernity.">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/rosalia-villa.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -19,28 +21,27 @@
                 </a>
             </div>
             <nav class="desktop-nav">
-                <a href="/index.html">HOME</a>
-                <a href="/rosalia-villa.html" class="active">VILLA</a>
-                <a href="/rosalia-service.html">SERVICE</a>
-                <a href="/rosalia-about.html">ABOUT US</a>
-                <a href="/restaurant.html">RESTAURANT</a>
-                <a href="/offer.html">OFFER</a>
-                <a href="/wedding.html">WEDDING</a>
+                <a href="index.html" data-i18n="nav_home">HOME</a>
+                <a href="rooms.html" data-i18n="nav_rooms">ROOMS</a>
+                <a href="rosalia-service.html" data-i18n="nav_service">SERVICE</a>
+                <a href="rosalia-about.html" data-i18n="nav_about">ABOUT US</a>
+                <a href="offer.html" data-i18n="nav_offer">OFFER</a>
             </nav>
             <a href="/register.html">
-                <button class="btn-book" href>BOOK NOW</button>
+                <button class="btn-book" href data-i18n="nav_booknow">BOOK NOW</button>
             </a>
             <button class="mobile-menu-btn" id="menuToggle"><i class="fas fa-bars"></i></button>
         </div>
         <div class="mobile-nav" id="mobileNav">
             <a href="/index.html">HOME</a>
-            <a href="/rosalia-villa.html" class="active">VILLA</a>
+            <a href="/rooms.html" data-i18n="menu_rooms">ROOMS</a>
+            <a href="/rosalia-villa.html" class="active" data-i18n="nav_villa">VILLA</a>
             <a href="/rosalia-service.html">SERVICE</a>
             <a href="/rosalia-about.html">ABOUT US</a>
-            <a href="/restaurant.html">RESTAURANT</a>
+            <a href="/restaurant.html" data-i18n="nav_restaurant">RESTAURANT</a>
             <a href="/offer.html">OFFER</a>
-            <a href="/wedding.html">WEDDING</a>
-            <button class="btn-book" style="margin-top:10px;width:100%">BOOK NOW</button>
+            <a href="/wedding.html" data-i18n="nav_wedding">WEDDING</a>
+            <button class="btn-book" style="margin-top:10px;width:100%" data-i18n="nav_booknow">BOOK NOW</button>
         </div>
     </header>
 
@@ -81,7 +82,7 @@
                 <span><i class="fas fa-bed"></i> King Bed</span>
                 <span><i class="fas fa-swimming-pool"></i> Pool</span>
             </div>
-            <a href="#" class="btn-explore">EXPLORE</a>
+            <a href="#" class="btn-explore" data-i18n="btn_explore">EXPLORE</a>
         </div>
     </section>
 
@@ -97,7 +98,7 @@
                 <span><i class="fas fa-bed"></i> King Bed</span>
                 <span><i class="fas fa-mountain"></i> Balcony</span>
             </div>
-            <a href="#" class="btn-explore">EXPLORE</a>
+            <a href="#" class="btn-explore" data-i18n="btn_explore">EXPLORE</a>
         </div>
     </section>
 
@@ -105,15 +106,15 @@
     <footer>
         <div class="container">
             <div class="newsletter">
-                <h3>Subscribe to our e-newsletter:</h3>
+                <h3 data-i18n="footer_newsletter">Subscribe to our e-newsletter:</h3>
                 <form id="newsletter-form">
                     <input type="email" placeholder="Your email address" required>
-                    <button type="submit">SUBSCRIBE</button>
+                    <button type="submit" data-i18n="footer_subscribe">SUBSCRIBE</button>
                 </form>
             </div>
             <div class="contact-info">
-                <p>147 Mai Dich, Cau Giay, Ha Noi</p>
-                <p>0242 242 0777 | info@webhotel.vn</p>
+                <p data-i18n="footer_address">448 Le Van Viet, Tang Nhon Phu A, TP Ho Chi Minh</p>
+                <p data-i18n="footer_phone">0336374498 | dinhgiang19092k6@gmail.com</p>
             </div>
             <div class="copyright"><p>&copy; 2026 SOT. All rights reserved</p></div>
         </div>

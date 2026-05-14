@@ -5,13 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>User Management - SOT Resort & Hotel</title>
   <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <link rel="stylesheet" href="assets/css/admin.css" />
   <style>
     .badge-admin { background: rgba(201,160,80,0.18); color: #B8941E; border: 1px solid rgba(201,160,80,0.4); }
     .badge-user  { background: rgba(61,40,23,0.08);   color: #3D2817; border: 1px solid rgba(61,40,23,0.2); }
+    
+    /* Search box premium style */
+    .header-actions { display: flex; gap: 15px; align-items: center; }
+    .search-box { position: relative; display: flex; align-items: center; background: var(--white); border: 1px solid var(--border); border-radius: 30px; padding: 0 15px; transition: 0.3s; box-shadow: var(--shadow); }
+    .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(201, 160, 80, 0.1); }
+    .search-box i { color: var(--text-muted); font-size: 0.9rem; }
+    .search-box input { border: none; padding: 10px 12px; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.9rem; width: 250px; background: transparent; }
   </style>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <header class="topbar">
@@ -41,8 +50,8 @@
       </div>
     </div>
     <button id="lang-toggle-btn" onclick="toggleLanguage()" title="Switch to Vietnamese">
-      <span class="lang-flag">🇻🇳</span>
-      <span class="lang-label">VI</span>
+      <span class="lang-flag"></span>
+      <span class="lang-label"></span>
     </button>
   </div>
 </header>
@@ -86,7 +95,7 @@
         <span id="sidebar-unread-badge" class="sidebar-unread-badge"></span>
       </button>
       <div class="sidebar-divider"></div>
-      <button class="nav-item danger" onclick="AdminDashboard.handleLogout()">
+      <button class="nav-item danger" onclick="AdminUsers.handleLogout()">
         <i class="fas fa-sign-out-alt"></i><span data-i18n="sidebar_logout">Sign Out</span>
       </button>
     </nav>
@@ -100,6 +109,12 @@
         <h1 data-i18n="admin_users_title">User Management</h1>
         <p data-i18n="admin_users_sub">View, manage roles and delete accounts</p>
       </div>
+      <div class="header-actions">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="user-search" placeholder="Search name or email..." />
+        </div>
+      </div>
     </div>
 
     <div class="card">
@@ -111,10 +126,11 @@
           <thead>
           <tr>
             <th data-i18n="admin_users_col_id">User ID</th>
-            <th data-i18n="admin_users_col_name">Name</th>
+            <th data-i18n="table_name">Name</th>
             <th data-i18n="admin_users_col_email">Email</th>
-            <th data-i18n="admin_users_col_role">Current Role</th>
-            <th>Change Role</th>
+            <th data-i18n="admin_users_col_role">Role</th>
+            <th>Status</th>
+            <th>Update Role / Status</th>
             <th data-i18n="admin_users_col_action">Action</th>
           </tr>
           </thead>
@@ -125,6 +141,19 @@
       </div>
     </div>
   </main>
+</div>
+
+<!-- Custom Confirmation Modal -->
+<div id="confirm-modal" class="modal" style="display:none">
+  <div class="modal-content" style="max-width:400px; text-align:center">
+    <div style="font-size:3rem; color:var(--primary); margin-bottom:15px"><i class="fas fa-exclamation-circle"></i></div>
+    <h2 id="confirm-title" style="margin-bottom:10px">Confirm Action</h2>
+    <p id="confirm-text" style="color:var(--text-muted); margin-bottom:25px; white-space: pre-line;">Are you sure you want to proceed?</p>
+    <div style="display:flex; gap:12px; justify-content:center">
+      <button id="confirm-cancel-btn" class="btn-cancel" style="padding:10px 20px">Cancel</button>
+      <button id="confirm-ok-btn" class="btn-primary" style="padding:10px 20px">Confirm</button>
+    </div>
+  </div>
 </div>
 
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>

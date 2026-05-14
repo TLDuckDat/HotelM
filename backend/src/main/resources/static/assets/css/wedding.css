@@ -10,14 +10,14 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', sans-serif;
     color: var(--dark);
     line-height: 1.6;
     overflow-x: hidden;
 }
 
 .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-h1, h2, h3, h4 { font-family: 'Playfair Display', serif; }
+h1, h2, h3, h4 { font-family: 'Inter', sans-serif; }
 
 /* Header */
 header {
@@ -90,7 +90,7 @@ header.scrolled { background: rgba(42, 24, 16, 0.95); backdrop-filter: blur(5px)
     align-self: flex-start;
     border: 2px solid var(--primary); background: transparent; color: var(--primary);
     padding: 12px 30px; font-size: 14px; letter-spacing: 2px; font-weight: 600;
-    cursor: pointer; transition: 0.3s; border-radius: 4px; font-family: 'Lato', sans-serif;
+    cursor: pointer; transition: 0.3s; border-radius: 4px; font-family: 'Inter', sans-serif;
 }
 .btn-proposal:hover { background: var(--primary); color: var(--white); }
 
@@ -114,7 +114,7 @@ header.scrolled { background: rgba(42, 24, 16, 0.95); backdrop-filter: blur(5px)
 footer { background: var(--light); padding: 80px 0 30px; text-align: center; }
 .newsletter h3 { font-size: 1.2rem; }
 .newsletter form { display: flex; max-width: 500px; margin: 20px auto; }
-.newsletter input { flex: 1; padding: 12px; border: 2px solid var(--dark); outline: none; font-family: 'Lato', sans-serif; }
+.newsletter input { flex: 1; padding: 12px; border: 2px solid var(--dark); outline: none; font-family: 'Inter', sans-serif; }
 .newsletter button {
     background: var(--dark); color: white; border: none; padding: 0 25px;
     cursor: pointer; font-size: 14px; letter-spacing: 1px; transition: 0.3s;
@@ -132,3 +132,28 @@ footer { background: var(--light); padding: 80px 0 30px; text-align: center; }
     .info-image img { height: 250px; }
     .gallery-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+
+
+
+/* GLOBAL PREMIUM TYPOGRAPHY OVERRIDE */
+body, p, a, button, input, select, textarea, label, span, div, td, th {
+    font-family: 'Outfit', sans-serif !important;
+}
+h1, h2, h3, h4, h5, h6, .logo-wordmark, .hero-title, .section-title, .card-title, .section-heading h2 {
+    font-family: 'Playfair Display', serif !important;
+    letter-spacing: 0.5px;
+}
+/* Ensure icons keep their font family */
+i.fas, i.far, i.fab, i.fa {
+    font-family: "Font Awesome 6 Free" !important;
+}
+
+button, .btn, .btn-primary, .btn-secondary, .btn-danger, .btn-nav-primary, .btn-nav-outline, .btn-book, .btn-explore,
+input, select, textarea, .form-input, .form-select, .form-textarea,
+.card, .filter-card, .promo-card, .offer-card, .villa-card, .service-card, .stat-card, .room-card,
+.modal-content, .auth-container, .table-wrap, .notification-content, .user-menu, .nav-item {
+    border-radius: 0 !important;
+}
+
+#lang-toggle-btn { border-radius: 20px !important; }

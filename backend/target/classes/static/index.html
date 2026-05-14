@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOT Resort & Hotel</title>
     <link rel="icon" href="/assets/image/logo.svg" type="image/svg+xml">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
-        rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/home.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -24,16 +24,10 @@
             </div>
             <nav class="desktop-nav">
                 <a href="index.html" data-i18n="nav_home">HOME</a>
-                <!-- <a href="login.html">LOGIN</a> -->
-                <!-- <a href="dashboard.html">DASHBOARD</a> -->
-                <!-- <a href="room-list.html">ROOMS</a> -->
-                <!-- <a href="booking.html">BOOKINGS</a> -->
-                <!-- <a href="rosalia-villa.html">VILLA</a> -->
+                <a href="rooms.html" data-i18n="nav_rooms">ROOMS</a>
                 <a href="rosalia-service.html" data-i18n="nav_service">SERVICE</a>
                 <a href="rosalia-about.html" data-i18n="nav_about">ABOUT US</a>
-                <!-- <a href="restaurant.html">RESTAURANT</a> -->
                 <a href="offer.html" data-i18n="nav_offer">OFFER</a>
-                <!-- <a href="wedding.html">WEDDING</a> -->
             </nav>
 
             <div class="nav-actions" id="nav-actions">
@@ -42,9 +36,7 @@
                     <span class="lang-flag">🇻🇳</span>
                     <span class="lang-label">VI</span>
                 </button>
-                <button class="btn-nav-outline" id="btn-login" onclick="openLoginModal()" data-i18n>SIGN IN</button>
-                <button class="btn-nav-primary" id="btn-register" onclick="openRegisterModal()" data-i18n>BOOK
-                    NOW</button>
+                <button class="btn-nav-outline" id="btn-login" onclick="openLoginModal()" data-i18n data-i18n="nav_signin">SIGN IN</button>
             </div>
 
             <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
@@ -211,11 +203,11 @@
                 </form>
             </div>
             <div class="contact-info">
-                <p data-i18n="footer_address">147 Mai Dich, Cau Giay, Ha Noi</p>
-                <p data-i18n="footer_phone">0242 242 0777 | info@webhotel.vn</p>
+                <p data-i18n="footer_address">448 Le Van Viet, Tang Nhon Phu A, TP Ho Chi Minh</p>
+                <p data-i18n="footer_phone">0336374498 | dinhgiang19092k6@gmail.com</p>
             </div>
             <div class="copyright">
-                <p>© 2026 SOT. All rights reserved</p>
+                <p data-i18n="footer_copyright">© 2026 SOT. All rights reserved</p>
             </div>
         </div>
     </footer>

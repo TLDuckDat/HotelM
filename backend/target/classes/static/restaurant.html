@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant - SOT Resort & Hotel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/restaurant.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -18,16 +20,14 @@
                 </a>
             </div>
             <nav class="desktop-nav">
-                <a href="/index.html">HOME</a>
-                <a href="/rosalia-villa.html">VILLA</a>
-                <a href="/rosalia-service.html">SERVICE</a>
-                <a href="/rosalia-about.html">ABOUT US</a>
-                <a href="/restaurant.html" class="active">RESTAURANT</a>
-                <a href="/offer.html">OFFER</a>
-                <a href="/wedding.html">WEDDING</a>
+                <a href="index.html" data-i18n="nav_home">HOME</a>
+                <a href="rooms.html" data-i18n="nav_rooms">ROOMS</a>
+                <a href="rosalia-service.html" data-i18n="nav_service">SERVICE</a>
+                <a href="rosalia-about.html" data-i18n="nav_about">ABOUT US</a>
+                <a href="offer.html" data-i18n="nav_offer">OFFER</a>
             </nav>
             <a href="/register.html">
-                <button class="btn-book" href>BOOK NOW</button>
+                <button class="btn-book" href data-i18n="nav_booknow">BOOK NOW</button>
             </a>
             <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
         </div>
@@ -66,7 +66,7 @@
                         </div>
                     </div>
                     <p class="description">A unique combination of spices together to create a new dish. Bold French style mixed with Vietnamese flavor. The restaurant's dishes have made a deep impression on diners.</p>
-                    <button class="btn-table">BOOK A TABLE</button>
+                    <button class="btn-table" data-i18n="btn_book_table">BOOK A TABLE</button>
                 </div>
             </div>
 
@@ -106,7 +106,7 @@
                         </div>
                     </div>
                     <p class="description">An ideal place for you to relax. Nestled among elegant villas, serving a variety of cool tropical cocktails, healthy organic juices and a delicious snack menu, we will bring you exciting experiences.</p>
-                    <button class="btn-table">BOOK A TABLE</button>
+                    <button class="btn-table" data-i18n="btn_book_table">BOOK A TABLE</button>
                 </div>
             </div>
 
@@ -114,7 +114,7 @@
                 <button class="carousel-btn prev" onclick="carouselPrev('bar')"><i class="fas fa-chevron-left"></i></button>
                 <div class="carousel-track">
                     <img src="" alt="Bar" class="carousel-img" id="bar-img">
-                    <div class="carousel-overlay"><h3>Bar</h3></div>
+                    <div class="carousel-overlay"><h3 data-i18n="heading_bar">Bar</h3></div>
                 </div>
                 <button class="carousel-btn next" onclick="carouselNext('bar')"><i class="fas fa-chevron-right"></i></button>
                 <div class="carousel-dots" id="bar-dots"></div>
@@ -126,15 +126,15 @@
     <footer>
         <div class="container">
             <div class="newsletter">
-                <h3>Subscribe to our e-newsletter:</h3>
+                <h3 data-i18n="footer_newsletter">Subscribe to our e-newsletter:</h3>
                 <form id="newsletter-form">
                     <input type="email" placeholder="Your email address" required>
-                    <button type="submit">SUBSCRIBE</button>
+                    <button type="submit" data-i18n="footer_subscribe">SUBSCRIBE</button>
                 </form>
             </div>
             <div class="contact-info">
-                <p>147 Mai Dich, Cau Giay, Ha Noi</p>
-                <p>0242 242 0777 | info@webhotel.vn</p>
+                <p data-i18n="footer_address">448 Le Van Viet, Tang Nhon Phu A, TP Ho Chi Minh</p>
+                <p data-i18n="footer_phone">0336374498 | dinhgiang19092k6@gmail.com</p>
             </div>
             <div class="copyright">
                 <p>&copy; 2026 SOT. All rights reserved</p>
