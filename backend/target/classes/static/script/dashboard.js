@@ -55,18 +55,20 @@
         document.getElementById('sidebar-overlay').classList.remove('active');
     };
 
-    function renderUserUI() {
-        const user = window.AuthStore?.getCurrentUser();
-        if (!user) return;
+    window.toggleNotification = function (e) {
+        e.stopPropagation();
+        const menu = document.getElementById('notificationMenu');
+        if (menu) menu.classList.toggle('active');
+    };
 
-        const topbarName = document.getElementById('topbar-username');
-        const sidebarName = document.getElementById('sidebar-username');
-        const sidebarRole = document.getElementById('sidebar-role');
+    document.addEventListener('click', (e) => {
+        const dropdown = document.querySelector('.notification-dropdown');
+        if (dropdown && !dropdown.contains(e.target)) {
+            const menu = document.getElementById('notificationMenu');
+            if (menu) menu.classList.remove('active');
+        }
+    });
 
-        if (topbarName) topbarName.textContent = user.fullName || 'Guest';
-        if (sidebarName) sidebarName.textContent = user.fullName || 'Guest';
-        if (sidebarRole) sidebarRole.textContent = user.role || 'USER';
-    }
 
     document.addEventListener('DOMContentLoaded', () => {
         loadDashboard();

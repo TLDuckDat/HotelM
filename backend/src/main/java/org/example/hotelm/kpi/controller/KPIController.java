@@ -2,6 +2,7 @@ package org.example.hotelm.kpi.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.hotelm.kpi.dto.GlobalKPIResponse;
 import org.example.hotelm.kpi.dto.KPIResponse;
 import org.example.hotelm.kpi.dto.KPITargetRequest;
 import org.example.hotelm.kpi.service.KPIService;
@@ -17,8 +18,16 @@ public class KPIController {
 
     private final KPIService kpiService;
 
+    @GetMapping("/summary")
+    public ResponseEntity<GlobalKPIResponse> getGlobalSummary(
+            @RequestParam int year,
+            @RequestParam int month) {
+        return ResponseEntity.ok(kpiService.getGlobalSummary(year, month));
+    }
+
 
     @GetMapping("/branch/{branchId}")
+
     public ResponseEntity<KPIResponse> getKPIByBranchAndMonth(
             @PathVariable String branchId,
             @RequestParam int year,

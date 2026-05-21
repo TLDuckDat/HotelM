@@ -5,16 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard - SOT Resort & Hotel</title>
     <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
-      rel="stylesheet"
-    />
+    
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
     <link rel="stylesheet" href="assets/css/admin.css" />
-  </head>
+      
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
   <body>
     <header class="topbar">
       <a href="index.html" class="topbar-logo">
@@ -241,8 +240,12 @@
       <i class="fas fa-bars"></i>
     </button>
 
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="script/api/baseApi.js"></script>
     <script src="script/authStore.js"></script>
+    <script src="script/api/notificationApi.js"></script>
+    <script src="script/notification-manager.js"></script>
     <script src="script/api/userApi.js"></script>
     <script src="script/api/roomApi.js"></script>
     <script src="script/api/bookingApi.js"></script>
@@ -250,5 +253,6 @@
     <script src="script/app-shell.js"></script>
     <script src="script/admin-dashboard.js"></script>
     <script src="script/language.js"></script>
+
   </body>
 </html>

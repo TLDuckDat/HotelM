@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard - SOT Resort & Hotel</title>
     <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
-        rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/profile.css" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -22,9 +22,24 @@
         </a>
         <div class="topbar-right">
             <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            
+            <div class="notification-dropdown">
+                <button class="notification-btn" onclick="toggleNotification(event)">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge"></span>
+                </button>
+                <div class="notification-content" id="notificationMenu">
+                    <div class="notification-header">Notifications</div>
+                    <div class="notification-list">
+                        <div class="notification-empty">No new notifications</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="topbar-greeting">Welcome, <strong id="topbar-username">Guest</strong></div>
             <a href="account.html" class="topbar-avatar"><i class="fas fa-user"></i></a>
         </div>
+
     </header>
 
     <div class="layout">
@@ -94,13 +109,18 @@
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
     <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
 
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="script/api/baseApi.js"></script>
+    <script src="script/authStore.js"></script>
+    <script src="script/api/notificationApi.js"></script>
+    <script src="script/notification-manager.js"></script>
     <script src="script/api/userApi.js"></script>
     <script src="script/api/roomApi.js"></script>
     <script src="script/api/bookingApi.js"></script>
-    <script src="script/authStore.js"></script>
     <script src="script/guard.js"></script>
     <script src="script/dashboard.js"></script>
+
 
 </body>
 

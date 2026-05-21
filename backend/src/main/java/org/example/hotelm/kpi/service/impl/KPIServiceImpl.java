@@ -6,6 +6,7 @@ import org.example.hotelm.branch.entity.Branch;
 import org.example.hotelm.branch.repository.BranchRepository;
 import org.example.hotelm.common.exception.ResourceNotFoundException;
 import org.example.hotelm.invoice.repository.InvoiceRepository;
+import org.example.hotelm.kpi.dto.GlobalKPIResponse;
 import org.example.hotelm.kpi.dto.KPIResponse;
 import org.example.hotelm.kpi.dto.KPITargetRequest;
 import org.example.hotelm.kpi.entity.BranchKPI;
@@ -45,6 +46,13 @@ public class KPIServiceImpl implements KPIService {
 
     @Override
     public List<KPIResponse> getAllBranchesKPIForMonth(int year, int month) {
+        // Đảm bảo tất cả chi nhánh đều có dữ liệu KPI cho tháng đó
+        List<Branch> branches = branchRepository.findAll();
+        for (Branch b : branches) {
+            if (kpiRepository.findByBranch_BranchIdAndYearAndMonth(b.getBranchId(), year, month).isEmpty()) {
+                recalculateAndSave(b.getBranchId(), year, month);
+            }
+        }
         return kpiRepository.findByYearAndMonth(year, month).stream()
                 .map(this::toResponse)
                 .toList();
@@ -74,6 +82,29 @@ public class KPIServiceImpl implements KPIService {
         return toResponse(recalculateAndSave(branchId, year, month));
     }
 
+    @Override
+    public GlobalKPIResponse getGlobalSummary(int year, int month) {
+        Double totalRevenue = invoiceRepository.sumGlobalRevenueByMonth(year, month);
+        long totalBookings = bookingRepository.countGlobalByMonth(year, month);
+        Double avgRating = reviewRepository.avgGlobalRating();
+        
+        List<BranchKPI> monthlyKpis = kpiRepository.findByYearAndMonth(year, month);
+        double avgOccupancy = monthlyKpis.stream()
+                .mapToDouble(BranchKPI::getOccupancyRate)
+                .average()
+                .orElse(0.0);
+
+        return new GlobalKPIResponse(
+                year,
+                month,
+                totalRevenue != null ? totalRevenue : 0.0,
+                totalBookings,
+                avgOccupancy,
+                avgRating != null ? avgRating : 0.0,
+                (int) branchRepository.count()
+        );
+    }
+
     private BranchKPI recalculateAndSave(String branchId, int year, int month) {
         Branch branch = branchRepository.findById(branchId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chi nhánh: " + branchId));
@@ -88,33 +119,11 @@ public class KPIServiceImpl implements KPIService {
                     return newKpi;
                 });
 
-        // Tính tổng doanh thu từ Invoice của chi nhánh trong tháng
-        double totalRevenue = invoiceRepository.findAll().stream()
-                .filter(inv -> inv.getBooking() != null
-                        && inv.getBooking().getRoom() != null
-                        && inv.getBooking().getRoom().getBranch() != null
-                        && branchId.equals(inv.getBooking().getRoom().getBranch().getBranchId())
-                        && inv.getPaidAt() != null
-                        && inv.getPaidAt().getYear() == year
-                        && inv.getPaidAt().getMonthValue() == month)
-                .mapToDouble(inv -> inv.getAmount() - (inv.getDiscount() != null ? inv.getDiscount() : 0))
-                .sum();
-
-        // Đếm tổng số booking của chi nhánh trong tháng
-        long totalBookings = bookingRepository.findAll().stream()
-                .filter(b -> b.getRoom() != null
-                        && b.getRoom().getBranch() != null
-                        && branchId.equals(b.getRoom().getBranch().getBranchId())
-                        && b.getCreatedAt() != null
-                        && b.getCreatedAt().getYear() == year
-                        && b.getCreatedAt().getMonthValue() == month)
-                .count();
-
-        // Tổng số phòng của chi nhánh
-        long totalRooms = roomRepository.findAll().stream()
-                .filter(r -> r.getBranch() != null
-                        && branchId.equals(r.getBranch().getBranchId()))
-                .count();
+        // Sử dụng query đã tối ưu
+        Double totalRevenue = invoiceRepository.sumRevenueByBranchAndMonth(branchId, year, month);
+        long totalBookings = bookingRepository.countByBranchAndMonth(branchId, year, month);
+        long totalRooms = roomRepository.countByBranch_BranchId(branchId);
+        Double avgRating = reviewRepository.avgRatingByBranch(branchId);
 
         // Tỉ lệ lấp đầy = booking / (rooms * days_in_month)
         int daysInMonth = java.time.YearMonth.of(year, month).lengthOfMonth();
@@ -122,19 +131,10 @@ public class KPIServiceImpl implements KPIService {
                 ? Math.min(100.0, (totalBookings * 100.0) / (totalRooms * daysInMonth))
                 : 0;
 
-        // Điểm review trung bình của chi nhánh
-        double avgRating = reviewRepository.findAll().stream()
-                .filter(r -> r.getRoom() != null
-                        && r.getRoom().getBranch() != null
-                        && branchId.equals(r.getRoom().getBranch().getBranchId()))
-                .mapToInt(r -> r.getRating())
-                .average()
-                .orElse(0.0);
-
-        kpi.setTotalRevenue(totalRevenue);
+        kpi.setTotalRevenue(totalRevenue != null ? totalRevenue : 0.0);
         kpi.setTotalBookings((int) totalBookings);
         kpi.setOccupancyRate(occupancyRate);
-        kpi.setAverageRating(avgRating);
+        kpi.setAverageRating(avgRating != null ? avgRating : 0.0);
 
         return kpiRepository.save(kpi);
     }
@@ -158,4 +158,4 @@ public class KPIServiceImpl implements KPIService {
                 kpi.getAverageRating()
         );
     }
-}
+}

@@ -1,7 +1,7 @@
 @import url('../css/home.css');
 
 body {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', sans-serif;
     color: var(--dark);
     line-height: 1.6;
     overflow-x: hidden;
@@ -17,7 +17,7 @@ h1,
 h2,
 h3,
 h4 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', sans-serif;
 }
 
 header {
@@ -64,7 +64,7 @@ header.scrolled {
 }
 
 .logo-wordmark {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', sans-serif;
     font-size: 1.35rem;
     font-weight: 600;
     letter-spacing: 0.12em;
@@ -93,7 +93,7 @@ header.scrolled {
     padding: 8px 20px;
     cursor: pointer;
     transition: 0.3s;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     letter-spacing: 1px;
 }
@@ -144,7 +144,7 @@ header.scrolled {
     border-radius: 20px;
     padding: 5px 13px 5px 10px;
     cursor: pointer;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 1.5px;
@@ -313,7 +313,7 @@ header.scrolled #lang-toggle-btn {
     color: var(--primary);
     text-decoration: none;
     transition: 0.3s;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', sans-serif;
     margin-top: 10px;
 }
 
@@ -411,7 +411,7 @@ footer h3 {
     padding: 12px;
     border: 2px solid var(--dark);
     outline: none;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
 .newsletter button {
@@ -420,7 +420,7 @@ footer h3 {
     border: none;
     padding: 0 25px;
     cursor: pointer;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', sans-serif;
     letter-spacing: 1px;
 }
 
@@ -455,3 +455,27 @@ footer h3 {
         display: block;
     }
 }
+
+
+
+/* GLOBAL PREMIUM TYPOGRAPHY OVERRIDE */
+body, p, a, button, input, select, textarea, label, span, div, td, th {
+    font-family: 'Outfit', sans-serif !important;
+}
+h1, h2, h3, h4, h5, h6, .logo-wordmark, .hero-title, .section-title, .card-title, .section-heading h2 {
+    font-family: 'Playfair Display', serif !important;
+    letter-spacing: 0.5px;
+}
+/* Ensure icons keep their font family */
+i.fas, i.far, i.fab, i.fa {
+    font-family: "Font Awesome 6 Free" !important;
+}
+
+button, .btn, .btn-primary, .btn-secondary, .btn-danger, .btn-nav-primary, .btn-nav-outline, .btn-book, .btn-explore,
+input, select, textarea, .form-input, .form-select, .form-textarea,
+.card, .filter-card, .promo-card, .offer-card, .villa-card, .service-card, .stat-card, .room-card,
+.modal-content, .auth-container, .table-wrap, .notification-content, .user-menu, .nav-item {
+    border-radius: 0 !important;
+}
+
+#lang-toggle-btn { border-radius: 20px !important; }

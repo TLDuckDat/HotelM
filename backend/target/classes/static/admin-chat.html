@@ -5,17 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Live Chat — SOT Admin</title>
     <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
-      rel="stylesheet"
-    />
+    
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
     <link rel="stylesheet" href="assets/css/admin.css" />
     <link rel="stylesheet" href="assets/css/admin-chat.css" />
-  </head>
+      
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
 
   <body>
     <!-- ── TOPBAR ── -->
@@ -204,6 +203,8 @@
                 display: none;
                 flex-direction: column;
                 flex: 1;
+                min-height: 0;
+                height: 100%;
                 overflow: hidden;
               "
             >
@@ -275,11 +276,16 @@
       <i class="fas fa-bars"></i>
     </button>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
     <script src="script/api/baseApi.js"></script>
     <script src="script/api/chatApi.js"></script>
+    <script src="script/api/notificationApi.js"></script>
     <script src="script/authStore.js"></script>
     <script src="script/guard.js"></script>
     <script src="script/app-shell.js"></script>
+    <script src="script/notification-manager.js"></script>
     <script src="script/admin-chat.js"></script>
     <script src="script/language.js"></script>
   </body>

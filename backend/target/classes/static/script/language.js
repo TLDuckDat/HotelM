@@ -10,11 +10,34 @@ const TRANSLATIONS = {
         // -------------------------------------------------------------Home page -------------------------------------------------------------
         // ── Nav ───────────────────────────────────────────────
         nav_home: 'HOME',
+        nav_rooms: 'ROOMS',
         nav_service: 'SERVICE',
         nav_about: 'ABOUT US',
         nav_offer: 'OFFER',
         nav_signin: 'SIGN IN',
         nav_booknow: 'BOOK NOW',
+
+        // -- Missing Nav & Buttons --
+        nav_villa: 'VILLA',
+        nav_restaurant: 'RESTAURANT',
+        nav_wedding: 'WEDDING',
+        btn_search: 'Search',
+        btn_book_table: 'BOOK A TABLE',
+        btn_req_proposal: 'REQUEST PROPOSAL',
+        heading_bar: 'Bar',
+        rooms_list_title: 'Room list',
+        rooms_search_title: 'Search room',
+        table_id: 'ID',
+        table_name: 'Name',
+        table_type: 'Type',
+        table_capacity: 'Capacity',
+        table_status: 'Status',
+        table_detail: 'Detail',
+        loading_text: 'Loading...',
+        loading_rooms: 'Loading rooms...',
+        loading_reviews: 'Loading reviews...',
+        choose_booking: 'Choose a booking...',
+
 
         // ── Notification ─────────────────────────────────────────────
         notification_title: 'Notifications',
@@ -50,6 +73,33 @@ const TRANSLATIONS = {
 
         // ── Home Offers (mini cards) ──────────────────────────
         offers_title: 'OFFERS',
+
+        // -- Filters --
+        filter_search_placeholder: 'Search by room name...',
+        filter_capacity_placeholder: 'Guests...',
+        filter_type_all: 'All Room Types',
+        filter_rating_all: 'All',
+        filter_rating_5: '5 Stars',
+        filter_rating_4: '4+ Stars',
+        filter_rating_3: '3+ Stars',
+        filter_price_all: 'All Prices',
+        filter_price_1: 'Under $20',
+        filter_price_2: '$20 - $40',
+        filter_price_over: 'Over $40',
+        filter_reset: 'Reset Filters',
+
+
+        // -- Payment Status & Methods --
+        status_PENDING: 'PENDING',
+        status_COMPLETED: 'COMPLETED',
+        status_CANCELLED: 'CANCELLED',
+        status_REFUNDED: 'REFUNDED',
+        method_TRANSFER: 'Transfer',
+        method_CASH: 'Cash',
+        method_CARD: 'Card',
+        method_Bank_Transfer: 'Bank Transfer',
+        method_Bank: 'Bank Transfer',
+
         filter_all: 'All',
         filter_stay: 'Stay',
         filter_spa: 'Spa',
@@ -526,14 +576,37 @@ const TRANSLATIONS = {
     },
 
     vi: {
-            // -------------------------------------------------------------Home page -------------------------------------------------------------
+        // -------------------------------------------------------------Home page -------------------------------------------------------------
         // ── Nav ───────────────────────────────────────────────
         nav_home: 'TRANG CHỦ',
+        nav_rooms: 'PHÒNG',
         nav_service: 'DỊCH VỤ',
         nav_about: 'VỀ CHÚNG TÔI',
         nav_offer: 'ƯU ĐÃI',
         nav_signin: 'ĐĂNG NHẬP',
         nav_booknow: 'ĐẶT PHÒNG',
+
+        // -- Missing Nav & Buttons --
+        nav_villa: 'BIỆT THỰ',
+        nav_restaurant: 'NHÀ HÀNG',
+        nav_wedding: 'TIỆC CƯỚI',
+        btn_search: 'Tìm kiếm',
+        btn_book_table: 'ĐẶT BÀN',
+        btn_req_proposal: 'YÊU CẦU TƯ VẤN',
+        heading_bar: 'Quầy Bar',
+        rooms_list_title: 'Danh sách phòng',
+        rooms_search_title: 'Tìm phòng',
+        table_id: 'Mã',
+        table_name: 'Tên',
+        table_type: 'Loại',
+        table_capacity: 'Sức chứa',
+        table_status: 'Trạng thái',
+        table_detail: 'Chi tiết',
+        loading_text: 'Đang tải...',
+        loading_rooms: 'Đang tải danh sách phòng...',
+        loading_reviews: 'Đang tải đánh giá...',
+        choose_booking: 'Chọn một đặt phòng...',
+
 
         // ── Notification ─────────────────────────────────────────────
         notification_title: 'Thông báo',
@@ -569,6 +642,33 @@ const TRANSLATIONS = {
 
         // ── Home Offers (mini cards) ──────────────────────────
         offers_title: 'ƯU ĐÃI',
+
+        // -- Filters --
+        filter_search_placeholder: 'Tìm theo tên phòng...',
+        filter_capacity_placeholder: 'Số khách...',
+        filter_type_all: 'Tất cả loại phòng',
+        filter_rating_all: 'Tất cả',
+        filter_rating_5: '5 Sao',
+        filter_rating_4: 'Từ 4 Sao',
+        filter_rating_3: 'Từ 3 Sao',
+        filter_price_all: 'Tất cả mức giá',
+        filter_price_1: 'Dưới 500,000 VND',
+        filter_price_2: '500,000 - 1,000,000 VND',
+        filter_price_over: 'Trên 1,000,000 VND',
+        filter_reset: 'Xoá bộ lọc',
+
+
+        // -- Payment Status & Methods --
+        status_PENDING: 'ĐANG CHỜ',
+        status_COMPLETED: 'HOÀN THÀNH',
+        status_CANCELLED: 'ĐÃ HUỶ',
+        status_REFUNDED: 'ĐÃ HOÀN TIỀN',
+        method_TRANSFER: 'Chuyển khoản',
+        method_CASH: 'Tiền mặt',
+        method_CARD: 'Thẻ tín dụng',
+        method_Bank_Transfer: 'Chuyển khoản',
+        method_Bank: 'Chuyển khoản',
+
         filter_all: 'Tất cả',
         filter_stay: 'Lưu trú',
         filter_spa: 'Spa',
@@ -756,8 +856,8 @@ const TRANSLATIONS = {
         sidebar_reviews: "Đánh giá phòng",
         sidebar_signout: "Đăng xuất",
 
-        
-        
+
+
         // ── Admin overview ─────────────────────────────────────────────
         // ── Admin dashboard ─────────────────────────────────────────────
         admin_dashboard_title: 'Bảng Điều Khiển Quản Trị',
@@ -1090,17 +1190,25 @@ function applyTranslations(lang) {
 function updateToggleButton(lang) {
     const btn = document.getElementById('lang-toggle-btn');
     if (!btn) return;
-    // Show the OTHER language as the button label (what you'd switch TO)
     btn.setAttribute('data-current-lang', lang);
-    btn.querySelector('.lang-label').textContent = lang === 'en' ? 'VI' : 'EN';
-    btn.querySelector('.lang-flag').textContent = lang === 'en' ? '🇻🇳' : '🇬🇧';
-    btn.title = lang === 'en' ? 'Chuyển sang Tiếng Việt' : 'Switch to English';
+    // Show CURRENT language with active style, label says what lang you're in now
+    if (lang === 'vi') {
+        btn.querySelector('.lang-label').textContent = 'VI';
+        btn.querySelector('.lang-flag').textContent = '\uD83C\uDDFB\uD83C\uDDF3'; // 🇻🇳
+        btn.title = 'Switch to English';
+    } else {
+        btn.querySelector('.lang-label').textContent = 'EN';
+        btn.querySelector('.lang-flag').textContent = '\uD83C\uDDEC\uD83C\uDDE7'; // 🇬🇧
+        btn.title = 'Chuy\u1EC3n sang Ti\u1EBFng Vi\u1EC7t';
+    }
 }
 
 /** Toggle between EN and VI */
 function toggleLanguage() {
     const newLang = getLang() === 'en' ? 'vi' : 'en';
     setLang(newLang);
+    // Reload to refresh all JS rendered currency
+    window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang: newLang } }));
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1115,3 +1223,19 @@ document.addEventListener('DOMContentLoaded', () => {
     applyTranslations(lang);
     updateToggleButton(lang);
 });
+
+/** Currency Conversion */
+window.formatCurrency = function (amount) {
+    if (!amount && amount !== 0) return "—";
+    const lang = getLang();
+    const num = Number(amount);
+    if (lang === 'en') {
+        const usd = Math.round(num / 25000);
+        return "$" + usd;
+    } else {
+        return num.toLocaleString("vi-VN") + " ₫";
+    }
+};
+
+// Override toggleLanguage to also re-render prices if they are dynamic without data-i18n
+// The languageChanged custom event handles this for JS-rendered pages (room-detail, rooms list, etc.)

@@ -42,6 +42,12 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow();
 
+        if (user.getStatus() == User.UserStatus.BANNED) {
+            throw new org.example.hotelm.common.exception.ForbiddenException(
+                    "Your account has been locked. Please contact support. \nTài khoản của bạn đã bị khóa. Vui lòng liên hệ hỗ trợ."
+            );
+        }
+
         String token = jwtService.generateToken(
                 userDetailsService.loadUserByUsername(user.getEmail())
         );

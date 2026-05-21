@@ -260,19 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.switchToForgotPassword = switchToForgotPassword;
     window.switchToLoginFromForgot = switchToLoginFromForgot;
 
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    if (loginForm) loginForm.addEventListener('submit', handleLogin);
-    if (registerForm) registerForm.addEventListener('submit', handleRegister);
-
     checkExistingUser();
 
-    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-        backdrop.addEventListener('click', () => {
-            closeLoginModal();
-            closeRegisterModal();
-        });
-    });
 
     // Notifications
     window.toggleNotification = function (e) {

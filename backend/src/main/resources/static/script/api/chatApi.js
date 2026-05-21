@@ -17,8 +17,8 @@
         return baseApi.post(CHAT_ENDPOINT + "/threads", payload, options);
     }
 
-    function getThread(threadId, options) {
-        return baseApi.get(CHAT_ENDPOINT + "/threads/" + encodeURIComponent(threadId), options);
+    function getThread(threadId, viewerId, options) {
+        return baseApi.get(CHAT_ENDPOINT + "/threads/" + encodeURIComponent(threadId) + "?viewerId=" + encodeURIComponent(viewerId), options);
     }
 
     function getThreadsByUser(userId, options) {
@@ -29,11 +29,17 @@
         return baseApi.post(CHAT_ENDPOINT + "/messages", payload, options);
     }
 
+    function markAsRead(threadId, userId, options) {
+        return baseApi.patch(CHAT_ENDPOINT + "/threads/" + encodeURIComponent(threadId) + "/read?userId=" + encodeURIComponent(userId), null, options);
+    }
+
     global.ChatApi = {
         getAvailableStaff: getAvailableStaff,
         createThread: createThread,
         getThread: getThread,
         getThreadsByUser: getThreadsByUser,
-        sendMessage: sendMessage
+        sendMessage: sendMessage,
+        markAsRead: markAsRead
     };
+
 })(window);

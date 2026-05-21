@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Room Detail – SOT Resort &amp; Hotel</title>
     <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml" />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <link rel="stylesheet" href="assets/css/room-detail.css" />
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
 
     <!-- ══ TOPBAR ══ -->
@@ -41,9 +47,9 @@
                 </div>
             </div>
 
-            <button id="lang-toggle-btn" onclick="toggleLanguage()" title="Switch language">
-                <span class="lang-flag">🇻🇳</span>
-                <span class="lang-label">VI</span>
+            <button id="lang-toggle-btn" onclick="toggleLanguage()" title="Chuyển sang Tiếng Việt">
+                <span class="lang-flag">🇬🇧</span>
+                <span class="lang-label">EN</span>
             </button>
         </div>
     </header>
@@ -103,14 +109,23 @@
     <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
 
     <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
     <script src="script/api/baseApi.js"></script>
     <script src="script/api/roomApi.js"></script>
     <script src="script/api/roomTypeApi.js"></script>
     <script src="script/api/userApi.js"></script>
+    <script src="script/api/notificationApi.js"></script>
+    <script src="script/api/reviewApi.js"></script>
+
     <script src="script/authStore.js"></script>
     <script src="script/guard.js"></script>
     <script src="script/app-shell.js"></script>
+    <script src="script/notification-manager.js"></script>
+
     <script src="script/room-detail.js"></script>
     <script src="script/language.js"></script>
 </body>
+
 </html>

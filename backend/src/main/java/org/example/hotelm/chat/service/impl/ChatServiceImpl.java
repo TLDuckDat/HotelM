@@ -24,6 +24,7 @@ public class ChatServiceImpl implements ChatService {
     private final ChatThreadRepository chatThreadRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
+    private final org.example.hotelm.notification.service.NotificationService notificationService;
 
     @Override
     @Transactional(readOnly = true)
@@ -89,7 +90,22 @@ public class ChatServiceImpl implements ChatService {
         thread.setLastMessageAt(message.getSentAt());
         chatThreadRepository.save(thread);
 
-        return chatMessageRepository.save(message);
+        ChatMessage saved = chatMessageRepository.save(message);
+
+        // Notify the other participant
+        String recipientId = request.senderUserId().equals(thread.getGuest().getUserID()) 
+                ? thread.getStaff().getUserID() 
+                : thread.getGuest().getUserID();
+        
+        notificationService.createAndPush(
+                recipientId,
+                "New Message",
+                "You have a new message from " + (request.senderRole() == User.Role.USER ? thread.getGuest().getFullName() : "Support"),
+                org.example.hotelm.notification.entity.Notification.NotificationType.CHAT_MESSAGE,
+                thread.getId()
+        );
+
+        return saved;
     }
 
     /**
@@ -104,7 +120,22 @@ public class ChatServiceImpl implements ChatService {
         );
     }
 
+    @Override
+    @Transactional
+    public void markAsRead(String threadId, String userId) {
+        ChatThread thread = getThreadById(threadId);
+        thread.getMessages().forEach(msg -> {
+            if (!msg.getSenderUserId().equals(userId)) {
+                msg.setRead(true);
+            }
+        });
+        chatThreadRepository.save(thread);
+        notificationService.markAsReadByRelatedId(userId, threadId);
+    }
+
+
     private ChatThread hydrateThread(ChatThread thread) {
+
         if (thread.getGuest() != null) {
             thread.getGuest().getUserID();
             thread.getGuest().getFullName();

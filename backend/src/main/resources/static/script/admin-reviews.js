@@ -34,10 +34,10 @@
     }
 
     function resolveRef(r) {
-        // DB links review to room, not booking.
-        // Backend may expose bookingId if it joins through the booking table.
+        // Now using backend-provided bookingId and roomName
         if (r.bookingId) return "Booking #" + r.bookingId;
-        if (r.room) return "Room: " + (r.room.roomName || r.room.roomID || "");
+        if (r.roomName) return "Room: " + r.roomName;
+        if (r.roomId) return "Room ID: " + r.roomId;
         return "—";
     }
 
@@ -49,8 +49,8 @@
             return;
         }
         body.innerHTML = list.map(function (r) {
-            var id     = r.reviewID || r.id || "—";
-            var guest  = r.user ? (r.user.fullName || r.user.email || r.user.userID) : (r.userId || "—");
+            var id     = r.reviewId || r.reviewID || r.id || "—";
+            var guest  = r.userName || r.userEmail || r.userId || "—";
             var ref    = resolveRef(r);
             var text   = resolveText(r);
             var status = r.status || "PUBLISHED";
@@ -81,8 +81,8 @@
             return;
         }
         grid.innerHTML = list.map(function (r) {
-            var id     = r.reviewID || r.id || "—";
-            var guest  = r.user ? (r.user.fullName || r.user.email || r.user.userID) : (r.userId || "—");
+            var id     = r.reviewId || r.reviewID || r.id || "—";
+            var guest  = r.userName || r.userEmail || r.userId || "—";
             var ref    = resolveRef(r);
             var text   = resolveText(r);
             var status = r.status || "PUBLISHED";

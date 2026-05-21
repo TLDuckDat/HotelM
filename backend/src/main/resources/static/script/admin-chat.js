@@ -110,8 +110,14 @@
                 : null;
             var preview = lastMessage ? lastMessage.content : "No messages yet";
             var subtitle = getGuestAccount(thread) || (preview.slice(0, 50) + (preview.length > 50 ? "..." : ""));
+            
+            var unreadBadge = "";
+            if (thread.unreadCount > 0) {
+                unreadBadge = '<span class="conv-unread-badge">' + thread.unreadCount + '</span>';
+            }
+
             var item = document.createElement("div");
-            item.className = "conv-item" + (activeConvId === thread.id ? " active" : "");
+            item.className = "conv-item" + (activeConvId === thread.id ? " active" : "") + (thread.unreadCount > 0 ? " has-unread" : "");
             item.dataset.id = thread.id;
             item.innerHTML = ""
                 + '<div class="conv-avatar">'
@@ -119,7 +125,7 @@
                 + '<span class="online-dot"></span>'
                 + "</div>"
                 + '<div class="conv-meta">'
-                + '  <div class="conv-name">' + escHtml(getGuestName(thread)) + "</div>"
+                + '  <div class="conv-name">' + escHtml(getGuestName(thread)) + " " + unreadBadge + "</div>"
                 + '  <div class="conv-preview">' + escHtml(subtitle) + "</div>"
                 + "</div>"
                 + '<div class="conv-time">' + (lastMessage ? formatTime(lastMessage.sentAt) : "") + "</div>";
@@ -132,24 +138,57 @@
         updateSidebarBadge();
     }
 
-    function renderMessages(thread) {
+    function scrollToBottom(animated) {
+        var container = document.getElementById("chat-messages");
+        if (!container) return;
+        if (animated) {
+            container.style.scrollBehavior = "smooth";
+        } else {
+            container.style.scrollBehavior = "auto";
+        }
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function buildMessageRow(msg, currentUserId, thread) {
+        var isAdmin = msg.senderUserId === currentUserId;
+        var row = document.createElement("div");
+        row.className = "msg-row" + (isAdmin ? " from-admin" : "");
+        row.dataset.msgId = msg.id || "";
+        row.innerHTML = ""
+            + '<div class="msg-avatar-sm">' + (isAdmin ? "AD" : initials(getGuestName(thread))) + "</div>"
+            + '<div class="msg-group">'
+            + '  <div class="msg-sender">' + escHtml(isAdmin ? "Bạn" : getGuestName(thread)) + "</div>"
+            + '  <div class="msg-bubble">' + escHtml(msg.content) + "</div>"
+            + '  <div class="msg-time">' + formatTime(msg.sentAt) + "</div>"
+            + "</div>";
+        return row;
+    }
+
+    function renderMessages(thread, forceScroll) {
         var container = document.getElementById("chat-messages");
         var currentUser = getCurrentUser();
         var currentUserId = getUserId(currentUser);
-        var messages = sortMessages(thread && thread.messages ? thread.messages : []);
-        var signature = getThreadSignature(thread);
+        // Sort chronologically — oldest first, newest last → newest appears at bottom
+        var allMessages = sortMessages(thread && thread.messages ? thread.messages : []);
+        // Show only last 50; user can scroll up to see older
+        var messages = allMessages.slice(-50);
 
-        if (signature === activeThreadSignature) return;
+        var signature = getThreadSignature(thread);
+        if (signature === activeThreadSignature && !forceScroll) return;
 
         container.innerHTML = "";
         if (!messages.length) {
-            container.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:0.85rem;padding:40px 0;">No messages yet</div>';
+            var empty = document.createElement("div");
+            empty.className = "chat-empty-msg";
+            empty.textContent = "No messages yet — say hello!";
+            container.appendChild(empty);
             activeThreadSignature = signature;
             return;
         }
 
         var lastDateLabel = "";
         messages.forEach(function (msg) {
+            // Date separator
             var dateLabel = formatDateLabel(msg.sentAt);
             if (dateLabel !== lastDateLabel) {
                 lastDateLabel = dateLabel;
@@ -158,23 +197,17 @@
                 divider.textContent = dateLabel;
                 container.appendChild(divider);
             }
-
-            var isAdmin = msg.senderUserId === currentUserId;
-            var row = document.createElement("div");
-            row.className = "msg-row" + (isAdmin ? " from-admin" : "");
-            row.innerHTML = ""
-                + '<div class="msg-avatar-sm">' + (isAdmin ? "AD" : initials(getGuestName(thread))) + "</div>"
-                + '<div class="msg-group">'
-                + '  <div class="msg-sender">' + escHtml(isAdmin ? "Ban" : getGuestName(thread)) + "</div>"
-                + '  <div class="msg-bubble">' + escHtml(msg.content) + "</div>"
-                + '  <div class="msg-time">' + formatTime(msg.sentAt) + "</div>"
-                + "</div>";
-            container.appendChild(row);
+            container.appendChild(buildMessageRow(msg, currentUserId, thread));
         });
 
-        container.scrollTop = container.scrollHeight;
         activeThreadSignature = signature;
+        // Use rAF to ensure browser has finished layout before scrolling
+        requestAnimationFrame(function() {
+            container.style.scrollBehavior = "auto";
+            container.scrollTop = container.scrollHeight;
+        });
     }
+
 
     function renderActiveThread(thread) {
         if (!thread) return;
@@ -183,7 +216,7 @@
         document.getElementById("chat-header-status").textContent = getGuestAccount(thread) || "Online";
         document.getElementById("chat-empty-state").style.display = "none";
         document.getElementById("chat-active").style.display = "flex";
-        renderMessages(thread);
+        renderMessages(thread, true);
     }
 
     function loadThreads() {
@@ -203,7 +236,9 @@
 
     function loadThread(threadId) {
         if (!threadId) return Promise.resolve();
-        return global.ChatApi.getThread(threadId).then(function (thread) {
+        var user = getCurrentUser();
+        var userId = getUserId(user);
+        return global.ChatApi.getThread(threadId, userId).then(function (thread) {
             var idx = threadsCache.findIndex(function (item) { return item.id === thread.id; });
             if (idx >= 0) threadsCache[idx] = thread;
             activeConvId = thread.id;
@@ -214,7 +249,13 @@
 
     function openConversation(id) {
         activeThreadSignature = "";
-        loadThread(id);
+        var user = getCurrentUser();
+        var userId = getUserId(user);
+        global.ChatApi.markAsRead(id, userId).then(function() {
+            loadThread(id);
+        });
+
+
         if (window.innerWidth <= 768) {
             document.getElementById("conv-pane").classList.add("hidden");
             document.getElementById("chat-pane").classList.remove("hidden");
@@ -242,11 +283,14 @@
         }).then(function () {
             input.value = "";
             input.style.height = "auto";
-            activeThreadSignature = "";
+            activeThreadSignature = ""; // force re-render with new message
             return loadThread(activeConvId).then(loadThreads);
+        }).catch(function() {
+            // Re-enable on error
         }).finally(function () {
             sending = false;
             document.getElementById("send-btn").disabled = false;
+            input.focus();
         });
     }
 

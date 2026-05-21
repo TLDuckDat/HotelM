@@ -10,6 +10,8 @@ public record ChatMessageResponse(
         String senderUserId,
         User.Role senderRole,
         String content,
-        Instant sentAt
+        Instant sentAt,
+        boolean isRead
 ) {}
+
 

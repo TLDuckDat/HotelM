@@ -13,6 +13,8 @@ public record ChatThreadResponse(
         String staffEmail,
         Instant createdAt,
         Instant lastMessageAt,
-        List<ChatMessageResponse> messages
+        List<ChatMessageResponse> messages,
+        int unreadCount
 ) {}
+
 

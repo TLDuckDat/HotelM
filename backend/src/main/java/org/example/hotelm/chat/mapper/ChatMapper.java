@@ -20,14 +20,19 @@ public class ChatMapper {
                 message.getSenderUserId(),
                 message.getSenderRole(),
                 message.getContent(),
-                message.getSentAt()
+                message.getSentAt(),
+                message.isRead()
         );
     }
 
-    public ChatThreadResponse toThreadResponse(ChatThread thread) {
+    public ChatThreadResponse toThreadResponse(ChatThread thread, String viewerUserId) {
         List<ChatMessageResponse> messages = thread.getMessages() == null
                 ? List.of()
                 : thread.getMessages().stream().map(this::toMessageResponse).toList();
+
+        int unreadCount = (int) messages.stream()
+                .filter(m -> !m.isRead() && !m.senderUserId().equals(viewerUserId))
+                .count();
 
         return new ChatThreadResponse(
                 thread.getId(),
@@ -39,9 +44,11 @@ public class ChatMapper {
                 thread.getStaff() == null ? null : thread.getStaff().getEmail(),
                 thread.getCreatedAt(),
                 thread.getLastMessageAt(),
-                messages
+                messages,
+                unreadCount
         );
     }
+
 
     public StaffUserResponse toStaffUserResponse(User user) {
         return new StaffUserResponse(

@@ -66,11 +66,19 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = new Review();
         review.setUser(user);
         review.setRoom(room);
+        review.setBookingId(request.bookingId());
         review.setRating(request.rating());
         review.setComment(request.comment());
         review.setCreatedAt(LocalDateTime.now());
 
         return reviewMapper.toResponse(reviewRepository.save(review));
+    }
+
+    @Override
+    public void updateReviewStatus(String id, String status) {
+        Review review = findOrThrow(id);
+        review.setStatus(status);
+        reviewRepository.save(review);
     }
 
     @Override
