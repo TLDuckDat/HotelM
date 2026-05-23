@@ -1,3 +1,5 @@
+@import url('design-system.css');
+
 :root {
     --primary: #C9A050;
     --dark: #3D2817;
@@ -22,6 +24,7 @@ header.scrolled { background: rgba(42, 24, 16, 0.95); backdrop-filter: blur(5px)
 .logo-img { width: 48px; height: 48px; display: block; flex-shrink: 0; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35)); }
 .desktop-nav a { color: var(--white); text-decoration: none; margin: 0 15px; font-size: 14px; letter-spacing: 1px; transition: 0.3s; }
 .desktop-nav a:hover, .desktop-nav a.active { color: var(--primary); }
+.nav-actions { display: flex; gap: 1rem; align-items: center; }
 .btn-book { border: 2px solid var(--primary); background: transparent; color: var(--primary); padding: 8px 20px; cursor: pointer; transition: 0.3s; font-family: 'Outfit', sans-serif; font-size: 14px; letter-spacing: 1px; }
 .btn-book:hover { background: var(--primary); color: var(--white); }
 .mobile-menu-btn { display: none; background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
@@ -80,7 +83,7 @@ footer h3 { font-size: 1.2rem; color: var(--dark); }
 .copyright p { font-size: 0.75rem; color: rgba(61,40,23,0.4); }
 
 @media (max-width: 768px) {
-    .desktop-nav, .btn-book:not(.mobile-nav .btn-book) { display: none; }
+    .desktop-nav, .nav-actions .btn-book { display: none; }
     .mobile-menu-btn { display: block; }
     .cat-grid { gap: 30px; }
 }

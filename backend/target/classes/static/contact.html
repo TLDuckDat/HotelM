@@ -3,40 +3,46 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Contact - HotelM</title>
+    <title>Contact - SOT Resort & Hotel</title>
+    <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <link rel="stylesheet" href="/assets/css/app.css" />
-    
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="app-shell-topbar">
 <div id="app-topbar"></div>
 <div class="container">
-    <h2>Contact</h2>
-    <div id="contact-message" class="notice">Send contact request to hotel team.</div>
+    <div class="page-header-lite">
+        <h1 data-i18n="contact_title">Contact</h1>
+        <p data-i18n="contact_desc">Send a message to our team</p>
+    </div>
+    <div id="contact-message" class="notice" data-i18n="contact_desc">Send a message to our team</div>
     <div class="card">
         <form id="contact-form">
-            <label for="contact-name">Name</label>
+            <label for="contact-name" data-i18n="contact_name">Full Name</label>
             <input id="contact-name" required />
 
-            <label for="contact-email">Email</label>
+            <label for="contact-email" data-i18n="contact_email">Email</label>
             <input id="contact-email" type="email" required />
 
-            <label for="contact-content">Message</label>
+            <label for="contact-content" data-i18n="contact_message">Message</label>
             <textarea id="contact-content" rows="4" required></textarea>
 
-            <button class="primary" type="submit">Submit</button>
+            <button class="primary" type="submit" data-i18n="contact_submit">Send Message</button>
         </form>
     </div>
 </div>
 
+<script src="/script/language.js"></script>
 <script src="/script/api/baseApi.js"></script>
 <script src="/script/api/contactApi.js"></script>
 <script src="/script/authStore.js"></script>
 <script src="/script/app-shell.js"></script>
 <script src="/script/contact.js"></script>
 <script>
-    window.AppShell.renderTopbar("Contact");
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.AppShell) window.AppShell.renderTopbar(window.t ? window.t('contact_title') : 'Contact');
+    });
 </script>
 </body>
 </html>
-

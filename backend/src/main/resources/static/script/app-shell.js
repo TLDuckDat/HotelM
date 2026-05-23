@@ -11,24 +11,32 @@
         var role = user && user.role ? user.role : "GUEST";
         var name = user && user.fullName ? user.fullName : "Guest";
 
+        var lang = (global.getLang && global.getLang()) || "en";
+        var L = function (key, fallback) {
+            return (global.t && global.t(key, lang)) || fallback;
+        };
+
         host.innerHTML = ""
             + "<div class='topbar'>"
-            + "  <div><strong>HotelM</strong> - " + title + "</div>"
-            + "  <div>"
+            + "  <div><strong>SOT</strong> — " + title + "</div>"
+            + "  <div style='display:flex;align-items:center;flex-wrap:wrap;gap:8px;'>"
             + "    <span class='badge'>" + name + " (" + role + ")</span>"
-            + "    <a href='index.html'>Home</a>"
-            + "    <a href='dashboard.html'>Dashboard</a>"
-            + "    <a href='rooms.html'>Rooms</a>"
-            + "    <a href='bookings.html'>Bookings</a>"
-            + "    <a href='create-booking.html'>Create Booking</a>"
-            + "    <a href='payments.html'>Payments</a>"
-            + "    <a href='refunds.html'>Refunds</a>"
-            + "    <a href='reviews.html'>Reviews</a>"
-            + "    <a href='account.html'>Account</a>"
-            + "    <a href='admin-dashboard.html'>Admin</a>"
-            + "    <button id='logout-btn' type='button'>Logout</button>"
+            + "    <button id='lang-toggle-btn' type='button' onclick='toggleLanguage()'>"
+            + "      <span class='lang-flag'>" + (lang === "vi" ? "🇻🇳" : "🇬🇧") + "</span>"
+            + "      <span class='lang-label'>" + (lang === "vi" ? "VI" : "EN") + "</span>"
+            + "    </button>"
+            + "    <a href='index.html'>" + L("nav_home", "Home") + "</a>"
+            + "    <a href='dashboard.html'>" + L("sidebar_dashboard", "Dashboard") + "</a>"
+            + "    <a href='rooms.html'>" + L("nav_rooms", "Rooms") + "</a>"
+            + "    <a href='bookings.html'>" + L("sidebar_bookings", "Bookings") + "</a>"
+            + "    <a href='account.html'>" + L("sidebar_account", "Account") + "</a>"
+            + "    <button id='logout-btn' type='button'>" + L("sidebar_signout", "Logout") + "</button>"
             + "  </div>"
             + "</div>";
+
+        if (global.updateToggleButton) {
+            global.updateToggleButton(lang);
+        }
 
         var logoutBtn = document.getElementById("logout-btn");
         if (logoutBtn) {

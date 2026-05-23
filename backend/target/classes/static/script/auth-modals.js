@@ -342,6 +342,7 @@ function initForgotPasswordModal() {
 function openForgotPasswordModal() {
     closeLoginModal();
     closeRegisterModal();
+    _showForgotStep(1);
     if (forgotPasswordModal) forgotPasswordModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
@@ -349,6 +350,7 @@ function openForgotPasswordModal() {
 function closeForgotPasswordModal() {
     if (forgotPasswordModal) forgotPasswordModal.classList.remove('active');
     document.body.style.overflow = 'auto';
+    _showForgotStep(1);
 }
 
 function switchToForgotPassword(e) {
@@ -361,6 +363,15 @@ function switchToLoginFromForgot(e) {
     if (e) e.preventDefault();
     closeForgotPasswordModal();
     setTimeout(openLoginModal, 300);
+}
+
+function _showForgotStep(step) {
+    const stepEmail = document.getElementById('forgot-step-email');
+    const stepReset = document.getElementById('forgot-step-reset');
+    const msg       = document.getElementById('forgotMessage');
+    if (stepEmail) stepEmail.style.display = step === 1 ? 'block' : 'none';
+    if (stepReset) stepReset.style.display = step === 2 ? 'block' : 'none';
+    if (msg)       msg.textContent = '';
 }
 
 async function handleForgotPassword(e) {
@@ -389,19 +400,91 @@ async function handleForgotPassword(e) {
     msg.textContent = '';
 
     try {
-        await new Promise(resolve => setTimeout(resolve, 1200));
+        const res = await fetch(REGISTER_BASE_URL + '/auth/otp/forgot-password/send', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ email })
+        });
+        const data = await res.json();
 
-        msg.innerHTML = `✅ <strong>Reset link has been sent!</strong><br>
-            Please check your email: <strong>${email}</strong>`;
+        if (!res.ok) {
+            const errMsg = data.message || data.error || 'Failed to send OTP';
+            msg.textContent = '❌ ' + errMsg;
+            msg.className = 'form-message error';
+            return;
+        }
+
+        _showForgotStep(2);
+        const emailDisplay = document.getElementById('forgot-otp-email');
+        if (emailDisplay) emailDisplay.textContent = email;
+
+        msg.textContent = '✅ OTP sent to your email!';
+        msg.className = 'form-message success';
+
+    } catch (err) {
+        msg.textContent = '❌ Cannot connect to server. Check backend!';
+        msg.className = 'form-message error';
+    } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+    }
+}
+
+async function handleForgotPasswordReset() {
+    const btn      = document.getElementById('forgotResetBtn');
+    const msg      = document.getElementById('forgotMessage');
+    const otpInput = document.getElementById('forgotOtp');
+    const otp      = otpInput.value.trim();
+    const newPassInput = document.getElementById('forgotNewPassword');
+    const newPassword  = newPassInput.value;
+
+    const otpOk = otp.length === 6 && /^\d{6}$/.test(otp);
+    otpInput.classList.toggle('error-field', !otpOk);
+    if (!otpOk) {
+        msg.textContent = 'Please enter a valid 6-digit OTP';
+        msg.className = 'form-message error';
+        return;
+    }
+
+    const passOk = newPassword.length >= 6;
+    newPassInput.classList.toggle('error-field', !passOk);
+    if (!passOk) {
+        msg.textContent = 'Password must be at least 6 characters';
+        msg.className = 'form-message error';
+        return;
+    }
+
+    btn.classList.add('loading');
+    btn.disabled = true;
+    msg.textContent = '';
+
+    const email = document.getElementById('forgotEmail').value.trim();
+
+    try {
+        const res = await fetch(REGISTER_BASE_URL + '/auth/otp/forgot-password/verify', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ email, otp, newPassword })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            const errMsg = data.message || data.error || 'Failed to reset password';
+            msg.textContent = '❌ ' + errMsg;
+            msg.className = 'form-message error';
+            return;
+        }
+
+        msg.textContent = '✅ Password reset successfully!';
         msg.className = 'form-message success';
 
         setTimeout(() => {
             closeForgotPasswordModal();
             setTimeout(openLoginModal, 600);
-        }, 4000);
+        }, 1500);
 
     } catch (err) {
-        msg.textContent = 'Something went wrong. Please try again.';
+        msg.textContent = '❌ Cannot connect to server. Check backend!';
         msg.className = 'form-message error';
     } finally {
         btn.classList.remove('loading');
@@ -412,3 +495,5 @@ async function handleForgotPassword(e) {
 // Expose globals cần thiết
 window.handleRegisterOtpVerify    = handleRegisterOtpVerify;
 window.handleRegisterResendOtp    = handleRegisterResendOtp;
+window.handleForgotPasswordReset = handleForgotPasswordReset;
+window._showForgotStep            = _showForgotStep;

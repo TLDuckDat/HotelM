@@ -137,14 +137,43 @@
         <p data-i18n="modal_forgot_sub">Enter your email address and we'll send you a link to reset your password</p>
       </div>
       <form class="auth-form" id="forgotPasswordForm" onsubmit="handleForgotPassword(event)">
-        <div class="form-field">
-          <label class="form-label" data-i18n="modal_forgot_email_label">Email Address</label>
-          <input type="email" id="forgotEmail" class="form-input" placeholder="you@example.com" required />
+        <!-- BƯỚC 1: Nhập email -->
+        <div id="forgot-step-email">
+          <div class="form-field">
+            <label class="form-label" data-i18n="modal_forgot_email_label">Email Address</label>
+            <input type="email" id="forgotEmail" class="form-input" placeholder="you@example.com" required />
+          </div>
+          <button type="submit" class="btn-submit" id="forgotBtn">
+            <span class="btn-text" data-i18n="modal_forgot_submit_btn">Send Reset Code</span>
+            <span class="btn-loader"></span>
+          </button>
         </div>
-        <button type="submit" class="btn-submit" id="forgotBtn">
-          <span class="btn-text" data-i18n="modal_forgot_submit_btn">Send Reset Link</span>
-          <span class="btn-loader"></span>
-        </button>
+
+        <!-- BƯỚC 2: Nhập OTP và Mật khẩu mới (ẩn ban đầu) -->
+        <div id="forgot-step-reset" style="display:none">
+          <p style="text-align:center; margin-bottom:16px; color:#888; font-size:0.88rem">
+            OTP sent to <strong id="forgot-otp-email"></strong>
+          </p>
+          <div class="form-field">
+            <label class="form-label">OTP Code (6 digits)</label>
+            <input type="text" id="forgotOtp" class="form-input" placeholder="123456" maxlength="6"
+                   style="letter-spacing:6px; font-size:1.3rem; text-align:center" />
+          </div>
+          <div class="form-field">
+            <label class="form-label">New Password</label>
+            <input type="password" id="forgotNewPassword" class="form-input" placeholder="Min 6 characters" minlength="6" />
+          </div>
+          <button type="button" class="btn-submit" id="forgotResetBtn" onclick="handleForgotPasswordReset()">
+            <span class="btn-text">Reset Password</span>
+            <span class="btn-loader"></span>
+          </button>
+          <p style="text-align:center; margin-top:10px; font-size:0.82rem">
+            <a href="#" onclick="_showForgotStep(1); return false;" style="color:#666; text-decoration:none">
+               <i class="fas fa-arrow-left"></i> Back
+            </a>
+          </p>
+        </div>
+
         <div id="forgotMessage" class="form-message"></div>
       </form>
       <div class="modal-footer">

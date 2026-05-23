@@ -1,3 +1,5 @@
+@import url('design-system.css');
+
         :root {
             --primary: #C9A050;
             --primary-dark: #B8941E;
@@ -901,6 +903,13 @@
         }
 
         /* ── QUICK ACTIONS ── */
+        .quick-actions-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
         .quick-actions {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -1116,7 +1125,537 @@
 
         /* ── CREATE BOOKING FORM ── */
         .booking-card {
-            max-width: 680px;
+            max-width: none;
+            width: 100%;
+        }
+
+        .booking-form-layout {
+            display: grid;
+            grid-template-columns: 40% 60%;
+            gap: 28px 36px;
+            align-items: start;
+        }
+
+        .booking-form-col-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            min-width: 0;
+        }
+
+        .booking-form-col-fields .form-field {
+            margin-bottom: 22px;
+        }
+
+        .booking-form-col-fields .form-label {
+            font-size: 0.82rem;
+            margin-bottom: 12px !important;
+        }
+
+        .booking-form-col-fields .form-label i {
+            font-size: 0.9rem;
+        }
+
+        .booking-form-col-fields .form-select,
+        .booking-form-col-fields .form-input,
+        .booking-form-col-fields .form-textarea {
+            padding: 13px 16px;
+            font-size: 0.95rem;
+            border-radius: 10px;
+        }
+
+        .booking-form-col-fields .form-textarea {
+            min-height: 110px;
+        }
+
+        .booking-form-col-fields .btn-primary,
+        .booking-form-col-fields .btn-secondary {
+            padding: 13px 24px;
+            font-size: 0.9rem;
+        }
+
+        .booking-form-col-schedule {
+            min-width: 0;
+            max-width: none;
+        }
+
+        .booking-form-col-schedule .booking-schedule-field {
+            margin-bottom: 0;
+        }
+
+        .booking-form-col-schedule .schedule-picker {
+            padding: 14px 16px;
+        }
+
+        .booking-form-col-schedule .schedule-section-dates {
+            margin-bottom: 16px;
+        }
+
+        .booking-selection-panel {
+            margin: 4px 0 20px;
+            padding: 20px 22px;
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md, 12px);
+        }
+
+        .booking-selection-panel[hidden] {
+            display: none !important;
+        }
+
+        .booking-selection-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--dark);
+            margin: 0 0 14px;
+        }
+
+        .booking-selection-list {
+            margin: 0;
+        }
+
+        .booking-selection-list > div {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border);
+            font-size: 0.92rem;
+        }
+
+        .booking-selection-list > div:last-child {
+            border-bottom: none;
+        }
+
+        .booking-selection-list dt {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .booking-selection-list dd {
+            margin: 0;
+            font-weight: 600;
+            color: var(--dark);
+            text-align: right;
+        }
+
+        .booking-price-total {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 2px solid var(--border-gold, var(--border));
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+        }
+
+        .booking-price-total[hidden] {
+            display: none !important;
+        }
+
+        .booking-price-total-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .booking-price-total strong {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.35rem;
+            color: var(--primary-dark, var(--primary));
+        }
+
+        .schedule-price-strip {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: var(--primary-light);
+            border: 1px solid var(--border-gold, var(--border));
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .schedule-price-strip[hidden] {
+            display: none !important;
+        }
+
+        .schedule-price-strip strong {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--dark);
+        }
+
+        .booking-form-col-fields .booking-actions {
+            margin-top: 8px;
+        }
+
+        .booking-schedule-field {
+            margin-top: 0;
+            height: 100%;
+        }
+
+        @media (max-width: 960px) {
+            .booking-form-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .booking-form-col-schedule {
+                max-width: none;
+            }
+
+            .booking-form-col-fields .booking-actions {
+                order: 10;
+            }
+        }
+
+        .schedule-picker {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md, 12px);
+            background: var(--white);
+            padding: 18px;
+        }
+
+        .schedule-picker.is-disabled {
+            opacity: 0.72;
+            pointer-events: none;
+        }
+
+        .schedule-hint {
+            margin: 0 0 14px;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        .schedule-picker:not(.is-disabled) .schedule-hint {
+            display: none;
+        }
+
+        .schedule-section {
+            margin-bottom: 22px;
+        }
+
+        .schedule-section-times {
+            padding-top: 18px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .booking-form-col-schedule .schedule-section-times {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .booking-form-col-schedule .schedule-section-times .schedule-section-head {
+            grid-column: 1 / -1;
+        }
+
+        .booking-form-col-schedule .schedule-section-times .schedule-legend {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 1100px) {
+            .booking-form-col-schedule .schedule-section-times {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .schedule-section-head {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .schedule-section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+
+        .schedule-section-title i {
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .schedule-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 20px;
+        }
+
+        .schedule-summary-item {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .schedule-summary-item strong {
+            display: block;
+            color: var(--dark);
+            font-size: 0.92rem;
+            margin-top: 2px;
+        }
+
+        .schedule-month-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .schedule-month-label {
+            font-weight: 600;
+            min-width: 160px;
+            text-align: center;
+            color: var(--dark);
+        }
+
+        .schedule-nav-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border-gold, var(--border));
+            background: var(--light);
+            color: var(--dark);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .schedule-nav-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .schedule-nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .date-picker {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+
+        .booking-form-col-schedule .date-picker {
+            gap: 4px;
+            max-width: none;
+        }
+
+        .date-picker-weekday {
+            text-align: center;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 4px 0 6px;
+        }
+
+        .date-picker-spacer {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .date-cell {
+            aspect-ratio: 1;
+            min-height: 42px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: var(--light);
+            color: var(--dark);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .booking-form-col-schedule .date-cell {
+            min-height: 34px;
+            aspect-ratio: 1;
+            font-size: 0.8rem;
+            border-radius: 8px;
+        }
+
+        .date-cell:hover:not(:disabled):not(.is-booked) {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .date-cell.is-today {
+            box-shadow: inset 0 0 0 1px var(--primary);
+        }
+
+        .date-cell.is-selected {
+            background: var(--primary);
+            border-color: var(--primary-dark, var(--primary));
+            color: var(--white);
+        }
+
+        .date-cell.is-in-range {
+            background: rgba(201, 160, 80, 0.22);
+            border-color: rgba(201, 160, 80, 0.45);
+        }
+
+        .date-cell.is-booked,
+        .date-cell:disabled {
+            background: #d8d0c4;
+            border-color: #bfb5a8;
+            color: #6b5f52;
+            cursor: not-allowed;
+            opacity: 0.85;
+        }
+
+        .date-cell.is-past:disabled {
+            background: #ebe6df;
+            color: #a89f94;
+        }
+
+        .time-picker-block {
+            margin-bottom: 10px;
+        }
+
+        .time-picker-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .time-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .booking-form-col-schedule .time-picker {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+            gap: 5px;
+        }
+
+        .time-slot {
+            min-width: 72px;
+            padding: 8px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            background: var(--light);
+            color: var(--dark);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .booking-form-col-schedule .time-slot {
+            min-width: 0;
+            padding: 5px 3px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 6px;
+            border-width: 1px;
+            line-height: 1.2;
+        }
+
+        .time-slot:hover:not(:disabled):not(.is-booked) {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .time-slot.is-selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+
+        .time-slot.is-booked,
+        .time-slot:disabled {
+            background: #d8d0c4;
+            border-color: #bfb5a8;
+            color: #6b5f52;
+            cursor: not-allowed;
+            opacity: 0.88;
+        }
+
+        .time-picker-empty {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 8px 0;
+        }
+
+        .schedule-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 18px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-swatch {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .legend-available {
+            background: var(--light);
+        }
+
+        .legend-booked {
+            background: #d8d0c4;
+            border-color: #bfb5a8;
+        }
+
+        .legend-selected {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 560px) {
+            .date-cell {
+                min-height: 36px;
+                font-size: 0.8rem;
+            }
+
+            .booking-form-col-schedule .date-cell {
+                min-height: 32px;
+                font-size: 0.75rem;
+            }
+
+            .booking-form-col-schedule .time-slot {
+                font-size: 0.65rem;
+                padding: 4px 2px;
+            }
         }
 
         .booking-card-header {

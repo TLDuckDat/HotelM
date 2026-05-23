@@ -46,6 +46,9 @@ spring:
           starttls:
             enable: true
             required: true
+          connectiontimeout: 5000 # 5 giây để thiết lập kết nối ban đầu
+          timeout: 5000           # 5 giây để đợi phản hồi dữ liệu
+          writetimeout: 5000      # 5 giây để gửi dữ liệu đi
 
 otp:
   expiry-seconds: 300

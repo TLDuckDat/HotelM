@@ -1,4 +1,6 @@
-/* ── DESIGN TOKENS (mirrors profile.css) ── */
+@import url('design-system.css');
+
+/* ── DESIGN TOKENS (dashboard / admin) ── */
 :root {
     --primary: #C9A050;
     --primary-dark: #B8941E;

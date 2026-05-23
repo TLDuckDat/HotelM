@@ -172,7 +172,7 @@
           <div class="pay-stat-card">
             <div class="pay-stat-icon"><i class="fas fa-receipt"></i></div>
             <div>
-              <div class="pay-stat-label" data-i18n="payments_stat_total">Total Payments</div>
+              <div class="pay-stat-label" data-i18n="payments_stat_total_pay">Total Payments</div>
               <div class="pay-stat-value" id="stat-total">—</div>
             </div>
           </div>
@@ -220,12 +220,13 @@
               <input
                 class="form-input"
                 id="payment-amount"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="0.00"
+                type="text"
+                inputmode="decimal"
+                data-i18n-placeholder="payments_amount_placeholder"
+                placeholder="—"
                 readonly
                 required
+                aria-readonly="true"
               />
             </div>
             <button class="btn-primary" id="payment-submit-btn" type="button">
@@ -303,7 +304,7 @@
     <script src="/script/authStore.js"></script>
     <script src="/script/guard.js"></script>
     <script src="script/app-shell.js"></script>
-    <script src="/script/payments.js"></script>
     <script src="/script/language.js"></script>
+    <script src="/script/payments.js"></script>
   </body>
 </html>

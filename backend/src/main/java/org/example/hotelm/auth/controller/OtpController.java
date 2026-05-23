@@ -10,9 +10,11 @@ import org.example.hotelm.auth.dto.AuthResponse;
 import org.example.hotelm.common.email.EmailService;
 import org.example.hotelm.common.exception.BadRequestException;
 import org.example.hotelm.common.otp.OtpStore;
+import org.example.hotelm.user.entity.User;
 import org.example.hotelm.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.SecureRandom;
@@ -27,6 +29,7 @@ public class OtpController {
     private final EmailService emailService;
     private final UserRepository userRepository;
     private final AuthService authService;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${otp.expiry-seconds:300}")
     private long otpExpirySeconds;
@@ -73,10 +76,60 @@ public class OtpController {
         return ResponseEntity.ok(response);
     }
 
+    // POST /auth/otp/forgot-password/send  { "email": "..." }
+    @PostMapping("/forgot-password/send")
+    public ResponseEntity<Map<String, String>> sendForgotPasswordOtp(
+            @RequestBody Map<String, String> body) {
+
+        String email = body.get("email");
+        if (email == null || email.isBlank()) {
+            throw new BadRequestException("Email is required");
+        }
+        email = email.trim().toLowerCase();
+
+        if (!userRepository.existsByEmail(email)) {
+            throw new BadRequestException("Email này không tồn tại trên hệ thống");
+        }
+
+        String otp = String.format("%06d", new SecureRandom().nextInt(1_000_000));
+        otpStore.save("forgot:" + email, otp, otpExpirySeconds);
+        emailService.sendOtp(email, otp);
+
+        return ResponseEntity.ok(Map.of("message", "Mã xác thực OTP đã được gửi đến " + email));
+    }
+
+    // POST /auth/otp/forgot-password/verify  { email, otp, newPassword }
+    @PostMapping("/forgot-password/verify")
+    public ResponseEntity<Map<String, String>> verifyAndResetPassword(
+            @RequestBody @Valid ForgotPasswordResetRequest request) {
+
+        String email = request.email().trim().toLowerCase();
+
+        if (!otpStore.verify("forgot:" + email, request.otp())) {
+            throw new BadRequestException("OTP không hợp lệ hoặc đã hết hạn");
+        }
+
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new BadRequestException("Email này không tồn tại trên hệ thống"));
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+
+        otpStore.remove("forgot:" + email);
+
+        return ResponseEntity.ok(Map.of("message", "Đặt lại mật khẩu thành công!"));
+    }
+
     public record OtpVerifyRequest(
             @NotBlank String email,
             @NotBlank String otp,
             @NotBlank String fullName,
             @NotBlank String password
+    ) {}
+
+    public record ForgotPasswordResetRequest(
+            @NotBlank String email,
+            @NotBlank String otp,
+            @NotBlank String newPassword
     ) {}
 }

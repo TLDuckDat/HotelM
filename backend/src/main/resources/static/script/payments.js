@@ -19,9 +19,34 @@
         el.style.display = "block";
     }
 
+    function currentLang() {
+        if (global.getLang) return global.getLang();
+        return global.localStorage.getItem("sot_lang") || "en";
+    }
+
     function formatMoney(amount) {
         var value = Math.round(Number(amount) || 0);
-        return window.formatCurrency(value);
+        if (typeof global.formatCurrency === "function") {
+            return global.formatCurrency(value);
+        }
+        if (currentLang() === "vi") {
+            return value.toLocaleString("vi-VN") + " ₫";
+        }
+        return "$" + Math.round(value / 25000);
+    }
+
+    function getSelectedBooking() {
+        var bookingId = document.getElementById("payment-booking-id").value;
+        if (!bookingId) return null;
+        return bookingCache.filter(function (item) {
+            return String(getBookingId(item)) === String(bookingId);
+        })[0] || null;
+    }
+
+    function getSelectedBookingAmount() {
+        var booking = getSelectedBooking();
+        if (!booking) return 0;
+        return Math.round(Number(booking.totalPrice || 0));
     }
 
     // BookingResponse fields: bookingId, userId, roomId, checkIn, checkOut, totalPrice, status
@@ -75,14 +100,20 @@
     }
 
     function updateAmountFromBooking() {
-        var bookingId = document.getElementById("payment-booking-id").value;
         var amountInput = document.getElementById("payment-amount");
-        var booking = bookingCache.filter(function (item) {
-            return getBookingId(item) === bookingId;
-        })[0];
+        var booking = getSelectedBooking();
 
         if (!amountInput) return;
-        amountInput.value = booking ? String(Math.round(Number(booking.totalPrice || 0))) : "";
+
+        if (!booking) {
+            amountInput.value = "";
+            amountInput.removeAttribute("data-raw-amount");
+            return;
+        }
+
+        var raw = Math.round(Number(booking.totalPrice || 0));
+        amountInput.setAttribute("data-raw-amount", String(raw));
+        amountInput.value = raw > 0 ? formatMoney(raw) : "";
     }
 
     function renderBookingOptions() {
@@ -282,7 +313,7 @@
     function submitPayment() {
         var bookingId = document.getElementById("payment-booking-id").value;
         var method = document.getElementById("payment-method").value;
-        var amount = Number(document.getElementById("payment-amount").value);
+        var amount = getSelectedBookingAmount();
 
         if (!bookingId || !amount || amount <= 0) {
             setMessage("Please choose a valid booking first.", "error");
@@ -401,6 +432,35 @@
         if (confirmBtn) confirmBtn.addEventListener("click", confirmPayment);
         if (hideQrBtn) hideQrBtn.addEventListener("click", hideQrPayment);
     }
+
+    function refreshPaymentsPageI18n() {
+        if (typeof global.applyTranslations === "function" && global.getLang) {
+            global.applyTranslations(global.getLang());
+        }
+        updateAmountFromBooking();
+        if (activePayment) {
+            var amtEl = document.getElementById("payment-qr-amount");
+            if (amtEl) {
+                amtEl.textContent = formatMoney(
+                    activePayment.finalAmount != null ? activePayment.finalAmount : activePayment.amount
+                );
+            }
+        }
+        if (paymentCache && paymentCache.length) {
+            var completed = paymentCache.filter(function (payment) {
+                return getPaymentStatus(payment) === "COMPLETED";
+            });
+            var totalAmt = completed.reduce(function (sum, payment) {
+                return sum + (Number(payment.finalAmount != null ? payment.finalAmount : payment.amount) || 0);
+            }, 0);
+            var elAmt = document.getElementById("stat-amount");
+            if (elAmt) elAmt.textContent = formatMoney(totalAmt);
+            renderBookingOptions();
+            renderPayments(paymentCache);
+        }
+    }
+
+    document.addEventListener("languageChanged", refreshPaymentsPageI18n);
 
     document.addEventListener("DOMContentLoaded", init);
 })(window);

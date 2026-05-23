@@ -41,6 +41,7 @@ const TRANSLATIONS = {
 
         // ── Notification ─────────────────────────────────────────────
         notification_title: 'Notifications',
+        notification_header: 'Notifications',
         notification_empty: 'No new notifications',
 
         // ── Menu ─────────────────────────────────────────────
@@ -500,6 +501,30 @@ const TRANSLATIONS = {
         label_note: "Note",
         label_checkin: "Check In",
         label_checkout: "Check Out",
+        label_checkin_date: "Check-in date",
+        label_checkout_date: "Check-out date",
+        label_checkin_time: "Check-in time",
+        label_checkout_time: "Check-out time",
+        booking_schedule_date_section: "Date",
+        booking_schedule_time_section: "Time",
+        booking_pick_room_first: "Please select a room to view availability",
+        booking_legend_available: "Available",
+        booking_legend_booked: "Booked",
+        booking_legend_selected: "Selected",
+        booking_select_checkin_date: "Select check-in date first",
+        booking_select_checkout_date: "Select check-out date first",
+        booking_time_unavailable: "No available time slots",
+        booking_select_datetime: "Please select check-in and check-out date and time",
+        booking_err_invalid_dates: "Please select valid check-in and check-out dates.",
+        booking_err_checkout_after_checkin: "Check-out must be after check-in.",
+        booking_your_selection: "Your selection",
+        booking_room_unavailable: "Selected room is not available for these dates. Please choose another room.",
+        booking_price_per_day: "Price per day",
+        booking_num_days: "Number of days",
+        booking_total: "Total",
+        booking_day_one: "1 day",
+        booking_days_count: "{n} days",
+        booking_price_formula: "{days} × {price}/day",
         btn_confirm: "Confirm Booking",
         btn_back_to_list: "Back to List",
         placeholder_note: "Any special requests or notes (optional)",
@@ -534,6 +559,7 @@ const TRANSLATIONS = {
         label_booking: "Booking",
         label_method: "Payment Method",
         label_amount: "Amount",
+        payments_amount_placeholder: "—",
         btn_submit_payment: "Submit Payment",
         payments_col: "My Payments",
         payments_col_id: "ID",
@@ -573,6 +599,27 @@ const TRANSLATIONS = {
         placeholder_review: "Tell us about your stay…",
         btn_submit_review: "Submit Review",
         label_my_reviews: "My Reviews",
+
+        // ── Guest dashboard ─────────────────────────────────────
+        guest_dashboard_title: 'Dashboard',
+        guest_dashboard_sub: 'Overview of your reservations and account',
+        guest_stat_bookings: 'My Bookings',
+        guest_stat_rooms: 'Rooms Available',
+        guest_stat_payments: 'Payments',
+        guest_stat_reviews: 'Reviews',
+        guest_quick_links: 'Quick Links',
+        guest_link_bookings: 'My Bookings',
+        guest_link_rooms: 'Search Rooms',
+        guest_link_profile: 'My Profile',
+
+        contact_title: 'Contact',
+        contact_desc: 'Send a message to our team',
+        contact_name: 'Full Name',
+        contact_email: 'Email',
+        contact_message: 'Message',
+        contact_submit: 'Send Message',
+        search_keyword_ph: 'Keyword',
+        search_capacity_ph: 'Min. guests',
     },
 
     vi: {
@@ -610,6 +657,7 @@ const TRANSLATIONS = {
 
         // ── Notification ─────────────────────────────────────────────
         notification_title: 'Thông báo',
+        notification_header: 'Thông báo',
         notification_empty: 'Không có thông báo mới',
 
         // ── Menu ─────────────────────────────────────────────
@@ -1074,6 +1122,30 @@ const TRANSLATIONS = {
         label_note: "Ghi chú",
         label_checkin: "Ngày nhận phòng",
         label_checkout: "Ngày trả phòng",
+        label_checkin_date: "Ngày nhận phòng",
+        label_checkout_date: "Ngày trả phòng",
+        label_checkin_time: "Giờ nhận phòng",
+        label_checkout_time: "Giờ trả phòng",
+        booking_schedule_date_section: "Ngày",
+        booking_schedule_time_section: "Giờ",
+        booking_pick_room_first: "Vui lòng chọn phòng để xem lịch trống",
+        booking_legend_available: "Còn trống",
+        booking_legend_booked: "Đã đặt",
+        booking_legend_selected: "Đã chọn",
+        booking_select_checkin_date: "Chọn ngày nhận phòng trước",
+        booking_select_checkout_date: "Chọn ngày trả phòng trước",
+        booking_time_unavailable: "Không còn khung giờ trống",
+        booking_select_datetime: "Vui lòng chọn đầy đủ ngày và giờ nhận/trả phòng",
+        booking_err_invalid_dates: "Vui lòng chọn ngày nhận và trả phòng hợp lệ.",
+        booking_err_checkout_after_checkin: "Ngày trả phòng phải sau ngày nhận phòng.",
+        booking_your_selection: "Lựa chọn của bạn",
+        booking_room_unavailable: "Phòng đã chọn không còn trống trong khoảng thời gian này. Vui lòng chọn phòng khác.",
+        booking_price_per_day: "Giá mỗi ngày",
+        booking_num_days: "Số ngày",
+        booking_total: "Tổng cộng",
+        booking_day_one: "1 ngày",
+        booking_days_count: "{n} ngày",
+        booking_price_formula: "{days} × {price}/ngày",
         btn_confirm: "Xác nhận đặt phòng",
         btn_back_to_list: "Quay lại danh sách",
         placeholder_note: "Yêu cầu đặc biệt hoặc ghi chú thêm (tùy chọn)",
@@ -1108,6 +1180,7 @@ const TRANSLATIONS = {
         label_booking: "Mã đặt phòng",
         label_method: "Phương thức",
         label_amount: "Số tiền",
+        payments_amount_placeholder: "—",
         btn_submit_payment: "Gửi thanh toán",
         payments_col: "Thanh toán của tôi",
         payments_col_id: "Mã thanh toán",
@@ -1147,6 +1220,26 @@ const TRANSLATIONS = {
         placeholder_review: "Hãy chia sẻ về kỳ nghỉ của bạn…",
         btn_submit_review: "Gửi đánh giá",
         label_my_reviews: "Các đánh giá của tôi",
+
+        guest_dashboard_title: 'Bảng điều khiển',
+        guest_dashboard_sub: 'Tổng quan đặt phòng và tài khoản của bạn',
+        guest_stat_bookings: 'Đơn đặt phòng',
+        guest_stat_rooms: 'Phòng có sẵn',
+        guest_stat_payments: 'Thanh toán',
+        guest_stat_reviews: 'Đánh giá',
+        guest_quick_links: 'Lối tắt',
+        guest_link_bookings: 'Đơn đặt phòng',
+        guest_link_rooms: 'Tìm phòng',
+        guest_link_profile: 'Tài khoản',
+
+        contact_title: 'Liên hệ',
+        contact_desc: 'Gửi tin nhắn cho đội ngũ SOT',
+        contact_name: 'Họ và tên',
+        contact_email: 'Email',
+        contact_message: 'Nội dung',
+        contact_submit: 'Gửi tin nhắn',
+        search_keyword_ph: 'Từ khóa',
+        search_capacity_ph: 'Số khách tối thiểu',
     }
 };
 
@@ -1166,24 +1259,52 @@ function setLang(lang) {
     updateToggleButton(lang);
 }
 
+function t(key, lang) {
+    const dict = TRANSLATIONS[lang || getLang()] || TRANSLATIONS.en;
+    return dict[key] || TRANSLATIONS.en[key] || key;
+}
+
 /** Walk the DOM and swap every [data-i18n] element */
 function applyTranslations(lang) {
     const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
+    const root = document.documentElement;
+
+    root.lang = lang;
+    root.classList.remove('lang-en', 'lang-vi');
+    root.classList.add(lang === 'vi' ? 'lang-vi' : 'lang-en');
 
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (!dict[key]) return;
 
-        // Handle placeholder for inputs
-        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-            el.placeholder = dict[key];
+        const tag = el.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA') {
+            if (el.type === 'button' || el.type === 'submit') {
+                el.value = dict[key];
+            } else {
+                el.placeholder = dict[key];
+            }
+        } else if (tag === 'OPTION') {
+            el.textContent = dict[key];
         } else {
             el.textContent = dict[key];
         }
     });
 
-    // Update html lang attribute
-    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (dict[key]) el.placeholder = dict[key];
+    });
+
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        if (dict[key]) el.title = dict[key];
+    });
+
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+        const key = el.getAttribute('data-i18n-aria');
+        if (dict[key]) el.setAttribute('aria-label', dict[key]);
+    });
 }
 
 /** Keep the toggle button label in sync */
@@ -1214,11 +1335,15 @@ function toggleLanguage() {
 // ─────────────────────────────────────────────────────────────
 //  Boot
 // ─────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-    // Expose globally so onclick="" attributes work
-    window.toggleLanguage = toggleLanguage;
+window.TRANSLATIONS = TRANSLATIONS;
 
-    // Apply stored preference immediately
+document.addEventListener('DOMContentLoaded', () => {
+    window.toggleLanguage = toggleLanguage;
+    window.t = t;
+    window.getLang = getLang;
+    window.updateToggleButton = updateToggleButton;
+    window.applyTranslations = applyTranslations;
+
     const lang = getLang();
     applyTranslations(lang);
     updateToggleButton(lang);
