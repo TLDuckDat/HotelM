@@ -1,0 +1,58 @@
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: hotelm-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: hotelm
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - hotelm-network
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: hotelm-redis
+    restart: unless-stopped
+    command: redis-server --requirepass redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - hotelm-network
+
+  app:
+    build: .
+    container_name: hotelm-backend
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - redis
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - DB_URL=jdbc:mysql://mysql:3306/hotelm?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_DATA_REDIS_PASSWORD=redis
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - hotelm-network
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  hotelm-network:
+    driver: bridge
