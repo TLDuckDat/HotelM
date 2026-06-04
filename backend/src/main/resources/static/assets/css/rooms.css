@@ -18,6 +18,10 @@
   background: var(--dark);
 }
 
+#main-header {
+  background: var(--dark);
+}
+
 body {
   padding-top: 0;
 }

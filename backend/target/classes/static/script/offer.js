@@ -35,6 +35,7 @@ function getOfferData() {
         rateKey:  el.dataset.rateKey,
         incKeys:  (el.dataset.incKeys  || '').split(',').map(k => k.trim()).filter(Boolean),
         conKeys:  (el.dataset.conKeys  || '').split(',').map(k => k.trim()).filter(Boolean),
+        link:     el.dataset.link || 'create-booking.html?offerId=' + el.dataset.id,
     }));
 }
 
@@ -93,7 +94,7 @@ function renderOffers(category = 'all') {
                         <ul>${conItems}</ul>
                     </div>
                 </div>
-                <button class="btn-book-offer" data-i18n="${bookKey}">${txt(bookKey)}</button>
+                <a href="${o.link}" class="btn-book-offer" data-i18n="${bookKey}">${txt(bookKey)}</a>
             </div>
         </div>`;
     }).join('');

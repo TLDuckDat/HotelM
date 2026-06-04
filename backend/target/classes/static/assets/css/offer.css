@@ -403,6 +403,7 @@ header.scrolled #lang-toggle-btn {
     transition: 0.3s;
     border-radius: 4px;
     font-family: 'Inter', sans-serif;
+    text-decoration: none;
 }
 
 .btn-book-offer:hover {

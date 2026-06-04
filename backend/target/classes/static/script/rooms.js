@@ -499,9 +499,39 @@
 
     // ====================== INIT ======================
     document.addEventListener("DOMContentLoaded", () => {
-        loadAuthModals();
+        loadAuthModals().then(() => {
+            // Expose modal functions to window AFTER modals are loaded & initted
+            window.openLoginModal        = typeof openLoginModal        === 'function' ? openLoginModal        : window.openLoginModal;
+            window.openRegisterModal     = typeof openRegisterModal     === 'function' ? openRegisterModal     : window.openRegisterModal;
+            window.closeLoginModal       = typeof closeLoginModal       === 'function' ? closeLoginModal       : window.closeLoginModal;
+            window.closeRegisterModal    = typeof closeRegisterModal    === 'function' ? closeRegisterModal    : window.closeRegisterModal;
+            window.switchToRegister      = typeof switchToRegister      === 'function' ? switchToRegister      : window.switchToRegister;
+            window.switchToLogin         = typeof switchToLogin         === 'function' ? switchToLogin         : window.switchToLogin;
+            window.openForgotPasswordModal   = typeof openForgotPasswordModal   === 'function' ? openForgotPasswordModal   : window.openForgotPasswordModal;
+            window.closeForgotPasswordModal  = typeof closeForgotPasswordModal  === 'function' ? closeForgotPasswordModal  : window.closeForgotPasswordModal;
+            window.switchToForgotPassword    = typeof switchToForgotPassword    === 'function' ? switchToForgotPassword    : window.switchToForgotPassword;
+            window.switchToLoginFromForgot   = typeof switchToLoginFromForgot   === 'function' ? switchToLoginFromForgot   : window.switchToLoginFromForgot;
+        });
+
         checkExistingUser();
         loadRooms();
+
+        // Notifications toggle
+        window.toggleNotification = function (e) {
+            e.stopPropagation();
+            const menu = document.getElementById('notificationMenu');
+            const userMenu = document.getElementById('userMenu');
+            if (userMenu) userMenu.classList.remove('active');
+            if (menu) menu.classList.toggle('active');
+        };
+
+        document.addEventListener('click', function (e) {
+            const notiDropdown = document.querySelector('.notification-dropdown');
+            if (notiDropdown && !notiDropdown.contains(e.target)) {
+                const menu = document.getElementById('notificationMenu');
+                if (menu) menu.classList.remove('active');
+            }
+        });
 
         // Listen for language change to re-render dynamic content
         window.addEventListener('languageChanged', () => {

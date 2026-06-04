@@ -8,18 +8,21 @@
       name="description"
       content="Learn about SOT Resort, a luxury destination blending Vietnamese tradition and French architecture."
     />
-    
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
     <link rel="stylesheet" href="assets/css/rosalia-about.css" />
-      
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
   <body>
-    <header id="main-header" class="scrolled">
+    <header id="main-header">
       <div class="container nav-container">
         <div class="logo">
           <a
@@ -38,13 +41,21 @@
           </a>
         </div>
         <nav class="desktop-nav">
-                <a href="index.html" data-i18n="nav_home">HOME</a>
-                <a href="rooms.html" data-i18n="nav_rooms">ROOMS</a>
-                <a href="rosalia-service.html" data-i18n="nav_service">SERVICE</a>
-                <a href="rosalia-about.html" data-i18n="nav_about">ABOUT US</a>
-                <a href="offer.html" data-i18n="nav_offer">OFFER</a>
-            </nav>
+          <a href="index.html" data-i18n="nav_home">HOME</a>
+          <a href="rooms.html" data-i18n="nav_rooms">ROOMS</a>
+          <a href="rosalia-service.html" data-i18n="nav_service">SERVICE</a>
+          <a href="rosalia-about.html" data-i18n="nav_about">ABOUT US</a>
+          <a href="offer.html" data-i18n="nav_offer">OFFER</a>
+        </nav>
         <div class="nav-actions" id="nav-actions">
+          <button
+            id="lang-toggle-btn"
+            onclick="toggleLanguage()"
+            title="Switch to Vietnamese"
+          >
+            <span class="lang-flag">🇻🇳</span>
+            <span class="lang-label">VI</span>
+          </button>
           <button
             class="btn-nav-outline"
             id="btn-login"
@@ -245,8 +256,12 @@
           </form>
         </div>
         <div class="contact-info">
-          <p data-i18n="footer_address">448 Le Van Viet, Tang Nhon Phu A, TP Ho Chi Minh</p>
-          <p data-i18n="footer_phone">0336374498 | dinhgiang19092k6@gmail.com</p>
+          <p data-i18n="footer_address">
+            448 Le Van Viet, Tang Nhon Phu A, TP Ho Chi Minh
+          </p>
+          <p data-i18n="footer_phone">
+            0336374498 | dinhgiang19092k6@gmail.com
+          </p>
         </div>
         <div class="copyright">
           <p data-i18n="footer_copyright">© 2026 SOT. All rights reserved</p>
