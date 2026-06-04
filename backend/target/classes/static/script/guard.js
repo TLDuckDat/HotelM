@@ -6,7 +6,7 @@
     }
 
     function requireLogin() {
-        if (!global.AuthStore || !global.AuthStore.isLoggedIn()) {
+        if (!global.AuthStore || !global.AuthStore.ensureValidSession()) {
             goToLogin();
             return false;
         }
@@ -32,4 +32,3 @@
         requireAdmin: requireAdmin
     };
 })(window);
-

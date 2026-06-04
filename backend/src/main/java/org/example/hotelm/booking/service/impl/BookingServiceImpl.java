@@ -5,7 +5,11 @@ import org.example.hotelm.booking.entity.Booking;
 import org.example.hotelm.booking.repository.BookingRepository;
 import org.example.hotelm.booking.service.BookingService;
 import org.example.hotelm.common.exception.ResourceNotFoundException;
+import org.example.hotelm.common.exception.BadRequestException;
+import org.example.hotelm.common.exception.ForbiddenException;
+import org.example.hotelm.room.entity.Room;
 import org.example.hotelm.room.repository.RoomRepository;
+import org.example.hotelm.user.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -89,6 +93,49 @@ public class BookingServiceImpl implements BookingService {
                     saved.getUser().getUserID(),
                     "Booking Updated",
                     "Your booking for room " + (saved.getRoom() != null ? saved.getRoom().getRoomName() : "N/A") + " is now " + status,
+                    org.example.hotelm.notification.entity.Notification.NotificationType.BOOKING_STATUS,
+                    saved.getBookingID()
+            );
+        }
+
+        return saved;
+    }
+
+    @Override
+    public Booking cancelBooking(String bookingId, String requesterEmail) {
+        Booking booking = getBookingById(bookingId);
+        User requester = userRepository.findByEmailIgnoreCase(requesterEmail)
+                .orElseThrow(() -> new BadRequestException("User not found"));
+
+        boolean isStaff = requester.getRole() == User.Role.ADMIN
+                || requester.getRole() == User.Role.RECEPTIONIST;
+        if (!isStaff) {
+            if (booking.getUser() == null
+                    || !booking.getUser().getUserID().equals(requester.getUserID())) {
+                throw new ForbiddenException("You can only cancel your own bookings.");
+            }
+        }
+
+        if (booking.getStatus() == Booking.BookingStatus.CANCELLED
+                || booking.getStatus() == Booking.BookingStatus.CHECKED_OUT) {
+            throw new BadRequestException("This booking cannot be cancelled.");
+        }
+
+        booking.setStatus(Booking.BookingStatus.CANCELLED);
+        if (booking.getRoom() != null && booking.getRoom().getStatus() == Room.RoomStatus.BOOKED) {
+            booking.getRoom().setStatus(Room.RoomStatus.AVAILABLE);
+            roomRepository.save(booking.getRoom());
+        }
+
+        Booking saved = bookingRepository.save(booking);
+
+        if (saved.getUser() != null) {
+            notificationService.createAndPush(
+                    saved.getUser().getUserID(),
+                    "Booking Cancelled",
+                    "Your booking for room "
+                            + (saved.getRoom() != null ? saved.getRoom().getRoomName() : "N/A")
+                            + " has been cancelled.",
                     org.example.hotelm.notification.entity.Notification.NotificationType.BOOKING_STATUS,
                     saved.getBookingID()
             );

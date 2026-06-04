@@ -345,7 +345,7 @@
         }
 
         setMessage("Confirming payment...", "notice");
-        global.PaymentApi.updatePaymentStatus(getPaymentId(activePayment), "COMPLETED")
+        global.PaymentApi.confirmPayment(getPaymentId(activePayment))
             .then(function () {
                 hideQrPayment();
                 setMessage("Payment confirmed successfully.", "success");

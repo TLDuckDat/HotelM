@@ -8,6 +8,7 @@ import org.example.hotelm.invoice.dto.InvoiceStatusUpdateRequest;
 import org.example.hotelm.invoice.service.InvoiceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,6 +50,12 @@ public class InvoiceController {
             @PathVariable String id,
             @Valid @RequestBody InvoiceStatusUpdateRequest request) {
         return ResponseEntity.ok(invoiceService.updateInvoiceStatus(id, request.status()));
+    }
+
+    @PostMapping("/{id}/confirm")
+    public ResponseEntity<InvoiceResponse> confirmPayment(@PathVariable String id) {
+        String requesterEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(invoiceService.confirmPayment(id, requesterEmail));
     }
 
     @DeleteMapping("/{id}")

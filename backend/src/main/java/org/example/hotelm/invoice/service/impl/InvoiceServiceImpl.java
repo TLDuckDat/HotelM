@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.hotelm.booking.entity.Booking;
 import org.example.hotelm.booking.repository.BookingRepository;
 import org.example.hotelm.common.exception.ConflictException;
+import org.example.hotelm.common.exception.BadRequestException;
+import org.example.hotelm.common.exception.ForbiddenException;
 import org.example.hotelm.common.exception.ResourceNotFoundException;
 import org.example.hotelm.invoice.dto.InvoiceCreateRequest;
 import org.example.hotelm.invoice.dto.InvoiceResponse;
@@ -13,6 +15,8 @@ import org.example.hotelm.invoice.repository.InvoiceRepository;
 import org.example.hotelm.invoice.service.InvoiceService;
 import org.example.hotelm.room.entity.Room;
 import org.example.hotelm.room.repository.RoomRepository;
+import org.example.hotelm.user.entity.User;
+import org.example.hotelm.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -26,6 +30,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final BookingRepository bookingRepository;
     private final InvoiceMapper invoiceMapper;
     private final RoomRepository roomRepository;
+    private final UserRepository userRepository;
     private final org.example.hotelm.notification.service.NotificationService notificationService;
 
     @Override
@@ -148,6 +153,29 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
 
         return invoiceMapper.toResponse(invoiceRepository.save(invoice));
+    }
+
+    @Override
+    public InvoiceResponse confirmPayment(String invoiceId, String requesterEmail) {
+        Invoice invoice = findOrThrow(invoiceId);
+        User requester = userRepository.findByEmailIgnoreCase(requesterEmail)
+                .orElseThrow(() -> new BadRequestException("User not found"));
+
+        boolean isStaff = requester.getRole() == User.Role.ADMIN
+                || requester.getRole() == User.Role.RECEPTIONIST;
+        if (!isStaff) {
+            Booking booking = invoice.getBooking();
+            if (booking == null || booking.getUser() == null
+                    || !booking.getUser().getUserID().equals(requester.getUserID())) {
+                throw new ForbiddenException("You can only confirm your own payments.");
+            }
+        }
+
+        if (invoice.getStatus() != Invoice.PaymentStatus.PENDING) {
+            throw new BadRequestException("Only pending payments can be confirmed.");
+        }
+
+        return updateInvoiceStatus(invoiceId, Invoice.PaymentStatus.COMPLETED);
     }
 
 

@@ -15,6 +15,10 @@
         return baseApi.get(REFUND_ENDPOINT, options);
     }
 
+    function getRefundsByUser(userId, options) {
+        return baseApi.get(REFUND_ENDPOINT + "/user/" + encodeURIComponent(userId), options);
+    }
+
     function createRefund(payload, options) {
         // Expected payload: { bookingId, userId, reason }
         return baseApi.post(REFUND_ENDPOINT, payload, options);
@@ -37,6 +41,7 @@
 
     global.RefundApi = {
         getRefunds:           getRefunds,
+        getRefundsByUser:     getRefundsByUser,
         createRefund:         createRefund,
         updateRefundStatus:   updateRefundStatus,
         deleteRefund:         deleteRefund

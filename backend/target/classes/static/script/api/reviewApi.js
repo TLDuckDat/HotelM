@@ -20,6 +20,10 @@
         return baseApi.get(REVIEW_ENDPOINT + "/room/" + encodeURIComponent(roomId), options);
     }
 
+    function getReviewsByUser(userId, options) {
+        return baseApi.get(REVIEW_ENDPOINT + "/user/" + encodeURIComponent(userId), options);
+    }
+
     function createReview(payload, options) {
         // Expected payload: { bookingId, userId, rating, content }
         // Backend maps bookingId → roomId internally based on the booking record.
@@ -44,6 +48,7 @@
     global.ReviewApi = {
         getReviews:           getReviews,
         getReviewsByRoom:     getReviewsByRoom,
+        getReviewsByUser:     getReviewsByUser,
         createReview:         createReview,
         deleteReview:         deleteReview,
         updateReviewStatus:   updateReviewStatus

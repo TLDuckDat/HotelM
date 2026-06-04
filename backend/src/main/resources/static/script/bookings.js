@@ -194,13 +194,24 @@
     }
 
     function loadBookings() {
-        // Fetch rooms and bookings in parallel
+        const user = global.AuthStore.getCurrentUser();
+        if (!user) return;
+
+        const userId = String(user.userId || user.userID || user.id || "");
+        if (!userId) {
+            msg("Cannot identify current user.", "error");
+            return;
+        }
+
+        const bookingLoader = user.role === "ADMIN" || user.role === "RECEPTIONIST"
+            ? global.BookingApi.getBookings()
+            : global.BookingApi.getBookingsByUser(userId);
+
         Promise.all([
             global.RoomApi.getRooms(),
-            global.BookingApi.getBookings()
+            bookingLoader
         ])
             .then(function ([roomsData, bookingsData]) {
-                // Build room lookup map
                 const rooms = Array.isArray(roomsData) ? roomsData : (roomsData.payload || roomsData.data || []);
                 rooms.forEach(function (room) {
                     const id = room.roomId || room.roomID || room.id;
@@ -208,19 +219,24 @@
                     if (id) roomMap[id] = name;
                 });
 
-                // Process bookings
-                const list = Array.isArray(bookingsData) ? bookingsData : (bookingsData.payload || bookingsData.data || []);
+                const list = Array.isArray(bookingsData)
+                    ? bookingsData
+                    : (bookingsData.payload || bookingsData.data || []);
                 renderBookings(list);
             })
             .catch(err => {
                 console.error("Load error:", err);
-                msg(err?.payload?.message || 'Cannot load bookings', 'error');
+                const body = document.getElementById('bookings-body');
+                if (body) {
+                    body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No bookings found</td></tr>';
+                }
+                msg(err?.payload?.message || err?.message || 'Cannot load bookings', 'error');
             });
     }
 
     function cancelBooking(id) {
         if (!confirm("Are you sure you want to cancel this booking?")) return;
-        global.BookingApi.updateBookingStatus(id, 'CANCELLED')
+        global.BookingApi.cancelBooking(id)
             .then(() => {
                 msg('Booking cancelled successfully', 'success');
                 loadBookings();

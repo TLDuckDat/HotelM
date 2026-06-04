@@ -12,5 +12,6 @@ public interface InvoiceService {
     List<InvoiceResponse> getInvoicesByUserId(String userId);
     InvoiceResponse createInvoice(InvoiceCreateRequest request);
     InvoiceResponse updateInvoiceStatus(String id, org.example.hotelm.invoice.entity.Invoice.PaymentStatus status);
+    InvoiceResponse confirmPayment(String invoiceId, String requesterEmail);
     void deleteInvoice(String id);
 }

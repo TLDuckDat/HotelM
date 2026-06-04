@@ -31,6 +31,43 @@
         return url + "?" + queryEntries.join("&");
     }
 
+    function decodeJwtPayload(token) {
+        var parts = token.split(".");
+        if (parts.length < 2) {
+            return null;
+        }
+        var base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+        while (base64.length % 4) {
+            base64 += "=";
+        }
+        try {
+            return JSON.parse(atob(base64));
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function isAuthTokenExpired(token) {
+        if (!token) {
+            return true;
+        }
+        var payload = decodeJwtPayload(token);
+        if (!payload || !payload.exp) {
+            return false;
+        }
+        return payload.exp * 1000 <= Date.now();
+    }
+
+    function redirectToLoginIfNeeded() {
+        if (global.AuthStore && typeof global.AuthStore.clearCurrentUser === "function") {
+            global.AuthStore.clearCurrentUser();
+        }
+
+        if (global.location && global.location.pathname.indexOf("index.html") === -1 && global.location.pathname !== "/") {
+            global.location.href = "index.html";
+        }
+    }
+
     function parseResponsePayload(response) {
         var contentType = response.headers.get("content-type") || "";
         if (contentType.indexOf("application/json") !== -1) {
@@ -61,6 +98,10 @@
 
         var token = config.authToken || internalAuthToken;
         if (token) {
+            if (isAuthTokenExpired(token)) {
+                redirectToLoginIfNeeded();
+                return Promise.reject(new Error("Session expired"));
+            }
             headers["Authorization"] = "Bearer " + token;
         }
 
@@ -75,13 +116,7 @@
             return parseResponsePayload(response).then(function (payload) {
                 if (!response.ok) {
                     if (response.status === 401 && normalizedEndpoint !== "/auth/login") {
-                        if (global.AuthStore && typeof global.AuthStore.clearCurrentUser === "function") {
-                            global.AuthStore.clearCurrentUser();
-                        }
-
-                        if (global.location && global.location.pathname.indexOf("login.html") === -1) {
-                            global.location.href = "login.html";
-                        }
+                        redirectToLoginIfNeeded();
                     }
 
                     var error = new Error("Request failed with status " + response.status);

@@ -24,6 +24,11 @@ public class RefundController {
         return ResponseEntity.ok(refundService.getAllRefunds());
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<RefundResponse>> getRefundsByUserId(@PathVariable String userId) {
+        return ResponseEntity.ok(refundService.getRefundsByUserId(userId));
+    }
+
     @PostMapping
     public ResponseEntity<RefundResponse> createRefund(@Valid @RequestBody RefundCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(refundService.createRefund(request));

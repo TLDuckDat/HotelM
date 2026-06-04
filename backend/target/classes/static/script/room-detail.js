@@ -414,8 +414,8 @@
     // ─────────────────────────────────────────────
 
     function loadUser() {
-        if (global.Guard && !global.Guard.requireLogin()) return;
-        var user = global.AuthStore && global.AuthStore.getCurrentUser();
+        if (!global.AuthStore || !global.AuthStore.isLoggedIn()) return;
+        var user = global.AuthStore.getCurrentUser();
         if (!user) return;
         var el = document.getElementById("topbar-username");
         if (el) el.textContent = user.fullName || user.name || "Guest";

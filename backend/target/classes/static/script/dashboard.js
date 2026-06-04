@@ -29,7 +29,9 @@
         var userId = user ? String(user.userId || user.userID || user.id || "") : "";
 
         var roomPromise = global.RoomApi.getRooms();
-        var bookingPromise = global.BookingApi.getBookings();
+        var bookingPromise = userId
+            ? global.BookingApi.getBookingsByUser(userId)
+            : Promise.resolve([]);
         var paymentPromise = global.PaymentApi && userId
             ? global.PaymentApi.getPaymentsByUser(userId)
             : Promise.resolve([]);

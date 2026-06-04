@@ -9,6 +9,8 @@ import java.util.List;
 public interface RefundRepository extends JpaRepository<RefundRequest, String> {
     List<RefundRequest> findAllByOrderByCreatedAtDesc();
 
+    List<RefundRequest> findByUser_UserIDOrderByCreatedAtDesc(String userId);
+
     boolean existsByBooking_BookingIDAndStatusIn(String bookingId, Collection<RefundRequest.RefundStatus> statuses);
 }
 

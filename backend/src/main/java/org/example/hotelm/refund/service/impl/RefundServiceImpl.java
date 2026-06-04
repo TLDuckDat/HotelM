@@ -43,6 +43,14 @@ public class RefundServiceImpl implements RefundService {
     }
 
     @Override
+    public List<RefundResponse> getRefundsByUserId(String userId) {
+        return refundRepository.findByUser_UserIDOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(refundMapper::toResponse)
+                .toList();
+    }
+
+    @Override
     @Transactional
     public RefundResponse createRefund(RefundCreateRequest request) {
         Booking booking = bookingRepository.findById(request.bookingId())

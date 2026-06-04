@@ -9,6 +9,8 @@ import java.util.List;
 public interface RefundService {
     List<RefundResponse> getAllRefunds();
 
+    List<RefundResponse> getRefundsByUserId(String userId);
+
     RefundResponse createRefund(RefundCreateRequest request);
 
     RefundResponse updateStatus(String refundId, RefundRequest.RefundStatus status);

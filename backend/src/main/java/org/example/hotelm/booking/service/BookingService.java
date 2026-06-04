@@ -11,6 +11,7 @@ public interface BookingService {
     List<Booking> getBookingsByUserId(String userId);
     Booking createBooking(Booking booking);
     Booking updateBookingStatus(String bookingId, Booking.BookingStatus status);
+    Booking cancelBooking(String bookingId, String requesterEmail);
     void deleteBooking(String bookingId);
 
     /**

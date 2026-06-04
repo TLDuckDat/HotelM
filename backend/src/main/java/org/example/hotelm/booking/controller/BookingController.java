@@ -12,6 +12,7 @@ import org.example.hotelm.booking.service.BookingQueueService;
 import org.example.hotelm.booking.service.BookingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -88,6 +89,13 @@ public class BookingController {
             @Valid @RequestBody BookingStatusUpdateRequest request) {
         Booking updated = bookingService.updateBookingStatus(id, request.status());
         return ResponseEntity.ok(bookingMapper.toResponse(updated));
+    }
+
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<BookingResponse> cancelBooking(@PathVariable String id) {
+        String requesterEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Booking cancelled = bookingService.cancelBooking(id, requesterEmail);
+        return ResponseEntity.ok(bookingMapper.toResponse(cancelled));
     }
 
     @DeleteMapping("/{id}")

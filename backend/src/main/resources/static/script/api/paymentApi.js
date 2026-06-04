@@ -33,6 +33,10 @@
         );
     }
 
+    function confirmPayment(id, options) {
+        return baseApi.post(PAYMENT_ENDPOINT + "/" + encodeURIComponent(id) + "/confirm", null, options);
+    }
+
     function deletePayment(id, options) {
         return baseApi.del(PAYMENT_ENDPOINT + "/" + encodeURIComponent(id), options);
     }
@@ -43,6 +47,7 @@
         createPayment:         createPayment,
         getPaymentById:        getPaymentById,
         updatePaymentStatus:   updatePaymentStatus,
+        confirmPayment:        confirmPayment,
         deletePayment:         deletePayment
     };
 })(window);

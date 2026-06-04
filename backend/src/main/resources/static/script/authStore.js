@@ -3,8 +3,54 @@
 
 	var STORAGE_KEY = "hotelm_current_user";
 
+	function decodeJwtPayload(token) {
+		var parts = token.split(".");
+		if (parts.length < 2) {
+			return null;
+		}
+		var base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+		while (base64.length % 4) {
+			base64 += "=";
+		}
+		try {
+			return JSON.parse(atob(base64));
+		} catch (error) {
+			return null;
+		}
+	}
+
+	function getAccessToken(user) {
+		var u = user || getCurrentUser();
+		if (!u) {
+			return null;
+		}
+		return u.accessToken || u.token || null;
+	}
+
+	function isTokenExpired(token) {
+		if (!token) {
+			return true;
+		}
+		var payload = decodeJwtPayload(token);
+		if (!payload || !payload.exp) {
+			return false;
+		}
+		return payload.exp * 1000 <= Date.now();
+	}
+
+	function getTokenExpiresAt(token) {
+		var payload = decodeJwtPayload(token);
+		if (!payload || !payload.exp) {
+			return null;
+		}
+		return new Date(payload.exp * 1000);
+	}
+
 	function setCurrentUser(user) {
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+		if (user && getAccessToken(user) && global.HotelMApiBase) {
+			global.HotelMApiBase.setAuthToken(getAccessToken(user));
+		}
 	}
 
 	function getCurrentUser() {
@@ -13,23 +59,17 @@
 			return null;
 		}
 
-		// try {
-		// 	return JSON.parse(raw);
-		// } catch (error) {
-		// 	localStorage.removeItem(STORAGE_KEY);
-		// 	return null;
-		// }
 		try {
-        var user = JSON.parse(raw);
-        // TỰ ĐỘNG KHÔI PHỤC TOKEN NẾU CÓ
-        if (user && user.token && global.HotelMApiBase) {
-            global.HotelMApiBase.setAuthToken(user.token);
-        }
-        return user;
-    } catch (error) {
-        localStorage.removeItem(STORAGE_KEY);
-        return null;
-    }
+			var user = JSON.parse(raw);
+			var token = getAccessToken(user);
+			if (token && global.HotelMApiBase) {
+				global.HotelMApiBase.setAuthToken(token);
+			}
+			return user;
+		} catch (error) {
+			localStorage.removeItem(STORAGE_KEY);
+			return null;
+		}
 	}
 
 	function clearCurrentUser() {
@@ -40,10 +80,27 @@
 	}
 
 	function isLoggedIn() {
-		return !!getCurrentUser();
+		var token = getAccessToken();
+		return !!token && !isTokenExpired(token);
+	}
+
+	function ensureValidSession() {
+		var user = getCurrentUser();
+		if (!user) {
+			return false;
+		}
+		var token = getAccessToken(user);
+		if (!token || isTokenExpired(token)) {
+			clearCurrentUser();
+			return false;
+		}
+		return true;
 	}
 
 	function hasRole(role) {
+		if (!ensureValidSession()) {
+			return false;
+		}
 		var user = getCurrentUser();
 		return !!(user && user.role === role);
 	}
@@ -53,7 +110,10 @@
 		getCurrentUser: getCurrentUser,
 		clearCurrentUser: clearCurrentUser,
 		isLoggedIn: isLoggedIn,
-		hasRole: hasRole
+		ensureValidSession: ensureValidSession,
+		hasRole: hasRole,
+		getAccessToken: function () { return getAccessToken(); },
+		isTokenExpired: isTokenExpired,
+		getTokenExpiresAt: function () { return getTokenExpiresAt(getAccessToken()); }
 	};
 })(window);
-

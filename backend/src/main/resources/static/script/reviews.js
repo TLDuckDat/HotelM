@@ -9,15 +9,34 @@
         el.style.display = "block";
     }
 
-    function loadBookingOptions() {
+    function getCurrentUserId() {
         var user = global.AuthStore.getCurrentUser();
-        var currentUserId = String(user.userId || user.userID || user.id || "");
+        return user ? String(user.userId || user.userID || user.id || "") : "";
+    }
 
-        // Fetch rooms and bookings to map room names correctly
-        return Promise.all([global.RoomApi.getRooms(), global.BookingApi.getBookings()]).then(function (results) {
+    function getBookingId(b) {
+        return b.bookingId || b.bookingID || b.id || "";
+    }
+
+    function loadBookingOptions(existingReviews) {
+        var currentUserId = getCurrentUserId();
+        if (!currentUserId) {
+            setMessage("Cannot identify current user.", "error");
+            return Promise.resolve();
+        }
+
+        var reviewedBookingIds = (existingReviews || []).map(function (r) {
+            return String(r.bookingId || r.bookingID || "");
+        }).filter(Boolean);
+
+        var bookingLoader = global.BookingApi.getBookingsByUser
+            ? global.BookingApi.getBookingsByUser(currentUserId)
+            : global.BookingApi.getBookings();
+
+        return Promise.all([global.RoomApi.getRooms(), bookingLoader]).then(function (results) {
             var roomsData = results[0];
             var bookingsData = results[1];
-            
+
             var rooms = Array.isArray(roomsData) ? roomsData : (roomsData.payload || roomsData.data || []);
             var roomMap = {};
             rooms.forEach(function (room) {
@@ -26,32 +45,51 @@
                 if (id) roomMap[id] = name;
             });
 
-            var bookings = Array.isArray(bookingsData) ? bookingsData : (bookingsData.payload || bookingsData.data || []);
+            var bookings = Array.isArray(bookingsData)
+                ? bookingsData
+                : (bookingsData.payload || bookingsData.data || []);
+
             var mine = bookings.filter(function (b) {
-                return String(b.userId || b.userID || "") === currentUserId;
+                var bUid = b.userId || b.userID
+                    || (b.user && (b.user.userId || b.user.userID || b.user.id))
+                    || "";
+                if (String(bUid) !== currentUserId) return false;
+
+                var status = (b.status || "").toUpperCase();
+                if (status === "CANCELLED") return false;
+
+                var bid = String(getBookingId(b));
+                if (bid && reviewedBookingIds.indexOf(bid) !== -1) return false;
+
+                return true;
             });
 
             var select = document.getElementById("review-booking-id");
             if (!select) return;
 
             if (!mine.length) {
-                select.innerHTML = "<option value=''>No booking found</option>";
+                select.innerHTML = "<option value=''>No eligible booking for review</option>";
                 return;
             }
 
-            select.innerHTML = mine.map(function (b) {
-                var rid = b.roomId || b.roomID || "";
-                var bid = b.bookingId || b.bookingID || "";
-                var roomName = roomMap[rid] || "Room " + rid.substring(0, 8);
-                var checkIn = b.checkIn ? new Date(b.checkIn).toLocaleDateString("vi-VN") : "";
-                
-                // Show "Room Name (#ShortID) - Date"
-                var display = roomName + " (#" + bid.substring(0, 8) + ")" + (checkIn ? " - " + checkIn : "");
-                
-                // Store both roomId and bookingId in the value, or just use bookingId and find roomId later
-                // For simplicity, we can store a JSON string or just use data attributes
-                return "<option value='" + rid + "' data-booking-id='" + bid + "'>" + display + "</option>";
-            }).join("");
+            select.innerHTML = "<option value=''>Choose a booking…</option>"
+                + mine.map(function (b) {
+                    var rid = b.roomId || b.roomID || "";
+                    var bid = getBookingId(b);
+                    var roomName = roomMap[rid] || "Room " + (rid ? rid.substring(0, 8) : "—");
+                    var checkIn = b.checkIn ? new Date(b.checkIn).toLocaleDateString("vi-VN") : "";
+                    var display = roomName + " (#" + bid.substring(0, 8) + ")"
+                        + (checkIn ? " - " + checkIn : "")
+                        + (b.status ? " [" + b.status + "]" : "");
+
+                    return "<option value='" + rid + "' data-booking-id='" + bid + "'>" + display + "</option>";
+                }).join("");
+        }).catch(function (err) {
+            var select = document.getElementById("review-booking-id");
+            if (select) select.innerHTML = "<option value=''>Cannot load bookings</option>";
+            var msg = (err && err.payload && (err.payload.message || err.payload.error))
+                || "Cannot load your bookings.";
+            setMessage(msg, "error");
         });
     }
 
@@ -119,10 +157,13 @@
     }
 
     function loadReviews() {
-        var user = global.AuthStore.getCurrentUser();
-        var currentUserId = String(user.userId || user.userID || user.id || "");
+        var currentUserId = getCurrentUserId();
 
-        return Promise.all([global.RoomApi.getRooms(), global.ReviewApi.getReviews()])
+        var reviewLoader = currentUserId && global.ReviewApi.getReviewsByUser
+            ? global.ReviewApi.getReviewsByUser(currentUserId)
+            : global.ReviewApi.getReviews();
+
+        return Promise.all([global.RoomApi.getRooms(), reviewLoader])
             .then(function (results) {
                 var roomsData = results[0];
                 var reviewsData = results[1];
@@ -136,18 +177,20 @@
 
                 var list = Array.isArray(reviewsData) ? reviewsData : (reviewsData.payload || reviewsData.data || []);
                 var mine = list.filter(function (r) {
-                    if (r.userId) return String(r.userId) === currentUserId;
-                    if (r.user && r.user.userID) return String(r.user.userID) === currentUserId;
-                    return true;
+                    if (!currentUserId) return true;
+                    var rUid = r.userId || r.userID
+                        || (r.user && (r.user.userId || r.user.userID || r.user.id))
+                        || "";
+                    return String(rUid) === currentUserId;
                 });
 
-                // Attach roomName to each review for rendering
                 mine.forEach(function(r) {
                     var rid = r.roomId || r.roomID;
-                    r.roomName = roomMap[rid] || rid || "Unknown Room";
+                    r.roomName = roomMap[rid] || r.roomName || rid || "Unknown Room";
                 });
 
                 renderReviews(mine);
+                return mine;
             })
             .catch(function (err) {
                 renderReviews([]);
@@ -155,6 +198,7 @@
                     ? "Review API is not available yet. UI is ready."
                     : "Cannot load reviews.";
                 setMessage(msg, "notice");
+                return [];
             });
     }
 
@@ -183,8 +227,8 @@
         // Use "comment" as the payload field name to match backend
         var comment   = document.getElementById("review-content").value.trim();
 
-        if (!roomId || !rating || rating < 1 || rating > 5 || !comment) {
-            setMessage("Please complete all review fields.", "error");
+        if (!roomId || !bookingId || !rating || rating < 1 || rating > 5 || !comment) {
+            setMessage("Please choose a booking and complete all review fields.", "error");
             return;
         }
 
@@ -204,7 +248,9 @@
             radios.forEach(function (r) { r.checked = false; });
             var hiddenSel = document.getElementById("review-rating");
             if (hiddenSel) hiddenSel.value = "";
-            loadReviews();
+            return loadReviews().then(function (mine) {
+                return loadBookingOptions(mine);
+            });
         }).catch(function (err) {
             var msg = err && err.payload
                 ? (err.payload.message || err.payload.error || "Submit review failed")
@@ -239,6 +285,11 @@
             el = document.getElementById("sidebar-role");    if (el) el.textContent = user.role || "USER";
         }
 
+        var user = global.AuthStore.getCurrentUser();
+        if (user && global.HotelMApiBase) {
+            global.HotelMApiBase.setAuthToken(user.accessToken || user.token || null);
+        }
+
         // Sync star radio clicks → hidden select
         var radios    = document.querySelectorAll("input[name='rating']");
         var hiddenSel = document.getElementById("review-rating");
@@ -248,10 +299,11 @@
             });
         });
 
-        Promise.all([
-            loadBookingOptions(),
-            loadReviews()
-        ]).catch(function () {
+        loadReviews()
+            .then(function (mine) {
+                return loadBookingOptions(mine);
+            })
+            .catch(function () {
             setMessage("Cannot initialize reviews page.", "error");
         });
 

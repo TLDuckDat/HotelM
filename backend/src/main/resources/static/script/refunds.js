@@ -144,20 +144,21 @@
 
     function loadRefunds() {
         var userId = getCurrentUserId();
+        if (!userId) {
+            renderRefunds([]);
+            setMessage("Cannot identify current user.", "error");
+            return Promise.resolve();
+        }
 
-        return global.RefundApi.getRefunds()
+        var loader = global.RefundApi.getRefundsByUser
+            ? global.RefundApi.getRefundsByUser(userId)
+            : global.RefundApi.getRefunds();
+
+        return loader
             .then(function (data) {
-                var all = Array.isArray(data)
+                var mine = Array.isArray(data)
                     ? data
                     : (data && (data.payload || data.data) || []);
-
-                // Filter to this user's refunds only
-                var mine = all.filter(function (r) {
-                    var rUid = r.userId
-                        || (r.user && (r.user.userId || r.user.userID || r.user.id))
-                        || "";
-                    return !userId || String(rUid) === String(userId);
-                });
 
                 // Stats
                 var pending  = mine.filter(function (r) { return (r.status || "PENDING") === "PENDING"; }).length;
