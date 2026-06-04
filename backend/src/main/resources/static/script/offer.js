@@ -2,19 +2,27 @@
  * offer.js — SOT Resort & Hotel — Offer page
  *
  * Each offer card is defined by a metadata block in #offer-data (HTML).
- * The block carries:
- *   data-id, data-category, data-title-key, data-desc-key,
- *   data-rate-key, data-image
- *   data-inc-keys  = comma-separated list of inclusion keys
- *   data-con-keys  = comma-separated list of condition keys
- *
- * Every rendered text node gets a data-i18n attribute so language.js
- * applyTranslations() can swap it on language toggle — no strings are
- * hardcoded in JS.
+ * Rendered text nodes use data-i18n so language.js can translate them.
  */
 
 function currentLang() {
     return localStorage.getItem('sot_lang') || 'en';
+}
+
+function txt(key) {
+    if (typeof window.t === 'function') {
+        return window.t(key);
+    }
+    const dict = (window.TRANSLATIONS && window.TRANSLATIONS[currentLang()])
+        || (window.TRANSLATIONS && window.TRANSLATIONS.en)
+        || {};
+    return dict[key] || key;
+}
+
+function applyOfferTranslations() {
+    if (typeof applyTranslations === 'function') {
+        applyTranslations(currentLang());
+    }
 }
 
 function getOfferData() {
@@ -30,59 +38,67 @@ function getOfferData() {
     }));
 }
 
+function categoryBadgeLabel(category) {
+    const map = {
+        stay: 'offer_filter_stay',
+        spa: 'offer_filter_spa',
+        dine: 'offer_filter_dine',
+    };
+    return txt(map[category] || category);
+}
+
 function renderOffers(category = 'all') {
     const container = document.getElementById('offers-container');
     if (!container) return;
 
-    const en      = (window.TRANSLATIONS && window.TRANSLATIONS.en) || {};
-    const offers  = getOfferData();
+    const offers = getOfferData();
     const filtered = category === 'all' ? offers : offers.filter(o => o.category === category);
 
-    // Seed every text node with its EN value AND its data-i18n key.
-    // applyTranslations() will overwrite textContent to the current lang.
-    container.innerHTML = filtered.map(o => {
-        const ratesKey = 'offer_rates_label';
-        const condKey  = 'offer_cond_label';
-        const bookKey  = 'offer_booknow';
+    const ratesKey = 'offer_rates_label';
+    const condKey  = 'offer_cond_label';
+    const bookKey  = 'offer_booknow';
 
+    container.innerHTML = filtered.map(o => {
         const incItems = o.incKeys.map(k =>
-            `<li data-i18n="${k}">${en[k] || k}</li>`
+            `<li data-i18n="${k}">${txt(k)}</li>`
         ).join('');
 
         const conItems = o.conKeys.map(k =>
-            `<li data-i18n="${k}">${en[k] || k}</li>`
+            `<li data-i18n="${k}">${txt(k)}</li>`
         ).join('');
 
         return `
         <div class="offer-card">
             <div class="card-image">
-                <img src="${o.image}" alt="${en[o.titleKey] || o.titleKey}">
-                <span class="badge">${o.category}</span>
+                <img src="${o.image}" alt="${txt(o.titleKey)}">
+                <span class="badge">${categoryBadgeLabel(o.category)}</span>
             </div>
             <div class="card-content">
-                <h3 data-i18n="${o.titleKey}">${en[o.titleKey] || o.titleKey}</h3>
-                <p class="desc" data-i18n="${o.descKey}">${en[o.descKey] || o.descKey}</p>
+                <h3 data-i18n="${o.titleKey}">${txt(o.titleKey)}</h3>
+                <p class="desc" data-i18n="${o.descKey}">${txt(o.descKey)}</p>
                 <ul class="inclusions">${incItems}</ul>
                 <div class="expandable">
                     <button class="expand-btn" onclick="toggleExpand(this)">
-                        <span data-i18n="${ratesKey}">${en[ratesKey] || 'Rates'}</span>
+                        <span data-i18n="${ratesKey}">${txt(ratesKey)}</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="expand-content">
-                        <p data-i18n="${o.rateKey}">${en[o.rateKey] || o.rateKey}</p>
+                        <p data-i18n="${o.rateKey}">${txt(o.rateKey)}</p>
                     </div>
                     <button class="expand-btn" onclick="toggleExpand(this)">
-                        <span data-i18n="${condKey}">${en[condKey] || 'Conditions'}</span>
+                        <span data-i18n="${condKey}">${txt(condKey)}</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="expand-content">
                         <ul>${conItems}</ul>
                     </div>
                 </div>
-                <button class="btn-book-offer" data-i18n="${bookKey}">${en[bookKey] || 'BOOK NOW'}</button>
+                <button class="btn-book-offer" data-i18n="${bookKey}">${txt(bookKey)}</button>
             </div>
         </div>`;
     }).join('');
+
+    applyOfferTranslations();
 }
 
 function toggleExpand(btn) {
@@ -90,19 +106,28 @@ function toggleExpand(btn) {
     btn.nextElementSibling.classList.toggle('show');
 }
 
+function getActiveFilterCategory() {
+    const active = document.querySelector('.filter-btn.active');
+    return active ? (active.dataset.category || 'all') : 'all';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     renderOffers('all');
-    // language.js boots after this and calls applyTranslations() on DOMContentLoaded,
-    // which will sweep all the data-i18n nodes we just injected.
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', e => {
-            document.querySelector('.filter-btn.active').classList.remove('active');
-            e.target.classList.add('active');
-            renderOffers(e.target.dataset.category);
-            // Re-apply current language to the freshly-rendered cards
-            if (typeof applyTranslations === 'function') applyTranslations(currentLang());
+            const target = e.currentTarget;
+            document.querySelector('.filter-btn.active')?.classList.remove('active');
+            target.classList.add('active');
+            renderOffers(target.dataset.category || 'all');
         });
+    });
+
+    window.addEventListener('languageChanged', () => {
+        renderOffers(getActiveFilterCategory());
+        if (typeof updateToggleButton === 'function') {
+            updateToggleButton(currentLang());
+        }
     });
 
     window.addEventListener('scroll', () => {

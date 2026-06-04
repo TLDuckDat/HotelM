@@ -146,13 +146,6 @@
                 if (typeof initModals === 'function') initModals();
                 if (typeof initForgotPasswordModal === 'function') initForgotPasswordModal();
 
-                const lForm = document.getElementById('loginForm');
-                const rForm = document.getElementById('registerForm');
-                const fForm = document.getElementById('forgotPasswordForm');
-
-                if (lForm) lForm.addEventListener('submit', handleLogin);
-                if (rForm) rForm.addEventListener('submit', handleRegister);
-                if (fForm) fForm.addEventListener('submit', handleForgotPassword);
 
                 document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
                     backdrop.addEventListener('click', () => {

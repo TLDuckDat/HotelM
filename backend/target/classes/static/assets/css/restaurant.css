@@ -1,3 +1,5 @@
+@import url('design-system.css');
+
 :root {
     --primary: #C9A050;
     --dark: #3D2817;
@@ -9,7 +11,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
     color: var(--dark);
     line-height: 1.6;
     overflow-x: hidden;
@@ -74,6 +76,12 @@ header.scrolled {
 
 .desktop-nav a:hover,
 .desktop-nav a.active { color: var(--primary); }
+
+.nav-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
 
 .btn-book {
     border: 2px solid var(--primary);
@@ -336,7 +344,7 @@ footer { background: var(--light); padding: 80px 0 30px; text-align: center; }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .desktop-nav, .btn-book { display: none; }
+    .desktop-nav, .nav-actions .btn-book { display: none; }
     .mobile-menu-btn { display: block; }
     .info-layout { grid-template-columns: 1fr; }
     .info-image img { height: 250px; }

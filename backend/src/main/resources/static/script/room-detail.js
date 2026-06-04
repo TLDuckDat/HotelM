@@ -34,7 +34,7 @@
             room_detail_rating_unit:      { en: "review", vi: "đánh giá" },
             room_detail_rating_units:     { en: "reviews", vi: "đánh giá" },
             room_detail_booking_from:     { en: "Starting from", vi: "Giá chỉ từ" },
-            room_detail_booking_unit:     { en: "per night · taxes & fees may apply", vi: "mỗi đêm · đã bao gồm thuế & phí" },
+            room_detail_booking_unit:     { en: "per night taxes & fees may apply", vi: "mỗi đêm đã bao gồm thuế & phí" },
             room_detail_booking_capacity: { en: "Up to", vi: "Tối đa" },
             room_detail_booking_guests:   { en: "guest", vi: "khách" },
             room_detail_booking_guests_plural: { en: "guests", vi: "khách" },

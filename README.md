@@ -98,3 +98,4 @@ Hoặc chạy từ root bằng Maven module:
 - Điểm vào ứng dụng vẫn là `backend/src/main/java/org/example/hotelm/HotelMApplication.java`.
 - `frontend/` là không gian tổ chức lại code UI theo hướng chuyên nghiệp, có thể gắn pipeline build/copy sau.
 
+# CNJAVA

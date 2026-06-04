@@ -1,120 +1,113 @@
 (function (global) {
     "use strict";
 
-    function loadDashboard() {
-        if (!global.Guard.requireLogin()) return;
+    function setMessage(text, type) {
+        var el = document.getElementById("dashboard-message");
+        if (!el) return;
+        el.className = "message-box " + (type || "notice");
+        el.textContent = text;
+        el.style.display = text ? "block" : "none";
+    }
 
-        Promise.all([
-            global.UserApi.getUsers(),
-            global.RoomApi.getRooms(),
-            global.BookingApi.getBookings()
-        ]).then(function (results) {
-            const [users, rooms, bookings] = results;
+    function countAvailableRooms(rooms) {
+        return (rooms || []).filter(function (r) {
+            var status = (r.status || r.roomStatus || "").toUpperCase();
+            return !status || status === "AVAILABLE";
+        }).length;
+    }
 
-            document.getElementById('stat-users').textContent = (users || []).length;
-            document.getElementById('stat-rooms').textContent = (rooms || []).length;
-            document.getElementById('stat-bookings').textContent = (bookings || []).length;
-
-            const pending = (bookings || []).filter(b => b.status === 'PENDING').length;
-            document.getElementById('stat-pending').textContent = pending;
-        }).catch(function (err) {
-            const msg = err?.payload?.message || 'Cannot load dashboard data';
-            const el = document.getElementById('dashboard-message');
-            if (el) {
-                el.className = 'message-box error';
-                el.textContent = msg;
-            }
+    function filterByCurrentUser(items, userId) {
+        return (items || []).filter(function (item) {
+            return String(item.userId || item.userID || "") === userId;
         });
     }
 
+    function loadDashboard() {
+        if (!global.Guard.requireLogin()) return;
+
+        var user = global.AuthStore && global.AuthStore.getCurrentUser();
+        var userId = user ? String(user.userId || user.userID || user.id || "") : "";
+
+        var roomPromise = global.RoomApi.getRooms();
+        var bookingPromise = global.BookingApi.getBookings();
+        var paymentPromise = global.PaymentApi && userId
+            ? global.PaymentApi.getPaymentsByUser(userId)
+            : Promise.resolve([]);
+        var reviewPromise = global.ReviewApi
+            ? global.ReviewApi.getReviews()
+            : Promise.resolve([]);
+
+        Promise.all([roomPromise, bookingPromise, paymentPromise, reviewPromise])
+            .then(function (results) {
+                var rooms = results[0] || [];
+                var bookings = results[1] || [];
+                var payments = results[2] || [];
+                var reviews = results[3] || [];
+
+                var myBookings = filterByCurrentUser(bookings, userId);
+                var myPayments = filterByCurrentUser(payments, userId);
+                var myReviews = filterByCurrentUser(reviews, userId);
+
+                var elBookings = document.getElementById("stat-bookings");
+                var elRooms = document.getElementById("stat-rooms");
+                var elPayments = document.getElementById("stat-payments");
+                var elReviews = document.getElementById("stat-reviews");
+
+                if (elBookings) elBookings.textContent = String(myBookings.length);
+                if (elRooms) elRooms.textContent = String(countAvailableRooms(rooms));
+                if (elPayments) elPayments.textContent = String(myPayments.length);
+                if (elReviews) elReviews.textContent = String(myReviews.length);
+            })
+            .catch(function (err) {
+                var msg = (err && err.payload && err.payload.message) || "Cannot load dashboard data";
+                setMessage(msg, "error");
+            });
+    }
+
     function renderUserUI() {
-        const user = window.AuthStore?.getCurrentUser();
+        var user = global.AuthStore && global.AuthStore.getCurrentUser();
         if (!user) return;
 
-        const topbarName = document.getElementById('topbar-username');
-        const sidebarName = document.getElementById('sidebar-username');
-        const sidebarRole = document.getElementById('sidebar-role');
+        var topbarName = document.getElementById("topbar-username");
+        var sidebarName = document.getElementById("sidebar-username");
+        var sidebarRole = document.getElementById("sidebar-role");
 
-        if (topbarName) topbarName.textContent = user.fullName || 'Guest';
-        if (sidebarName) sidebarName.textContent = user.fullName || 'Guest';
-        if (sidebarRole) sidebarRole.textContent = user.role || 'USER';
+        if (topbarName) topbarName.textContent = user.fullName || "Guest";
+        if (sidebarName) sidebarName.textContent = user.fullName || "Guest";
+        if (sidebarRole) sidebarRole.textContent = user.role || "USER";
     }
 
-    function handleLogout() {
+    global.handleLogout = function () {
         if (global.AuthStore) global.AuthStore.clearCurrentUser();
-        window.location.href = 'index.html';
-    }
-
-    window.toggleSidebar = function () {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('sidebar-overlay').classList.toggle('active');
+        window.location.href = "index.html";
     };
 
-    window.closeSidebar = function () {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('sidebar-overlay').classList.remove('active');
+    global.toggleSidebar = function () {
+        document.getElementById("sidebar").classList.toggle("open");
+        document.getElementById("sidebar-overlay").classList.toggle("active");
     };
 
-    window.toggleNotification = function (e) {
+    global.closeSidebar = function () {
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("sidebar-overlay").classList.remove("active");
+    };
+
+    global.toggleNotification = function (e) {
         e.stopPropagation();
-        const menu = document.getElementById('notificationMenu');
-        if (menu) menu.classList.toggle('active');
+        var menu = document.getElementById("notificationMenu");
+        if (menu) menu.classList.toggle("active");
     };
 
-    document.addEventListener('click', (e) => {
-        const dropdown = document.querySelector('.notification-dropdown');
+    document.addEventListener("click", function (e) {
+        var dropdown = document.querySelector(".notification-dropdown");
         if (dropdown && !dropdown.contains(e.target)) {
-            const menu = document.getElementById('notificationMenu');
-            if (menu) menu.classList.remove('active');
+            var menu = document.getElementById("notificationMenu");
+            if (menu) menu.classList.remove("active");
         }
     });
 
-
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener("DOMContentLoaded", function () {
         loadDashboard();
         renderUserUI();
     });
-
 })(window);
-
-// (function (global) {
-//     "use strict";
-
-//     function renderStats(users, rooms, bookings) {
-//         document.getElementById("stat-users").textContent = String((users || []).length);
-//         document.getElementById("stat-rooms").textContent = String((rooms || []).length);
-//         document.getElementById("stat-bookings").textContent = String((bookings || []).length);
-
-//         var pending = (bookings || []).filter(function (b) {
-//             return b.status === "PENDING";
-//         }).length;
-
-//         document.getElementById("stat-pending").textContent = String(pending);
-//     }
-
-//     function loadDashboard() {
-//         if (!global.Guard.requireLogin()) {
-//             return;
-//         }
-
-//         global.AppShell.renderTopbar("Dashboard");
-
-//         Promise.all([
-//             global.UserApi.getUsers(),
-//             global.RoomApi.getRooms(),
-//             global.BookingApi.getBookings()
-//         ]).then(function (result) {
-//             renderStats(result[0], result[1], result[2]);
-//         }).catch(function (error) {
-//             var box = document.getElementById("dashboard-error");
-//             var msg = error && error.payload && error.payload.message
-//                 ? error.payload.message
-//                 : "Cannot load dashboard data";
-//             box.textContent = msg;
-//             box.style.display = "block";
-//         });
-//     }
-
-//     document.addEventListener("DOMContentLoaded", loadDashboard);
-// })(window);
-

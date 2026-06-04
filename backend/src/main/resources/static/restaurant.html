@@ -26,9 +26,15 @@
                 <a href="rosalia-about.html" data-i18n="nav_about">ABOUT US</a>
                 <a href="offer.html" data-i18n="nav_offer">OFFER</a>
             </nav>
-            <a href="/register.html">
-                <button class="btn-book" href data-i18n="nav_booknow">BOOK NOW</button>
-            </a>
+            <div class="nav-actions">
+                <button id="lang-toggle-btn" onclick="toggleLanguage()" title="Switch to Vietnamese">
+                    <span class="lang-flag">🇻🇳</span>
+                    <span class="lang-label">VI</span>
+                </button>
+                <a href="/register.html">
+                    <button class="btn-book" type="button" data-i18n="nav_booknow">BOOK NOW</button>
+                </a>
+            </div>
             <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
         </div>
     </header>
@@ -142,6 +148,7 @@
         </div>
     </footer>
 
+    <script src="/script/language.js"></script>
     <script src="/script/restaurant.js"></script>
 </body>
 </html>

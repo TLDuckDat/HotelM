@@ -3,28 +3,39 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Search Rooms - HotelM</title>
+    <title>Search Rooms - SOT Resort & Hotel</title>
+    <link rel="icon" href="assets/image/logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <link rel="stylesheet" href="assets/css/app.css" />
-    
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="app-shell-topbar">
 <div id="app-topbar"></div>
 <div class="container">
-    <h2 data-i18n="rooms_search_title">Search room</h2>
-    <div class="actions">
-        <input id="q" placeholder="Keyword" />
-        <input id="capacity" type="number" placeholder="Min capacity" />
-        <button id="search-btn" class="primary" type="button" data-i18n="btn_search">Search</button>
+    <div class="page-header-lite">
+        <h1 data-i18n="rooms_search_title">Search room</h1>
+        <p data-i18n="rooms_desc">Search and filter rooms for your stay</p>
     </div>
-    <div id="search-results" class="grid"></div>
+    <div class="card">
+        <div class="actions">
+            <input id="q" data-i18n="search_keyword_ph" data-i18n-placeholder="search_keyword_ph" placeholder="Keyword" />
+            <input id="capacity" type="number" data-i18n="search_capacity_ph" data-i18n-placeholder="search_capacity_ph" placeholder="Min capacity" />
+            <button id="search-btn" class="primary" type="button" data-i18n="btn_search">Search</button>
+        </div>
+    </div>
+    <div id="search-results" class="grid" style="margin-top: 20px;"></div>
 </div>
 
+<script src="script/language.js"></script>
 <script src="script/api/baseApi.js"></script>
 <script src="script/api/roomApi.js"></script>
 <script src="script/authStore.js"></script>
 <script src="script/app-shell.js"></script>
 <script src="script/search.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.AppShell) window.AppShell.renderTopbar(window.t ? window.t('rooms_search_title') : 'Search');
+    });
+</script>
 </body>
 </html>
-

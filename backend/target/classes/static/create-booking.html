@@ -132,7 +132,8 @@
             </div>
           </div>
 
-          <form id="create-booking-form">
+          <form id="create-booking-form" class="booking-form-layout">
+            <div class="booking-form-col booking-form-col-fields">
             <div class="form-field">
               <label class="form-label" for="branchId"
                 ><i class="fas fa-map-marker-alt"></i> <span data-i18n="label_branch">Branch</span></label
@@ -148,30 +149,22 @@
               <select id="roomId" class="form-select" required></select>
             </div>
 
-            <div class="form-row">
-              <div class="form-field">
-                <label class="form-label" for="checkIn"
-                  ><i class="fas fa-arrow-right-to-bracket"></i> <span data-i18n="label_checkin">Check In</span></label
-                >
-                <input
-                  id="checkIn"
-                  class="form-input"
-                  type="datetime-local"
-                  required
-                />
+            <aside class="booking-selection-panel" id="booking-selection-panel" hidden>
+              <h3 class="booking-selection-title" data-i18n="booking_your_selection">Your selection</h3>
+              <dl class="booking-selection-list">
+                <div><dt data-i18n="label_room">Room</dt><dd id="panel-room-name">—</dd></div>
+                <div><dt data-i18n="label_checkin_date">Check-in date</dt><dd id="panel-checkin-date">—</dd></div>
+                <div><dt data-i18n="label_checkout_date">Check-out date</dt><dd id="panel-checkout-date">—</dd></div>
+                <div><dt data-i18n="label_checkin_time">Check-in time</dt><dd id="panel-checkin-time">—</dd></div>
+                <div><dt data-i18n="label_checkout_time">Check-out time</dt><dd id="panel-checkout-time">—</dd></div>
+                <div><dt data-i18n="booking_price_per_day">Price per day</dt><dd id="panel-price-per-day">—</dd></div>
+                <div><dt data-i18n="booking_num_days">Number of days</dt><dd id="panel-num-days">—</dd></div>
+              </dl>
+              <div class="booking-price-total" id="booking-price-total" hidden>
+                <span class="booking-price-total-label" data-i18n="booking_total">Total</span>
+                <strong id="panel-total-price">—</strong>
               </div>
-              <div class="form-field">
-                <label class="form-label" for="checkOut"
-                  ><i class="fas fa-arrow-right-from-bracket"></i> <span data-i18n="label_checkout">Check Out</span></label
-                >
-                <input
-                  id="checkOut"
-                  class="form-input"
-                  type="datetime-local"
-                  required
-                />
-              </div>
-            </div>
+            </aside>
 
             <div class="form-field">
               <label class="form-label" for="note"
@@ -197,6 +190,88 @@
                 <i class="fas fa-arrow-left"></i> <span data-i18n="btn_back_to_list">Back to List</span>
               </button>
             </div>
+            </div>
+
+            <div class="booking-form-col booking-form-col-schedule">
+            <div class="form-field booking-schedule-field">
+              <input type="hidden" id="checkIn" required />
+              <input type="hidden" id="checkOut" required />
+
+              <div id="schedule-picker" class="schedule-picker is-disabled" aria-live="polite">
+                <p class="schedule-hint" id="schedule-hint" data-i18n="booking_pick_room_first">
+                  Please select a room to view availability
+                </p>
+
+                <section class="schedule-section schedule-section-dates">
+                  <div class="schedule-section-head">
+                    <h3 class="schedule-section-title">
+                      <i class="fas fa-calendar-days"></i>
+                      <span data-i18n="booking_schedule_date_section">Date</span>
+                    </h3>
+                    <div class="schedule-summary">
+                      <span class="schedule-summary-item">
+                        <span class="schedule-summary-label" data-i18n="label_checkin_date">Check-in date</span>
+                        <strong id="summary-checkin-date">—</strong>
+                      </span>
+                      <span class="schedule-summary-item">
+                        <span class="schedule-summary-label" data-i18n="label_checkout_date">Check-out date</span>
+                        <strong id="summary-checkout-date">—</strong>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="schedule-month-nav">
+                    <button type="button" class="schedule-nav-btn" id="date-prev-month" aria-label="Previous month">
+                      <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span id="date-month-label" class="schedule-month-label"></span>
+                    <button type="button" class="schedule-nav-btn" id="date-next-month" aria-label="Next month">
+                      <i class="fas fa-chevron-right"></i>
+                    </button>
+                  </div>
+                  <div id="date-picker" class="date-picker" role="group" aria-label="Select dates"></div>
+                </section>
+
+                <section class="schedule-section schedule-section-times">
+                  <div class="schedule-section-head">
+                    <h3 class="schedule-section-title">
+                      <i class="fas fa-clock"></i>
+                      <span data-i18n="booking_schedule_time_section">Time</span>
+                    </h3>
+                    <div class="schedule-summary">
+                      <span class="schedule-summary-item">
+                        <span class="schedule-summary-label" data-i18n="label_checkin_time">Check-in time</span>
+                        <strong id="summary-checkin-time">—</strong>
+                      </span>
+                      <span class="schedule-summary-item">
+                        <span class="schedule-summary-label" data-i18n="label_checkout_time">Check-out time</span>
+                        <strong id="summary-checkout-time">—</strong>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="time-picker-block">
+                    <span class="time-picker-label" data-i18n="label_checkin_time">Check-in time</span>
+                    <div id="checkin-time-picker" class="time-picker" role="group" data-i18n-aria="label_checkin_time" aria-label="Check-in time"></div>
+                  </div>
+                  <div class="time-picker-block">
+                    <span class="time-picker-label" data-i18n="label_checkout_time">Check-out time</span>
+                    <div id="checkout-time-picker" class="time-picker" role="group" data-i18n-aria="label_checkout_time" aria-label="Check-out time"></div>
+                  </div>
+                </section>
+
+                <div class="schedule-price-strip" id="schedule-price-strip" hidden>
+                  <span id="schedule-price-detail">—</span>
+                  <strong id="schedule-price-total">—</strong>
+                </div>
+
+                <div class="schedule-legend">
+                  <span class="legend-item"><span class="legend-swatch legend-available"></span> <span data-i18n="booking_legend_available">Available</span></span>
+                  <span class="legend-item"><span class="legend-swatch legend-booked"></span> <span data-i18n="booking_legend_booked">Booked</span></span>
+                  <span class="legend-item"><span class="legend-swatch legend-selected"></span> <span data-i18n="booking_legend_selected">Selected</span></span>
+                </div>
+              </div>
+            </div>
+            </div>
           </form>
         </div>
       </main>
@@ -218,7 +293,7 @@
     <script src="/script/authStore.js"></script>
     <script src="/script/guard.js"></script>
     <script src="script/app-shell.js"></script>
-    <script src="/script/create-booking.js"></script>
     <script src="/script/language.js"></script>
+    <script src="/script/create-booking.js"></script>
   </body>
 </html>
