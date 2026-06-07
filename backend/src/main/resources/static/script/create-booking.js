@@ -232,10 +232,10 @@
             var kept = applyRoomSelectHtml(html, preferredRoomId);
 
             if (preferredRoomId && !kept) {
-                setMessage(
-                    t("booking_room_unavailable", "Selected room is not available for these dates. Please choose another room."),
-                    "error"
-                );
+                var el = document.getElementById("create-booking-message");
+                if (el && el.className.indexOf("error") !== -1) {
+                    el.style.display = "none";
+                }
                 select.value = "";
                 onRoomSelectionChange();
             }

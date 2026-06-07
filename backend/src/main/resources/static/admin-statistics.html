@@ -148,12 +148,6 @@
                 <form id="admin-set-kpi-form">
                     <div class="form-row">
                         <div class="form-field">
-                            <label class="form-label" data-i18n="admin_stats_label_branch">Branch</label>
-                            <select id="kpi-branch-select" class="form-input" required>
-                                <option value="" disabled selected>Select Branch</option>
-                            </select>
-                        </div>
-                        <div class="form-field">
                             <label class="form-label" data-i18n="admin_stats_label_year">Target Year</label>
                             <input id="kpi-target-year" class="form-input" type="number" min="2020" required />
                         </div>
@@ -161,13 +155,11 @@
                             <label class="form-label" data-i18n="admin_stats_label_month">Target Month</label>
                             <input id="kpi-target-month" class="form-input" type="number" min="1" max="12" required />
                         </div>
-                        <div class="form-field">
-                            <label class="form-label" data-i18n="admin_stats_label_rev">Target Revenue (₫)</label>
-                            <input id="kpi-target-revenue" class="form-input" type="number" min="0" step="1000" placeholder="e.g. 500000000" required />
-                        </div>
+                    </div>
+                    <div id="kpi-branch-inputs" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-top: 15px;">                        <!-- Populated dynamically -->
                     </div>
                     <div style="margin-top: 20px;">
-                        <button type="submit" class="btn-primary"><i class="fas fa-save" ></i> <span data-i18n="admin_stats_btn_save">Save Target</span></button>
+                        <button type="submit" class="btn-primary" id="btn-save-kpi" disabled><i class="fas fa-save" ></i> <span data-i18n="admin_stats_btn_save">Save Target</span></button>
                         <button type="button" id="btn-recalculate-kpi" class="btn-outline" style="margin-left: 10px;">
                             <i class="fas fa-sync-alt"></i> <span data-i18n="admin_stats_btn_recalc">Recalculate KPIs</span>
                         </button>

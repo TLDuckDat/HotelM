@@ -4,7 +4,7 @@
     var QR_BANK_CODE = "MB";
     var QR_BANK_NAME = "MB Bank";
     var QR_ACCOUNT_NO = "0979999999";
-    var QR_ACCOUNT_NAME = "SOT RESORT HOTEL";
+    var QR_ACCOUNT_NAME = "SOT TEST";
 
     var bookingCache = [];
     var paymentCache = [];
@@ -86,7 +86,7 @@
     }
 
     function getQrTransferNote(payment) {
-        return "HOTELM " + getPaymentId(payment);
+        return getPaymentId(payment);
     }
 
     function buildQrImageUrl(payment) {
@@ -116,6 +116,29 @@
         amountInput.value = raw > 0 ? formatMoney(raw) : "";
     }
 
+    function updateSubmitButton() {
+        var method = document.getElementById("payment-method") ? document.getElementById("payment-method").value : "";
+        var submitBtn = document.getElementById("payment-submit-btn");
+        if (!submitBtn) return;
+        
+        var icon = submitBtn.querySelector("i");
+        var textSpan = submitBtn.querySelector("span");
+        
+        if (method === "CASH") {
+            if (icon) icon.className = "fas fa-check";
+            if (textSpan) {
+                textSpan.setAttribute("data-i18n", "btn_confirm_payment");
+                textSpan.textContent = currentLang() === 'vi' ? "Xác nhận thanh toán" : "Confirm Payment";
+            }
+        } else {
+            if (icon) icon.className = "fas fa-qrcode";
+            if (textSpan) {
+                textSpan.setAttribute("data-i18n", "create_qr_payment");
+                textSpan.textContent = currentLang() === 'vi' ? "Tạo Thanh Toán QR" : "Create QR Payment";
+            }
+        }
+    }
+
     function renderBookingOptions() {
         var select = document.getElementById("payment-booking-id");
         if (!select) return;
@@ -139,16 +162,15 @@
         });
 
         if (!payableBookings.length) {
-            select.innerHTML = "<option value=''>No unpaid booking available</option>";
+            select.innerHTML = "<option value=''>" + (currentLang() === 'vi' ? "Không có phòng nào cần thanh toán" : "No unpaid booking available") + "</option>";
             updateAmountFromBooking();
             return;
         }
 
-        select.innerHTML = "<option value=''>Select a booking\u2026</option>" + payableBookings.map(function (booking) {
+        select.innerHTML = "<option value=''>" + (currentLang() === 'vi' ? "Chọn một đặt phòng\u2026" : "Select a booking\u2026") + "</option>" + payableBookings.map(function (booking) {
             var bId = String(getBookingId(booking));
             var roomName = getBookingRoomName(booking);
-            var checkIn = booking.checkIn ? String(booking.checkIn).replace('T', ' ').substring(0, 16) : "";
-            var label = roomName + (checkIn ? " (Check-in: " + checkIn + ")" : "") + " (" + formatMoney(booking.totalPrice) + ")";
+            var label = roomName + " (" + formatMoney(booking.totalPrice) + ")";
             // Mark bookings that already have a PENDING payment
             if (pendingBookingIds.indexOf(bId) !== -1) {
                 label += " [Payment pending]";
@@ -174,11 +196,16 @@
                             && getPaymentStatus(p) === "PENDING";
                     })[0];
                     if (existingPayment) {
-                        renderQrPayment(existingPayment);
-                        setMessage('Payment already created. Scan the QR and confirm after transferring.', "notice");
+                        if (getPaymentMethod(existingPayment) === "CASH") {
+                            setMessage(currentLang() === 'vi' ? 'Đã tạo thanh toán tiền mặt. Vui lòng thanh toán tại quầy lễ tân để được Admin duyệt.' : 'Cash payment already created. Please pay at the reception to be approved by Admin.', "notice");
+                            hideQrPayment();
+                        } else {
+                            renderQrPayment(existingPayment);
+                            setMessage(currentLang() === 'vi' ? 'Đã tạo thanh toán. Vui lòng quét mã QR và xác nhận sau khi chuyển khoản.' : 'Payment already created. Scan the QR and confirm after transferring.', "notice");
+                        }
                     }
                 } else {
-                    setMessage('Booking pre-selected! Click "Create QR Payment" to proceed.', "notice");
+                    setMessage(currentLang() === 'vi' ? 'Đã chọn phòng! Nhấp "Tạo Thanh Toán QR" để tiếp tục.' : 'Booking pre-selected! Click "Create QR Payment" to proceed.', "notice");
                 }
             } else {
                 setMessage('Booking #' + urlBookingId + ' not found in your payable bookings.', "error");
@@ -245,7 +272,7 @@
         if (!body) return;
 
         if (!payments || !payments.length) {
-            body.innerHTML = "<tr><td colspan='6'>No payments found</td></tr>";
+            body.innerHTML = "<tr><td colspan='6'>" + (currentLang() === 'vi' ? "Không tìm thấy thanh toán nào" : "No payments found") + "</td></tr>";
         if (typeof applyTranslations === 'function') applyTranslations(global.localStorage.getItem('sot_lang') || 'en');
             return;
         }
@@ -253,9 +280,15 @@
         body.innerHTML = payments.map(function (payment) {
             var id = getPaymentId(payment);
             var status = getPaymentStatus(payment);
-            var actionHtml = status === "PENDING"
-                ? "<button class='btn-secondary' type='button' onclick='continuePayment(\"" + id + "\")'>Show QR</button>"
-                : "—";
+            var actionHtml = "—";
+            
+            if (status === "PENDING") {
+                if (getPaymentMethod(payment) === "CASH") {
+                    actionHtml = currentLang() === 'vi' ? "Đang chờ duyệt" : "Pending Admin Approval";
+                } else {
+                    actionHtml = "<button class='btn-secondary' type='button' onclick='continuePayment(\"" + id + "\")'>" + (currentLang() === 'vi' ? "Hiển thị QR" : "Show QR") + "</button>";
+                }
+            }
             
             var bookingId = getPaymentBookingId(payment);
             var bookingMatch = bookingCache.filter(function(b) { return getBookingId(b) === bookingId; })[0];
@@ -320,15 +353,20 @@
             return;
         }
 
-        setMessage("Creating QR payment...", "notice");
+        setMessage("Creating payment...", "notice");
 
         global.PaymentApi.createPayment({
             bookingId: bookingId,
             paymentMethod: method,
             discount: 0
         }).then(function (payment) {
-            setMessage("QR created. Please scan and confirm after transferring.", "success");
-            renderQrPayment(payment);
+            if (method === "CASH") {
+                setMessage(currentLang() === 'vi' ? "Đã tạo thanh toán tiền mặt. Vui lòng thanh toán tại quầy lễ tân để được Admin duyệt." : "Cash payment created. Please pay at the reception to be approved by Admin.", "success");
+                hideQrPayment();
+            } else {
+                setMessage(currentLang() === 'vi' ? "Đã tạo mã QR. Vui lòng quét và xác nhận sau khi chuyển khoản." : "QR created. Please scan and confirm after transferring.", "success");
+                renderQrPayment(payment);
+            }
             return loadPayments();
         }).catch(function (err) {
             var msg = err && err.payload
@@ -369,8 +407,13 @@
             return;
         }
 
+        if (getPaymentMethod(payment) === "CASH") {
+            setMessage(currentLang() === 'vi' ? "Đây là thanh toán tiền mặt. Vui lòng thanh toán tại quầy lễ tân để được Admin duyệt." : "This is a cash payment. Please pay at the reception to be approved by Admin.", "notice");
+            return;
+        }
+
         renderQrPayment(payment);
-        setMessage("QR reopened. Scan and confirm after payment.", "notice");
+        setMessage(currentLang() === 'vi' ? "Đã mở lại mã QR. Vui lòng quét và xác nhận sau khi thanh toán." : "QR reopened. Scan and confirm after payment.", "notice");
     };
 
     function handleLogout() {
@@ -423,14 +466,18 @@
         });
 
         var bookingSelect = document.getElementById("payment-booking-id");
+        var methodSelect = document.getElementById("payment-method");
         var submitBtn = document.getElementById("payment-submit-btn");
         var confirmBtn = document.getElementById("payment-confirm-btn");
         var hideQrBtn = document.getElementById("payment-hide-qr-btn");
 
         if (bookingSelect) bookingSelect.addEventListener("change", updateAmountFromBooking);
+        if (methodSelect) methodSelect.addEventListener("change", updateSubmitButton);
         if (submitBtn) submitBtn.addEventListener("click", submitPayment);
         if (confirmBtn) confirmBtn.addEventListener("click", confirmPayment);
         if (hideQrBtn) hideQrBtn.addEventListener("click", hideQrPayment);
+        
+        updateSubmitButton();
     }
 
     function refreshPaymentsPageI18n() {
@@ -438,6 +485,7 @@
             global.applyTranslations(global.getLang());
         }
         updateAmountFromBooking();
+        updateSubmitButton();
         if (activePayment) {
             var amtEl = document.getElementById("payment-qr-amount");
             if (amtEl) {

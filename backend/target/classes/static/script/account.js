@@ -57,6 +57,10 @@
         document.getElementById('profile-role').textContent = user.role || '';
     }
 
+    function currentLang() {
+        return (window.getLang ? window.getLang() : window.localStorage.getItem("sot_lang")) || "en";
+    }
+
     // --- CHỨC NĂNG LOGOUT THÊM VÀO ---
     function handleLogout() {
         // Xóa dữ liệu user trong AuthStore
@@ -107,45 +111,77 @@
 
     // 1. Bật chế độ chỉnh sửa
     window.enableEditMode = function () {
-        const fields = ['profile-name', 'profile-email', 'profile-phone'];
+        const fields = ['profile-name', 'profile-phone'];
 
         fields.forEach(id => {
             const el = document.getElementById(id);
             el.setAttribute('contenteditable', 'true');
+            el.style.borderBottom = '1px dashed var(--primary-color)';
+            el.style.padding = '2px 4px';
         });
 
         // Focus vào ô đầu tiên
         document.getElementById('profile-name').focus();
 
-        // Đổi nút Edit thành nút Confirm (Tạm thời thay đổi giao diện Quick Action)
+        // Đổi nút Edit thành nút Confirm
         const editBtn = document.getElementById('btn-edit-profile');
-        editBtn.innerHTML = '<i class="fas fa-check"></i> Save Changes';
+        editBtn.innerHTML = '<i class="fas fa-check"></i> ' + (currentLang() === 'vi' ? 'Lưu Thay Đổi' : 'Save Changes');
         editBtn.style.background = '#27ae60'; // Màu xanh lá
         editBtn.onclick = saveProfileChanges;
-
-        // Thông báo nhẹ cho người dùng
-        console.log("Edit mode enabled");
     };
 
-    // 2. Lưu thay đổi (Giả lập)
+    // 2. Lưu thay đổi
     window.saveProfileChanges = function () {
-        const fields = ['profile-name', 'profile-email', 'profile-phone'];
+        const fields = ['profile-name', 'profile-phone'];
+
+        const nameVal = document.getElementById('profile-name').textContent.trim();
+        const phoneVal = document.getElementById('profile-phone').textContent.trim();
+
+        if (!nameVal) {
+            alert(currentLang() === 'vi' ? "Tên không được để trống." : "Name cannot be empty.");
+            return;
+        }
+
+        if (nameVal.length < 2) {
+            alert(currentLang() === 'vi' ? "Tên phải chứa ít nhất 2 ký tự." : "Name must contain at least 2 characters.");
+            return;
+        }
+
+        if (!phoneVal || phoneVal.length < 8) {
+            alert(currentLang() === 'vi' ? "Số điện thoại không hợp lệ." : "Invalid phone number.");
+            return;
+        }
 
         // Tắt chế độ chỉnh sửa
         fields.forEach(id => {
             const el = document.getElementById(id);
             el.setAttribute('contenteditable', 'false');
+            el.style.borderBottom = 'none';
+            el.style.padding = '0';
         });
 
         // Khôi phục nút bấm về trạng thái ban đầu
         const editBtn = document.getElementById('btn-edit-profile');
-        editBtn.innerHTML = '<i class="fas fa-user-edit"></i> Edit Profile Information';
-        editBtn.style.background = ''; // Trình duyệt tự lấy lại màu từ class btn-primary
+        editBtn.innerHTML = '<i class="fas fa-user-edit"></i> ' + (currentLang() === 'vi' ? 'Chỉnh Sửa Hồ Sơ' : 'Edit Profile Information');
+        editBtn.style.background = '';
         editBtn.onclick = enableEditMode;
 
-        // Hiển thị thông báo thành công (alert đơn giản hoặc bạn có thể dùng toast)
-        alert("Success! Your profile information has been updated.");
-
-        // Note: Vì là tĩnh nên nếu F5 trang web sẽ quay về dữ liệu cũ từ AuthStore
+        // Cập nhật
+        const user = global.AuthStore.getCurrentUser();
+        if (user) {
+            user.fullName = nameVal;
+            user.phoneNumber = phoneVal;
+            global.AuthStore.setCurrentUser(user);
+            
+            if (window.UserApi && window.UserApi.updateUser) {
+                window.UserApi.updateUser(user.userId || user.userID || user.id, {
+                    fullName: nameVal,
+                    phoneNumber: phoneVal
+                }).catch(err => console.error("Update profile error:", err));
+            }
+        }
+        
+        loadProfile();
+        alert(currentLang() === 'vi' ? "Thành công! Hồ sơ của bạn đã được cập nhật." : "Success! Your profile information has been updated.");
     };
 })(window);

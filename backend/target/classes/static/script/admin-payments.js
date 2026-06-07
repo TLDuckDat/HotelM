@@ -6,6 +6,10 @@
     var roomMap = {};
 
     /* ── helpers ── */
+    function currentLang() {
+        return (window.getLang ? window.getLang() : window.localStorage.getItem("sot_lang")) || "en";
+    }
+
     function flash(msg, type) {
         var el = document.getElementById("admin-message");
         el.textContent = msg;
@@ -63,8 +67,8 @@
                 + "<td>" + methodLabel(p) + "</td>"
                 + "<td>" + statusBadge(status) + "</td>"
                 + "<td><div class='actions-cell'>"
-                + (canAct ? "<button class='btn-approve' onclick='confirmAction(\"approve\",\"" + id + "\")'><i class='fas fa-check'></i><span data-i18n='admin_approve'> Approve</button>" : "")
-                + (canAct ? "<button class='btn-reject'  onclick='confirmAction(\"reject\",\""  + id + "\")'><i class='fas fa-times'></i> <span data-i18n='admin_reject'>Reject</button>" : "")
+                + (canAct ? "<button class='btn-approve' onclick='confirmAction(\"approve\",\"" + id + "\")'><i class='fas fa-check'></i><span data-i18n='admin_btn_approve'> " + (currentLang() === 'vi' ? "Chấp nhận" : "Approve") + "</span></button>" : "")
+                + (canAct ? "<button class='btn-reject'  onclick='confirmAction(\"reject\",\""  + id + "\")'><i class='fas fa-times'></i> <span data-i18n='admin_btn_reject'> " + (currentLang() === 'vi' ? "Từ chối" : "Reject") + "</span></button>" : "")
                 + "<button class='btn-del' onclick='confirmAction(\"delete\",\"" + id + "\")'><i class='fas fa-trash'></i></button>"
                 + "</div></td>"
                 + "</tr>";
@@ -113,10 +117,23 @@
     var pendingAction = null;
 
     window.confirmAction = function (type, id) {
+        var isVi = currentLang() === 'vi';
         var config = {
-            approve: { title: "Approve Payment", body: "Mark payment #" + id + " as Completed?",         color: "#1b4332", bg: "#d8f3dc" },
-            reject:  { title: "Reject Payment",  body: "Reject payment #" + id + "? Cannot be undone.",  color: "#7f0000", bg: "#ffe0e0" },
-            delete:  { title: "Delete Payment",  body: "Permanently delete payment #" + id + "?",        color: "#7f0000", bg: "#ffe0e0" }
+            approve: { 
+                title: isVi ? "Duyệt Thanh Toán" : "Approve Payment", 
+                body: isVi ? "Đánh dấu thanh toán #" + id.substring(0,8) + " là Đã Hoàn Thành?" : "Mark payment #" + id.substring(0,8) + " as Completed?",         
+                color: "#1b4332", bg: "#d8f3dc" 
+            },
+            reject:  { 
+                title: isVi ? "Từ Chối Thanh Toán" : "Reject Payment",  
+                body: isVi ? "Từ chối thanh toán #" + id.substring(0,8) + "? Thao tác không thể hoàn tác." : "Reject payment #" + id.substring(0,8) + "? Cannot be undone.",  
+                color: "#7f0000", bg: "#ffe0e0" 
+            },
+            delete:  { 
+                title: isVi ? "Xoá Thanh Toán" : "Delete Payment",  
+                body: isVi ? "Xoá vĩnh viễn thanh toán #" + id.substring(0,8) + "?" : "Permanently delete payment #" + id.substring(0,8) + "?",        
+                color: "#7f0000", bg: "#ffe0e0" 
+            }
         };
         var c = config[type];
         document.getElementById("modal-title").textContent = c.title;
@@ -151,7 +168,13 @@
             }
 
             promise.then(function () {
-                flash(type === "approve" ? "Payment approved." : type === "reject" ? "Payment rejected." : "Payment deleted.", "success");
+                var isVi = currentLang() === 'vi';
+                var msg = "";
+                if (type === "approve") msg = isVi ? "Thanh toán đã được duyệt." : "Payment approved.";
+                else if (type === "reject") msg = isVi ? "Thanh toán đã bị từ chối." : "Payment rejected.";
+                else msg = isVi ? "Thanh toán đã bị xoá." : "Payment deleted.";
+                
+                flash(msg, "success");
                 loadPayments();
             }).catch(function (err) {
                 flash((err && err.payload && (err.payload.message || err.payload.error)) || "Action failed.", "error");

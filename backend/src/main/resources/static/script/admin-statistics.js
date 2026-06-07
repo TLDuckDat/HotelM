@@ -14,9 +14,6 @@
         setTimeout(function() { box.style.display = "none"; }, 5000);
     }
 
-    ).format(val || 0);
-    }
-
     function formatPercent(val) {
         return (val || 0).toFixed(2) + "%";
     }
@@ -80,13 +77,17 @@
         var dataRevenue = kpiList.map(function(k) { return k.totalRevenue || 0; });
         var dataTarget = kpiList.map(function(k) { return k.revenueTarget || 0; });
 
+        var isVi = document.documentElement.lang === 'vi' || (global.localStorage && global.localStorage.getItem('sot_lang') === 'vi');
+        var actualRevLabel = isVi ? 'Doanh thu thực tế (VNĐ)' : 'Actual Revenue (VND)';
+        var targetKpiLabel = isVi ? 'Mục tiêu KPI (VNĐ)' : 'Target KPI (VND)';
+
         revenueChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [
                     {
-                        label: 'Actual Revenue (VND)',
+                        label: actualRevLabel,
                         data: dataRevenue,
                         backgroundColor: '#d4af37', // Gold accent
                         borderColor: '#b5952f',
@@ -94,7 +95,7 @@
                         borderRadius: 4
                     },
                     {
-                        label: 'Target KPI (VND)',
+                        label: targetKpiLabel,
                         data: dataTarget,
                         backgroundColor: 'rgba(51, 51, 51, 0.2)', // Dark gray semi-transparent
                         borderColor: '#333',
@@ -132,18 +133,40 @@
         });
     }
 
+    var currentBranches = [];
+    var currentKpis = [];
+
     function populateBranches() {
         if (!global.BranchApi) return;
         global.BranchApi.getBranches().then(function(res) {
-            var branches = Array.isArray(res) ? res : (res.payload || res.data || []);
-            var select = document.getElementById("kpi-branch-select");
-            var options = '<option value="" disabled selected>Select Branch</option>';
-            branches.forEach(function(b) {
-                options += '<option value="' + b.branchId + '">' + b.branchName + '</option>';
-            });
-            select.innerHTML = options;
+            currentBranches = Array.isArray(res) ? res : (res.payload || res.data || []);
+            renderBranchInputs();
+            document.getElementById("btn-save-kpi").disabled = false;
         }).catch(function(e) {
             console.error("Failed to load branches", e);
+        });
+    }
+
+    function renderBranchInputs() {
+        var container = document.getElementById("kpi-branch-inputs");
+        if (!container) return;
+        
+        var html = currentBranches.map(function(b) {
+            return '<div class="form-field">' +
+                   '<label class="form-label">' + b.branchName + '</label>' +
+                   '<input class="form-input kpi-branch-target-input" data-branch-id="' + b.branchId + '" type="number" min="0" step="1000" placeholder="0" required />' +
+                   '</div>';
+        }).join("");
+        container.innerHTML = html;
+        populateBranchInputValues();
+    }
+
+    function populateBranchInputValues() {
+        var inputs = document.querySelectorAll('.kpi-branch-target-input');
+        inputs.forEach(function(input) {
+            var branchId = input.getAttribute('data-branch-id');
+            var match = currentKpis.find(function(k) { return k.branchId === branchId; });
+            input.value = match ? (match.revenueTarget || 0) : 0;
         });
     }
 
@@ -163,9 +186,11 @@
         var date = getSelectedDate();
         global.KpiApi.getAllBranchesKPI(date.year, date.month).then(function(res) {
             var kpiList = Array.isArray(res) ? res : (res.payload || res.data || []);
+            currentKpis = kpiList;
             renderSummary(kpiList);
             renderTable(kpiList);
             renderChart(kpiList);
+            populateBranchInputValues();
         }).catch(function(error) {
             var msg = error && error.payload && error.payload.message ? error.payload.message : "Failed to load KPI data";
             setMessage(msg, "error");
@@ -174,47 +199,55 @@
 
     function handleSetTarget(e) {
         e.preventDefault();
-        var branchId = document.getElementById("kpi-branch-select").value;
         var year     = parseInt(document.getElementById("kpi-target-year").value);
         var month    = parseInt(document.getElementById("kpi-target-month").value);
-        var revenue  = parseFloat(document.getElementById("kpi-target-revenue").value);
 
-        if (!branchId) { setMessage("Please select a branch", "error"); return; }
-        if (!year || !month || isNaN(revenue) || revenue < 0) {
-            setMessage("Please fill in all target fields correctly.", "error"); return;
+        if (!year || !month) {
+            setMessage("Please fill in year and month.", "error"); return;
         }
 
-        // KPITargetRequest fields: branchId, year, month, revenueTarget
-        var payload = {
-            branchId:      branchId,
-            year:          year,
-            month:         month,
-            revenueTarget: revenue   // ← was wrongly "targetRevenue" before
-        };
+        var inputs = document.querySelectorAll('.kpi-branch-target-input');
+        var promises = [];
+        
+        inputs.forEach(function(input) {
+            var branchId = input.getAttribute('data-branch-id');
+            var revenue = parseFloat(input.value) || 0;
+            promises.push(global.KpiApi.setTarget({
+                branchId: branchId,
+                year: year,
+                month: month,
+                revenueTarget: revenue
+            }));
+        });
 
-        global.KpiApi.setTarget(payload).then(function() {
-            setMessage("Target KPI updated successfully", "success");
+        setMessage("Saving targets...", "notice");
+        Promise.all(promises).then(function() {
+            setMessage("Target KPIs updated successfully", "success");
             loadKpiData();
         }).catch(function(error) {
-            var msg = error && error.payload && error.payload.message ? error.payload.message : "Failed to set KPI target";
+            var msg = error && error.payload && error.payload.message ? error.payload.message : "Failed to set KPI targets";
             setMessage(msg, "error");
         });
     }
 
     function handleRecalculate() {
-        var branchId = document.getElementById("kpi-branch-select").value;
-        if (!branchId) {
-            setMessage("Please select a branch to recalculate", "error");
-            return;
-        }
         var year = parseInt(document.getElementById("kpi-target-year").value);
         var month = parseInt(document.getElementById("kpi-target-month").value);
 
-        global.KpiApi.recalculateKPI(branchId, year, month).then(function() {
-            setMessage("KPI Recalculated for branch", "success");
+        if (!year || !month) {
+            setMessage("Please fill in year and month.", "error"); return;
+        }
+
+        var promises = currentBranches.map(function(b) {
+            return global.KpiApi.recalculateKPI(b.branchId, year, month);
+        });
+
+        setMessage("Recalculating KPIs...", "notice");
+        Promise.all(promises).then(function() {
+            setMessage("KPIs Recalculated for all branches", "success");
             loadKpiData();
         }).catch(function(error) {
-            var msg = error && error.payload && error.payload.message ? error.payload.message : "Failed to recalculate KPI";
+            var msg = error && error.payload && error.payload.message ? error.payload.message : "Failed to recalculate KPIs";
             setMessage(msg, "error");
         });
     }
@@ -268,6 +301,13 @@
         document.getElementById("kpi-month-selector").value = yyyy + "-" + mm;
         document.getElementById("kpi-target-year").value = yyyy;
         document.getElementById("kpi-target-month").value = now.getMonth() + 1;
+
+        // Ensure chart updates when language changes
+        window.addEventListener('languageChanged', function() {
+            if (currentKpis && currentKpis.length > 0) {
+                renderChart(currentKpis);
+            }
+        });
 
         document.getElementById("kpi-month-selector").addEventListener("change", loadKpiData);
         document.getElementById("admin-set-kpi-form").addEventListener("submit", handleSetTarget);

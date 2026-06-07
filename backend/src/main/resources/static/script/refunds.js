@@ -106,7 +106,10 @@
         if (!body) return;
 
         if (!refunds || !refunds.length) {
-            body.innerHTML = "<tr><td colspan='4'>No refund request found</td></tr>";
+            body.innerHTML = "<tr><td colspan='4' data-i18n='refunds_no_data'>No refund request found</td></tr>";
+            if (typeof global.applyTranslations === 'function' && global.getLang) {
+                global.applyTranslations(global.getLang());
+            }
             return;
         }
 

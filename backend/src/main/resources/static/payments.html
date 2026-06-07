@@ -204,7 +204,7 @@
             ></div>
 
             <div class="form-group" style="margin-top: 20px">
-              <label class="form-label" data-i18n="label_booking">Booking</label>
+              <label class="form-label" data-i18n="label_payment_booking">Room & Price</label>
               <select class="form-input" id="payment-booking-id" required>
                 <option value="">Select a booking…</option>
               </select>
@@ -213,6 +213,7 @@
               <label class="form-label" data-i18n="label_method">Payment Method</label>
               <select class="form-input" id="payment-method" required>
                 <option value="TRANSFER">🏦 QR Bank Transfer</option>
+                <option value="CASH">💵 CASH - Tiền mặt</option>
               </select>
             </div>
             <div class="form-group">
@@ -230,30 +231,30 @@
               />
             </div>
             <button class="btn-primary" id="payment-submit-btn" type="button">
-              <i class="fas fa-qrcode"></i> <span>Create QR Payment</span>
+              <i class="fas fa-qrcode"></i> <span data-i18n="create_qr_payment">Create QR Payment</span>
             </button>
 
             <div id="qr-payment-box" class="qr-payment-box" hidden>
               <div class="card-title" style="margin-bottom: 0">
-                <i class="fas fa-mobile-alt"></i> <span>Scan QR and confirm</span>
+                <i class="fas fa-mobile-alt"></i> <span data-i18n="qr_scan_confirm">Scan QR and confirm</span>
               </div>
-              <p style="margin: 10px 0 0; color: #6b766f">
+              <p style="margin: 10px 0 0; color: #6b766f" data-i18n="qr_scan_desc">
                 Scan the QR below with your banking app, transfer the exact amount, then press confirm.
               </p>
               <div class="qr-image-wrap">
                 <img id="payment-qr-image" alt="Payment QR code" />
               </div>
               <div class="qr-payment-meta">
-                <div><strong>Bank:</strong> <span id="payment-qr-bank">-</span></div>
-                <div><strong>Account:</strong> <span id="payment-qr-account">-</span></div>
-                <div><strong>Amount:</strong> <span id="payment-qr-amount">-</span></div>
-                <div><strong>Transfer note:</strong> <span id="payment-qr-note">-</span></div>
+                <div><strong data-i18n="qr_bank">Bank:</strong> <span id="payment-qr-bank">-</span></div>
+                <div><strong data-i18n="qr_account">Account:</strong> <span id="payment-qr-account">-</span></div>
+                <div><strong data-i18n="qr_amount">Amount:</strong> <span id="payment-qr-amount">-</span></div>
+                <div><strong data-i18n="qr_note">Transfer note:</strong> <span id="payment-qr-note">-</span></div>
               </div>
               <div class="qr-payment-actions">
                 <button class="btn-primary" id="payment-confirm-btn" type="button">
-                  <i class="fas fa-check-circle"></i> <span>I have paid</span>
+                  <i class="fas fa-check-circle"></i> <span data-i18n="qr_btn_paid">I have paid</span>
                 </button>
-                <button class="btn-secondary" id="payment-hide-qr-btn" type="button">
+                <button class="btn-secondary" id="payment-hide-qr-btn" type="button" data-i18n="qr_btn_hide">
                   Hide QR
                 </button>
               </div>
@@ -269,7 +270,7 @@
                 <thead>
                   <tr>
                     <th data-i18n="table_id">ID</th>
-                    <th data-i18n="payments_col_booking">Booking</th>
+                    <th data-i18n="payments_col_room">Room</th>
                     <th data-i18n="payments_col_amount">Amount</th>
                     <th data-i18n="payments_col_method">Method</th>
                     <th data-i18n="table_status">Status</th>

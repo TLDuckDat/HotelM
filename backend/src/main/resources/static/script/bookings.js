@@ -145,8 +145,8 @@
         }
 
         body.innerHTML = filtered.map(b => {
-            const rid = b.roomId || b.roomID || '';
-            const roomName = roomMap[rid] || rid || 'N/A';
+            const rid = b.roomId || b.roomID || (b.room && (b.room.roomId || b.room.roomID)) || '';
+            const roomName = roomMap[rid] || b.roomName || (b.room && (b.room.roomName || b.room.name)) || (rid ? "Room #" + rid.substring(0,8) : 'N/A');
             const bookingId = b.bookingId || b.bookingID || '';
             const userId = b.userId || b.userID || '';
 
