@@ -1,11 +1,10 @@
 # HotelM
-## Project Structure
 
-- `backend/`: Spring Boot API + static resources đang được serve bởi backend.
-- `frontend/`: Bản source frontend để team UI làm việc độc lập, không làm ảnh hưởng runtime backend hiện tại.
-- `database/`: Script SQL khởi tạo và seed dữ liệu.
-- `docs/`: Tài liệu kỹ thuật và API.
-- `infra/`: Cấu hình hạ tầng (ví dụ Nginx).
+## Project Structure
+- **`backend/`**: Spring Boot API + toàn bộ frontend (HTML, CSS, JS) được đặt trong thư mục `src/main/resources/static/` và được serve trực tiếp bởi backend.
+- **`database/`**: Script SQL khởi tạo và seed dữ liệu.
+- **`docs/`**: Tài liệu kỹ thuật và API.
+- **`infra/`**: Cấu hình hạ tầng (ví dụ Nginx).
 
 ## Cấu trúc thư mục chi tiết
 
@@ -29,43 +28,13 @@ HotelM/
 │   │   │       └── security/
 │   │   │
 │   │   └── resources/
-│   │       ├── static/        
+│   │       ├── static/          # Chứa toàn bộ source code Frontend (HTML, JS, CSS)
+│   │       │   ├── assets/      # Ảnh, CSS...
+│   │       │   ├── script/      # JavaScript files
+│   │       │   └── *.html       # Các trang giao diện (index.html, bookings.html...)
 │   │       └── application.yml
 │   │
 │   └── test/                 
-│
-├── frontend/
-│   ├── components/
-│   │   ├── app-shell/
-│   │   └── chatbox/
-│   │
-│   ├── core/
-│   │   ├── api/
-│   │   ├── guards/
-│   │   └── store/
-│   │
-│   ├── features/
-│   │   ├── about/
-│   │   ├── account/
-│   │   ├── admin/
-│   │   ├── auth/
-│   │   ├── booking/
-│   │   ├── contact/
-│   │   ├── dashboard/
-│   │   ├── home/
-│   │   ├── offer/
-│   │   ├── payment/
-│   │   ├── refund/
-│   │   ├── restaurant/
-│   │   ├── review/
-│   │   ├── room/
-│   │   ├── search/
-│   │   ├── service/
-│   │   ├── villa/
-│   │   └── wedding/
-│   │
-│   ├── images/
-│   └── index.html
 │
 ├── database/
 │   ├── init-db.sql
@@ -79,7 +48,6 @@ HotelM/
 ```
 
 ## Quick Start
-
 Chạy backend từ thư mục `backend/`:
 
 ```powershell
@@ -87,15 +55,12 @@ Set-Location backend
 .\mvnw.cmd spring-boot:run
 ```
 
-Hoặc chạy từ root bằng Maven module:
+Hoặc chạy từ thư mục root bằng Maven module:
 
 ```powershell
 .\backend\mvnw.cmd -f .\backend\pom.xml spring-boot:run
 ```
 
 ## Notes
-
-- Điểm vào ứng dụng vẫn là `backend/src/main/java/org/example/hotelm/HotelMApplication.java`.
-- `frontend/` là không gian tổ chức lại code UI theo hướng chuyên nghiệp, có thể gắn pipeline build/copy sau.
-
-# CNJAVA
+- Điểm vào ứng dụng (entry point) là `backend/src/main/java/org/example/hotelm/HotelMApplication.java`.
+- CNJAVA
